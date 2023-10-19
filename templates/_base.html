@@ -7,13 +7,16 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
+
+    <!-- JS -->
+    <script src="{{ url_for('static', path='js/htmx.min.js') }}"></script>
 </head>
 <body>
     <header>
         <h1>{% block header %}Default Header{% endblock %}</h1>
     </header>
 
-    <main class="w-80 mx-auto">
+    <main class="w-8/12 mx-auto">
         {% block content %}{% endblock %}
     </main>
 

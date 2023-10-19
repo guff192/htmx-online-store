@@ -547,6 +547,6 @@ video {
   display: block;
 }
 
-.w-80 {
-  width: 20rem;
+.w-8\/12 {
+  width: 66.666667%;
 }

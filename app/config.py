@@ -1,5 +1,11 @@
+from pathlib import Path
+
 from pydantic import Field
 from pydantic_settings import BaseSettings
+
+
+ROOT_DIR = Path(__file__).parent.parent
+
 
 class Settings(BaseSettings):
     # make this singleton for preventing multiple instances
@@ -18,7 +24,8 @@ class Settings(BaseSettings):
     host: str = Field(default='0.0.0.0', alias='HOST')
     port: int = Field(default=42069, alias='PORT')
 
-    DB_URL: str = Field(default='sqlite:///../db.sqlite3')
+    static_dir: Path = Field(default=ROOT_DIR / 'static', alias='STATIC_DIR')
+    db_url: str = Field(default='sqlite:///./db.sqlite3', alias='DB_URL')
 
 
 def print_settings():

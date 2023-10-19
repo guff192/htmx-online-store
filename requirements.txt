@@ -2,4 +2,6 @@ fastapi
 uvicorn
 pydantic-settings
 SQLAlchemy
+Jinja2
+watchfiles
 

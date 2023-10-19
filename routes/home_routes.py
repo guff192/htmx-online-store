@@ -8,10 +8,13 @@ router = APIRouter(prefix='', tags=['Home'])
 templates = Jinja2Templates(directory='templates')
 
 
+@router.get('/')
+def root():
+    return RedirectResponse('/home', status_code=status.HTTP_301_MOVED_PERMANENTLY)
+
+
 @router.get('/home', response_class=HTMLResponse, name='home')
 def home(request: Request):
     return templates.TemplateResponse('home.html', {'request': request})
 
-@router.get('/')
-def root(request: Request):
-    return RedirectResponse('/home', status_code=status.HTTP_301_MOVED_PERMANENTLY)
+

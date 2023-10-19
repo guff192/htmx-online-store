@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     port: int = Field(default=42069, alias='PORT')
 
     static_dir: Path = Field(default=ROOT_DIR / 'static', alias='STATIC_DIR')
+    templates_dir: Path = Field(default=ROOT_DIR / 'templates', alias='TEMPLATES_DIR')
     db_url: str = Field(default='sqlite:///./db.sqlite3', alias='DB_URL')
 
 

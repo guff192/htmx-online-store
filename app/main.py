@@ -61,7 +61,8 @@ def run(app: FastAPI | str = 'app.main:app') -> None:
         app,
         host=settings.host, port=settings.port,
         reload=settings.debug,
-        reload_includes=str(settings.static_dir),
+        reload_includes='*.html',
+        reload_dirs=[str(settings.templates_dir), str(settings.static_dir)],
     )
 
 if __name__ == '__main__':

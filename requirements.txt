@@ -4,4 +4,7 @@ pydantic-settings
 SQLAlchemy
 Jinja2
 watchfiles
-
+python-multipart
+loguru
+google-auth
+requests

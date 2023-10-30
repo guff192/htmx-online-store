@@ -12,8 +12,17 @@ class ProductRepository:
     def get_all(self) -> list[Product]:
         return self.db.query(Product).all()
 
+    def get_by_id(self, product_id: int) -> Product | None:
+        return self.db.query(Product).get(product_id)
 
-def get_product_repository(db: Session = Depends(db_dependency)):
+
+def product_repository_dependency(db: Session = Depends(db_dependency)):
     repo = ProductRepository(db)
     yield repo
+
+
+def test_product_repository():
+    session = next(db_dependency())
+    repo = ProductRepository(session)
+    print(repo.get_by_id(2).__dict__)
 

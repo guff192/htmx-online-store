@@ -1,3 +1,4 @@
+from loguru import logger
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -7,7 +8,7 @@ from app.config import Settings
 
 settings = Settings()
 
-engine = create_engine(settings.db_url)
+engine = create_engine(url=settings.db_url)
 
 Base = declarative_base()
 Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
@@ -16,15 +17,19 @@ Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 def db_dependency():
     try:
         db = Session()
-        yield db
     except Exception as e:
-        print(f'Error establishing db session: {e}')
-    else:
+        logger.error(f'Error establishing db session:')
+        raise e
+
+    try:
+        yield db
+    finally:
         db.close()
 
 
+
 def get_db():
-    db = Session()
+    db = next(db_dependency())
     return db
 
 

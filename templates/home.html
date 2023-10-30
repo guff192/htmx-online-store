@@ -2,11 +2,18 @@
 
 {% block title %}Home{% endblock %}
 
-{% block header %}Home{% endblock %}
+{% block header %}
+<h1 id="page-header" class="text-4xl font-bold text-center mb-5 mt-2">Home Page</h1>
+
+{% endblock %}
 
 {% block content %}
-    <h1>Home Page</h1>
-    <div id="products">
+    <div id="content" class="container text-center">
+        <p>
+            Добро пожаловать{% if user %}, <span class="font-bold">{{ user.name }}</span>,{% endif %} ну и т.д.<br/>
+            Здесь вы можете найти БУ корпоративные ноутбуки в замечательном состоянии и по привлекательной цене.
+        </p>
+
     </div>
 {% endblock %}
 

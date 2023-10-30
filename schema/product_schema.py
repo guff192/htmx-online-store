@@ -1,4 +1,10 @@
+from typing import Any
 from pydantic import BaseModel
+
+from schema import SchemaUtils
+
+
+utils = SchemaUtils()
 
 
 class ProductBase(BaseModel):
@@ -10,9 +16,19 @@ class ProductBase(BaseModel):
 class Product(ProductBase):
     id: int
 
+    @property
+    def absolute_url(self) -> str:
+        return f'/products/{self.id}'
+
+    @utils.add_shop_to_context
+    def build_context(self) -> dict[str, Any]:
+        return {'product': self}
+
 
 class ProductList(BaseModel):
     products: list[Product]
 
-    def get_context(self):
-        return self.model_dump()
+    @utils.add_shop_to_context
+    def build_context(self) -> dict[str, Any]:
+        return {'products': self.products}
+

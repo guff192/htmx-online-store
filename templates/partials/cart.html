@@ -1,0 +1,21 @@
+{% if request.headers.get('hx-request') %}
+
+<script>
+    // Replace page header text
+    var pageHeader = document.getElementById('page-header');
+    pageHeader.innerText = '{{ user.name }}\'s Cart'
+    pageHeader.classList.remove('uppercase');
+</script>
+
+{% endif %}
+
+{% if products %}
+<div id="cart" class="md:grid md:grid-cols-3 md:gap-3">
+    {% for product in products %}
+    {% include 'partials/product_card.html' %}
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-center font-bold">No products in cart</p>
+{% endif %}
+

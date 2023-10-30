@@ -14,3 +14,7 @@ ENV/
 *.sqlite3
 db.sqlite3
 *.db
+
+# Auto-generated files
+__pycache__/
+static/css/main.css

@@ -1,6 +1,6 @@
 from fastapi import Depends
 
-from repository.product_repository import ProductRepository, get_product_repository
+from repository.product_repository import ProductRepository, product_repository_dependency
 from models.product import Product
 
 
@@ -11,8 +11,11 @@ class ProductService:
     def get_all(self) -> list[Product]:
         return self.repo.get_all()
 
+    def get_by_id(self, product_id: int) -> Product:
+        return self.repo.get_by_id(product_id)
 
-def get_product_service(product_repo: ProductRepository = Depends(get_product_repository)):
+
+def product_service_dependency(product_repo: ProductRepository = Depends(product_repository_dependency)):
     service = ProductService(product_repo)
     yield service
 

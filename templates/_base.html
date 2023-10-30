@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Default Title{% endblock %}</title>
+    <title>{% block title %}{{shop.name}}{% endblock %}</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
@@ -12,11 +12,15 @@
     <script src="{{ url_for('static', path='js/htmx.min.js') }}"></script>
 </head>
 <body>
-    <header>
-        <h1>{% block header %}Default Header{% endblock %}</h1>
+    {% block navbar %}
+        {% include 'partials/navbar.html' %}
+    {% endblock %}
+
+    <header class="mt-1">
+        {% block header %}<h1 id="page-header">Default Header</h1>{% endblock %}</h1>
     </header>
 
-    <main class="w-8/12 mx-auto">
+    <main id="content" class="w-8/12 mx-auto mt-1">
         {% block content %}{% endblock %}
     </main>
 

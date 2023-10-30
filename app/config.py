@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from loguru import logger
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
@@ -28,17 +29,15 @@ class Settings(BaseSettings):
     templates_dir: Path = Field(default=ROOT_DIR / 'templates', alias='TEMPLATES_DIR')
     db_url: str = Field(default='sqlite:///./db.sqlite3', alias='DB_URL')
 
+    shop_name: str = Field(default='Shop name', alias='SHOP_NAME')
 
-def print_settings():
+    # google settings
+    google_oauth2_token_uri: str = Field(default='https://oauth2.googleapis.com/token', alias='GOOGLE_OAUTH2_TOKEN_URI')
+    google_oauth2_client_id: str = Field(default='', alias='GOOGLE_OAUTH2_CLIENT_ID')
+
+
+def log_settings():
     settings = Settings().model_dump()
-    print('Settings:\n{')
-    for setting, value in settings.items():
-        print(f'\t{setting}: {value}')
-
-    print('}')
-
-    
-if Settings().debug:
-    print(f'\n{"="*20} DEBUG MODE {"="*20}')
-    print_settings()
+    logger.debug(f'\n{"="*20} DEBUG MODE {"="*20}')
+    logger.debug(settings)
 

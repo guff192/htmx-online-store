@@ -1,0 +1,14 @@
+<script type="text/javascript" async>
+    var pageHeader = document.getElementById('page-header');
+    pageHeader.innerText = 'Products catalog'
+    pageHeader.classList.add('uppercase');
+</script>
+
+<div id="products" class="md:grid md:grid-cols-3 md:gap-3">
+    {% for product in products %}
+
+    {% include 'partials/product_card.html' %}
+
+    {% endfor %}
+</div>
+

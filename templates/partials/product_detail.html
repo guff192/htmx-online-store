@@ -1,0 +1,22 @@
+{% if request.headers.get('hx-request') %}
+
+<script>
+    // Replace page header text
+    var pageHeader = document.getElementById('page-header');
+    pageHeader.innerText = '{{ product.name }}'
+    pageHeader.classList.remove('uppercase');
+</script>
+
+{% endif %}
+
+<div id="product{{ product.id }}detail" class="border rounded flex justify-around w-full h-full p-3 text-center">
+    <div id="product{{ product.id }}description" class="grow w-full h-full p-1 text-center">
+        <p>
+            {{ product.description.replace('\n', '<br>') | safe }}
+        </p>
+    </div>
+    <div id="product{{ product.id }}price" class="border rounded w-min h-full p-1 ml-3 text-center">
+        <strong>{{ product.price }}₽</strong>
+    </div>
+</div>
+

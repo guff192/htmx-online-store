@@ -1,9 +1,17 @@
 from typing import Any
+
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from schema.product_schema import ProductList
+from loguru import logger
 
+from schema.product_schema import (
+    Product,
+    ProductList,
+    ProductUpdate,
+    ProductUpdateResponse,
+)
+from services.product_service import ProductService, product_service_dependency
 from viewmodels.product_viewmodel import ProductViewModel, product_viewmodel_dependency
 
 
@@ -25,6 +33,16 @@ def get_all_products(
         return templates.TemplateResponse('partials/product_list.html', context=context_data)
 
     return templates.TemplateResponse('catalog.html', context=context_data)
+
+
+@router.put('')
+def update_product_by_name(
+    product_update: ProductUpdate,
+    product_service: ProductService = Depends(product_service_dependency),
+) -> ProductUpdateResponse:
+    logger.debug(product_update)
+    updated_product_id = product_service.update_by_name(product_update)
+    return updated_product_id
 
 
 @router.get('/{product_id}', response_class=HTMLResponse)

@@ -14,6 +14,40 @@ class ProductRepository:
 
     def get_by_id(self, product_id: int) -> Product | None:
         return self.db.query(Product).get(product_id)
+    
+    def get_by_name(self, name: str) -> Product | None:
+        return self.db.query(Product).filter(Product.name == name).first()
+
+    def search(self, name: str) -> list[Product]:
+        return self.db.query(Product).\
+                filter(Product.name.like(f'%{name}%')).all()
+
+    def create(self,
+               name: str,
+               description: str,
+               price: int) -> Product:
+        product = Product(name=name, description=description, price=price)
+        self.db.begin(nested=True)
+        self.db.add(product)
+        self.db.commit()
+        self.db.refresh(product)
+        return product
+
+    def update(self,
+               id: int,
+               name: str,
+               description: str,
+               price: int) -> int | None:
+
+        self.db.begin(nested=True)
+        updated_id = self.db.query(Product).filter(Product._id == id).update({
+            'name': name,
+            'description': description,
+            'price': price
+        })
+        self.db.commit()
+
+        return updated_id
 
 
 def product_repository_dependency(db: Session = Depends(db_dependency)):

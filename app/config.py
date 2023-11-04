@@ -26,14 +26,28 @@ class Settings(BaseSettings):
     port: int = Field(default=42069, alias='PORT')
 
     static_dir: Path = Field(default=ROOT_DIR / 'static', alias='STATIC_DIR')
-    templates_dir: Path = Field(default=ROOT_DIR / 'templates', alias='TEMPLATES_DIR')
+    templates_dir: Path = Field(
+        default=ROOT_DIR
+        / 'templates', alias='TEMPLATES_DIR'
+    )
     db_url: str = Field(default='sqlite:///./db.sqlite3', alias='DB_URL')
 
     shop_name: str = Field(default='Shop name', alias='SHOP_NAME')
 
     # google settings
-    google_oauth2_token_uri: str = Field(default='https://oauth2.googleapis.com/token', alias='GOOGLE_OAUTH2_TOKEN_URI')
-    google_oauth2_client_id: str = Field(default='', alias='GOOGLE_OAUTH2_CLIENT_ID')
+    google_oauth2_token_uri: str = Field(
+        default='https://oauth2.googleapis.com/token',
+        alias='GOOGLE_OAUTH2_TOKEN_URI'
+    )
+    google_oauth2_client_id: str = Field(
+        default='',
+        alias='GOOGLE_OAUTH2_CLIENT_ID'
+    )
+
+    posting_endpoint: str = Field(
+        default='',
+        alias='POSTING_ENDPOINT'
+    )
 
 
 def log_settings():

@@ -15,11 +15,6 @@ from models.product import Manufacturer, Product
 from models.user import User
 from services.auth_service import GoogleOAuthService, get_oauth_service
 from viewmodels.user_viewmodel import UserViewModel, get_user_viewmodel
-from viewmodels.user_viewmodel import get_user_viewmodel
-from viewmodels.user_viewmodel import get_user_viewmodel
-from viewmodels.user_viewmodel import get_user_viewmodel
-from viewmodels.user_viewmodel import get_user_viewmodel
-from viewmodels.user_viewmodel import get_user_viewmodel
 
 
 # ---------------------------------------------------------

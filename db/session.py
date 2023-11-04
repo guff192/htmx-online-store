@@ -20,7 +20,6 @@ def db_dependency():
     except Exception as e:
         logger.error(f'Error establishing db session:')
         raise e
-
     try:
         yield db
     finally:

@@ -16,16 +16,12 @@ class ProductViewModel:
 
         for orm_product in products:
             product_dict = orm_product.__dict__
-            _id = product_dict.get('_id', 0)
-            name: str = product_dict.get('name', '')
-            description: str = product_dict.get('description', '')
-            price = product_dict.get('price', 0)
 
             product_list.products.append(Product(
-                id=_id,
-                name=name,
-                description=description,
-                price=price
+                id=product_dict.get('_id', 0),
+                name=product_dict.get('name', ''),
+                description=product_dict.get('description', ''),
+                price=product_dict.get('price', 0)
             ))
         return product_list
 
@@ -35,16 +31,11 @@ class ProductViewModel:
             return None
 
         product_dict = orm_product.__dict__
-        _id = product_dict.get('_id', 0)
-        name = str(product_dict.get('name', ''))
-        description = str(product_dict.get('description', ''))
-        price = product_dict.get('price', 0) 
-
         return Product(
-            id=_id,
-            name=name,
-            description=description,
-            price=price
+            id=product_dict.get('_id', 0),
+            name=product_dict.get('name', ''),
+            description=product_dict.get('description', ''),
+            price=product_dict.get('price', 0)
         )
 
 

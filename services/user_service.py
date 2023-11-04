@@ -13,11 +13,11 @@ class UserService:
     def __init__(self, user_repo: UserRepository) -> None:
        self.repo = user_repo
 
-    def _get_by_google_id(self, google_id: str) -> User:
+    def _get_by_google_id(self, google_id: str) -> User | None:
         return self.repo.get_by_google_id(google_id)
 
-    def get_by_google_id_or_create(self, user: UserCreateGoogle) -> User:
-        if not user.verify():
+    def get_by_google_id_or_create(self, user_create: UserCreateGoogle) -> User:
+        if not user_create.verify():
             # INFO: From here...
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -25,14 +25,14 @@ class UserService:
             )
             # TODO: Change this to custom exception
             
-        user = self._get_by_google_id(user.google_id)
+        user: User = self._get_by_google_id(user_create.google_id)
         if user is not None:
             return user
 
-        user = self.repo.create(
-            name=user.name,
-            profile_img_url=user.profile_img_url,
-            google_id=user.google_id
+        user: User = self.repo.create(
+            name=user_create.name,
+            profile_img_url=user_create.profile_img_url,
+            google_id=user_create.google_id
         )
 
         return user

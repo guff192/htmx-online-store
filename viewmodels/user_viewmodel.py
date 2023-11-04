@@ -19,20 +19,13 @@ class UserViewModel:
 
     def _parse_user_create_google_schema(self, google_user_id_info: Mapping[str, Any]) -> UserCreateGoogle | None:
         try:
-            user_google_id = str(google_user_id_info.get('sub', None))
-            user_name = str(google_user_id_info.get('name', ''))
-            user_profile_img_url = str(google_user_id_info.get('picture'))
-            user_email = str(google_user_id_info.get('email', False))
-            user_email_verified = bool(google_user_id_info.get('email_verified', False))
-            user_hd = str(google_user_id_info.get('hd', ''))
-
             user_schema = UserCreateGoogle(
-                google_id=user_google_id,
-                name=user_name,
-                profile_img_url=user_profile_img_url,
-                email=user_email,
-                email_verified=user_email_verified,
-                hd=user_hd,
+                google_id=str(google_user_id_info.get('sub', None)),
+                name=str(google_user_id_info.get('name', '')),
+                profile_img_url=str(google_user_id_info.get('picture')),
+                email=str(google_user_id_info.get('email', False)),
+                email_verified=bool(google_user_id_info.get('email_verified', False)),
+                hd=str(google_user_id_info.get('hd', '')),
             )
 
             return user_schema
@@ -40,8 +33,11 @@ class UserViewModel:
             logger.debug(f'Error parsing user schema: {e}')
             return None
     
-    def get_by_google_id_or_create(self, google_user_id_info: Mapping[str, Any]) -> UserBase:
-        user_schema: UserCreateGoogle | None = self._parse_user_create_google_schema(google_user_id_info)
+    def get_by_google_id_or_create(
+        self,
+        google_user_id_info: Mapping[str, Any]
+    ) -> UserBase:
+        user_schema = self._parse_user_create_google_schema(google_user_id_info)
         if not user_schema:
             raise HTTPException(status_code=401, detail='Invalid Google ID')
             # TODO: Change this to custom exception
@@ -50,8 +46,10 @@ class UserViewModel:
         return user
 
 
-def user_viewmodel_dependency(user_service: UserService = Depends(user_service_dependency),
-                              auth_service: GoogleOAuthService = Depends(google_oauth_service_dependency)):
+def user_viewmodel_dependency(
+    user_service: UserService = Depends(user_service_dependency),
+    auth_service: GoogleOAuthService = Depends(google_oauth_service_dependency)
+):
     vm = UserViewModel(user_service, auth_service)
     yield vm
 

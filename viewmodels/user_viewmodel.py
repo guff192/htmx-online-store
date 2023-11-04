@@ -36,7 +36,8 @@ class UserViewModel:
             )
 
             return user_schema
-        except:
+        except Exception as e:
+            logger.debug(f'Error parsing user schema: {e}')
             return None
     
     def get_by_google_id_or_create(self, google_user_id_info: Mapping[str, Any]) -> UserBase:

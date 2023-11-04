@@ -25,5 +25,3 @@ class Manufacturer(Base):
 
     # products = relationship('Product', back_populates='manufacturer')
 
-
-

@@ -13,7 +13,8 @@ from wtforms.fields import TextAreaField
 from db.session import get_db
 from models.product import Manufacturer, Product
 from models.user import User
-from services.auth_service import GoogleOAuthService, get_oauth_service
+from schema.user_schema import UserBase
+from services.auth_service import AuthService, get_auth_service
 from viewmodels.user_viewmodel import UserViewModel, get_user_viewmodel
 
 
@@ -26,7 +27,8 @@ class ProductModelView(ModelView):
     can_delete = True
     can_create = True
 
-    column_details_list: list[str] = ['name', 'description', 'price', 'manufacturer.name']
+    column_details_list: list[str] = [
+        'name', 'description', 'price', 'manufacturer.name']
     column_editable_list: list[str] = ['price']
     form_columns: list[str] = ['name', 'description', 'price', 'manufacturer_id']
 
@@ -72,7 +74,7 @@ class AdminMiddleware(BaseHTTPMiddleware):
         app,
         admin_path: str = '/admin',
         user_viewmodel: UserViewModel = get_user_viewmodel(),
-        auth_service: GoogleOAuthService = get_oauth_service(),
+        auth_service: AuthService = get_auth_service(),
     ) -> None:
         super().__init__(app)
         self.admin_path = admin_path
@@ -88,16 +90,18 @@ class AdminMiddleware(BaseHTTPMiddleware):
             logger.debug('No credential')
             return False
 
-        id_info = self._service.verify_google_oauth2(credential)
+        user: UserBase = self._service.verify_session_credentials(credential)
 
-        user = self._vm.get_by_google_id_or_create(id_info)
         if user.is_admin:
             return True
         return False
 
-    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+    async def dispatch(
+        self,
+        request: Request,
+        call_next: RequestResponseEndpoint
+    ) -> Response:
         client, path = request.client, request.url.path
-        logger.debug(path)
 
         if self.admin_path not in path:
             return await call_next(request)
@@ -115,7 +119,7 @@ def get_admin_app(session: Session = get_db()) -> ASGIApp:
     flask_app = Flask(__name__)
     flask_app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
     flask_app.config['SECRET_KEY'] = 'secret_key'
-     
+
     flask_admin = Admin(flask_app, url='/')
     flask_admin.add_view(ProductModelView(Product, session))
     flask_admin.add_view(ManufacturerModelView(Manufacturer, session))

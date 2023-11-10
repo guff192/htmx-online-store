@@ -1,10 +1,6 @@
 from pydantic import BaseModel
 
 
-class UserGoogleCredential(BaseModel):
-    credential: str
-
-
 class UserBase(BaseModel):
     name: str
     profile_img_url: str
@@ -25,4 +21,3 @@ class UserCreateGoogle(UserBase):
             return True
 
         return False
-

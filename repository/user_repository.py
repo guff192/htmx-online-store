@@ -20,9 +20,11 @@ class UserRepository:
                name: str,
                profile_img_url: str|None,
                google_id: str|None) -> User | None:
+        # Check if at least one of necessary fields is not None
         if not any((google_id,)):
             return None
 
+        # Create user using given data
         if google_id:
             logger.debug(f'Creating user with google_id: {google_id}')
             user = User(
@@ -33,6 +35,7 @@ class UserRepository:
             self.db.add(user)
             self.db.commit()
             self.db.refresh(user)
+        # elif apple_id:
         else:
             return None
 

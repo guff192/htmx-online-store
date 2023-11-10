@@ -48,7 +48,10 @@ class Settings(BaseSettings):
         default='',
         alias='POSTING_ENDPOINT'
     )
-
+    google_client_secret: str = Field(
+        default='',
+        alias='GOOGLE_CLIENT_SECRET'
+    )
 
 def log_settings():
     settings = Settings().model_dump()

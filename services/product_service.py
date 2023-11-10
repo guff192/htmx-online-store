@@ -1,4 +1,5 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
+from exceptions.product_exceptions import ErrInvalidProduct, ErrProductNotFound
 
 from models.product import Product
 from repository.product_repository import (
@@ -28,45 +29,26 @@ class ProductService:
 
     def update_by_name(self, product_update: ProductUpdate) -> ProductUpdateResponse:
         if not product_update.validate():
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='Invalid product data'
-            )
-            # TODO: Change this to custom exception
+            raise ErrInvalidProduct()
 
         found_product = self.repo.get_by_name(product_update.name)
         if not found_product:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail='Product not found'
-            )
-            # TODO: Change this to custom exception
+            raise ErrProductNotFound()
 
         updated_product_id = self.repo.update(
-            id=found_product._id,
-            **product_update.dict()
+            id=found_product.__dict__['_id'],
+            **product_update.model_dump()
         )
         if not updated_product_id:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='Invalid product data'
-            )
-            # TODO: Change this to custom exception
-
+            raise ErrInvalidProduct()
         return ProductUpdateResponse(count=updated_product_id)
-
-        
 
     def search(self, name: str) -> list[Product]:
         return self.repo.search(name)
 
     def create(self, product_create: ProductCreate) -> ProductSchema:
         if not product_create.validate():
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='Invalid product data'
-            )
-            # TODO: Change this to custom exception
+            raise ErrInvalidProduct()
 
         found_product = self.repo.get_by_name(product_create.name)
         if found_product:
@@ -81,7 +63,9 @@ class ProductService:
         return ProductSchema(id=created_product['_id'], **created_product)
 
 
-def product_service_dependency(product_repo: ProductRepository = Depends(product_repository_dependency)):
+def product_service_dependency(
+        product_repo: ProductRepository = Depends(product_repository_dependency)
+):
     service = ProductService(product_repo)
     yield service
 

@@ -10,3 +10,4 @@ loguru
 google-auth
 requests
 python-jose[cryptography]
+boto3

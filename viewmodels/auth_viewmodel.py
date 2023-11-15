@@ -21,6 +21,9 @@ class AuthViewModel:
 
         return self.auth_service.verify_oauth(credentials)
 
+    def create_session(self, data: dict) -> str:
+        return self.auth_service.create_access_token(data)
+
 
 def auth_viewmodel_dependency(auth_service: AuthService = Depends(AuthService)):
     vm = AuthViewModel(auth_service)

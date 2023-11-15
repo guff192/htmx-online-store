@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from loguru import logger
 
 from schema.auth_schema import GoogleLoginForm, GoogleOAuthCredentials
-from schema.user_schema import UserBase
+from schema.user_schema import UserBase, UserResponse
 from services.auth_service import (
     AuthService,
     auth_service_dependency,
@@ -43,7 +43,7 @@ def google_oauth_user_dependency(
         return
 
     try:
-        user: UserBase = auth_service.verify_session_credentials(credential)
+        user: UserBase = auth_service.verify_session_token(credential)
     except Exception as e:
         logger.debug(f"Failed google authentication: {e}")
         yield None
@@ -82,15 +82,16 @@ def login_with_google_account(
     if not id_info:
         raise ErrWrongCredentials()
 
-    user: UserBase = user_vm.get_by_google_id_or_create(id_info)
+    user: UserResponse = user_vm.get_by_google_id_or_create(id_info)
+    token = auth_vm.create_session({'sub': str(user.id)})
 
     response = RedirectResponse(
         "/home",
         status_code=status.HTTP_302_FOUND,
     )
     response.set_cookie(
-        key="credential",
-        value=user_google_credential.form_data.credential,
+        key="_session",
+        value=token,
         httponly=True,
         samesite="strict",
     )
@@ -105,3 +106,4 @@ def process_logout():
     )
     response.delete_cookie("credential")
     return response
+

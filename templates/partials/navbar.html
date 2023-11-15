@@ -3,13 +3,13 @@
         <p class="text-2xl font-bold w-5/12 h-min p-2 self-center text-center"><a hx-boost="false" href="/">{{ shop.name }}</a></p>
         <menu class="grow flex justify-evenly">
             <a href="/products" hx-target="#content"><div class="p-4">Products</div></a>
-                {% if user %}
+                {% if request.state.user %}
             <a href="/cart" hx-target="#content"><div class="p-4">Cart</div></a>
             {% endif %}
         </menu>
         <div class="border-2 border-white rounded flex justify-evenly">
-            {% if user %}
-                {% if user.is_admin %}
+            {% if request.state.user %}
+                {% if request.state.user.is_admin %}
                     <a href="/admin" hx-boost="false"><div class="p-4">Admin</div></a>
                 {% endif %}
                 <a href="/auth/logout" hx-post="/auth/logout"><div class="p-4">Logout</div></a>

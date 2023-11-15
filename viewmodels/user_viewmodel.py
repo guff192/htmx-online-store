@@ -1,11 +1,12 @@
 from typing import Any, Mapping
 
 from fastapi import Depends
-from schema.user_schema import UserBase
+
+from schema.user_schema import UserResponse
 from services.user_service import (
     UserService,
     get_user_service,
-    user_service_dependency
+    user_service_dependency,
 )
 
 
@@ -15,8 +16,8 @@ class UserViewModel:
 
     def get_by_google_id_or_create(
         self, id_info: Mapping[str, Any]
-    ) -> UserBase:
-        user: UserBase = self.user_service.get_or_create_by_google_id(id_info)
+    ) -> UserResponse:
+        user: UserResponse = self.user_service.get_or_create_by_google_id(id_info)
         return user
 
 

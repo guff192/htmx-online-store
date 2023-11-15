@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from fastapi import Depends
 from exceptions.product_exceptions import ErrInvalidProduct, ErrProductNotFound
 
@@ -12,6 +13,16 @@ from schema.product_schema import (
     ProductUpdate,
     ProductUpdateResponse,
 )
+
+
+class ProductPhotoStorage:
+    def __init__(self, credentials: Mapping[str, str]) -> None:
+        raise NotImplementedError
+
+
+class S3ProductPhotoStorage(ProductPhotoStorage):
+    def __init__(self, s3_credentians: Mapping[str, str]) -> None:
+        pass
 
 
 class ProductService:

@@ -7,15 +7,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
-from app.admin import AdminMiddleware, get_admin_app
+from app.admin import get_admin_app
 from app.config import Settings, log_settings
 from db import init_db
 from db.session import get_db
 from initial_setup import fetch_and_load_products
+from middleware.auth_middleware import AdminMiddleware, LoginMiddleware
 from routes.auth_routes import router as auth_router
 from routes.cart_routes import router as cart_router
 from routes.home_routes import router as home_router
 from routes.product_routes import router as product_router
+from services.auth_service import get_auth_service
 
 
 settings = Settings()
@@ -55,6 +57,9 @@ async def lifecycle(app: FastAPI):
 def get_app() -> FastAPI:
     app = FastAPI(lifespan=lifecycle)
 
+    # ==========
+    # Middleware
+    # ==========
     # allow CORS
     app.add_middleware(
         CORSMiddleware,
@@ -65,11 +70,19 @@ def get_app() -> FastAPI:
     )
 
     app.add_middleware(AdminMiddleware, admin_path='/admin')
+
+    app.add_middleware(LoginMiddleware, auth_service=get_auth_service())
+
+    # ============
+    # Mounted apps
+    # ============
     app.mount('/admin', get_admin_app(), name='admin')
 
     app.mount('/static', StaticFiles(directory=settings.static_dir), name='static')
 
-    # include all routers
+    # =======
+    # Routers
+    # =======
     app.include_router(auth_router)
     app.include_router(product_router)
     app.include_router(home_router)

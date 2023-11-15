@@ -18,13 +18,12 @@ def db_dependency():
     try:
         db = Session()
     except Exception as e:
-        logger.error(f'Error establishing db session:')
+        logger.error(f'Error establishing db session: {e}')
         raise e
     try:
         yield db
     finally:
         db.close()
-
 
 
 def get_db():

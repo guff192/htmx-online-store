@@ -2,9 +2,11 @@ fastapi
 uvicorn
 pydantic-settings
 SQLAlchemy
+sqlalchemy-utils
 Jinja2
 watchfiles
 python-multipart
 loguru
 google-auth
 requests
+python-jose[cryptography]

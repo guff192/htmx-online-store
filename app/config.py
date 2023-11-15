@@ -27,10 +27,15 @@ class Settings(BaseSettings):
 
     static_dir: Path = Field(default=ROOT_DIR / 'static', alias='STATIC_DIR')
     templates_dir: Path = Field(
-        default=ROOT_DIR
-        / 'templates', alias='TEMPLATES_DIR'
+        default=ROOT_DIR / 'templates',
+        alias='TEMPLATES_DIR'
     )
+
     db_url: str = Field(default='sqlite:///./db.sqlite3', alias='DB_URL')
+
+    # JWT
+    jwt_secret: str = Field(default='very strong secret', alias='JWT_SECRET')
+    jwt_algorithm: str = Field(default='HS256', alias='JWT_ALGORITHM')
 
     shop_name: str = Field(default='Shop name', alias='SHOP_NAME')
 
@@ -52,6 +57,14 @@ class Settings(BaseSettings):
         default='',
         alias='GOOGLE_CLIENT_SECRET'
     )
+
+    # storage settings
+    aws_access_key_id: str = Field(default='', alias='AWS_ACCESS_KEY_ID')
+    aws_secret_access_key: str = Field(
+        default='',
+        alias='AWS_SECRET_ACCESS_KEY'
+    )
+
 
 def log_settings():
     settings = Settings().model_dump()

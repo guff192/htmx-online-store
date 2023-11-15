@@ -85,12 +85,11 @@ class AdminMiddleware(BaseHTTPMiddleware):
         self,
         request: Request,
     ) -> bool:
-        credential = request.cookies.get('credential')
-        if not credential:
-            logger.debug('No credential')
+        session_cookie = request.cookies.get('_session')
+        if not session_cookie:
             return False
 
-        user: UserBase = self._service.verify_session_credentials(credential)
+        user: UserBase = self._service.verify_session_token(session_cookie)
 
         if user.is_admin:
             return True

@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel
 
 
@@ -6,6 +7,10 @@ class UserBase(BaseModel):
     profile_img_url: str
     google_id: str | None
     is_admin: bool = False
+
+
+class UserResponse(UserBase):
+    id: UUID
 
 
 class UserCreateGoogle(UserBase):

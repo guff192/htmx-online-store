@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 from fastapi import Depends
 from exceptions.product_exceptions import ErrInvalidProduct, ErrProductNotFound
 
@@ -13,21 +12,17 @@ from schema.product_schema import (
     ProductUpdate,
     ProductUpdateResponse,
 )
-
-
-class ProductPhotoStorage:
-    def __init__(self, credentials: Mapping[str, str]) -> None:
-        raise NotImplementedError
-
-
-class S3ProductPhotoStorage(ProductPhotoStorage):
-    def __init__(self, s3_credentians: Mapping[str, str]) -> None:
-        pass
+from storage.photo_storage import ProductPhotoStorage, product_photo_storage_dependency
 
 
 class ProductService:
-    def __init__(self, product_repo: ProductRepository):
+    def __init__(
+            self,
+            product_repo: ProductRepository,
+            photo_storage: ProductPhotoStorage
+    ):
         self.repo = product_repo
+        self.photo_storage = photo_storage
 
     def get_all(self) -> list[Product]:
         return self.repo.get_all()
@@ -37,6 +32,9 @@ class ProductService:
 
     def get_by_name(self, name: str) -> Product:
         return self.repo.get_by_name(name)
+
+    def get_main_photo(self, product_name: str):
+        return self.photo_storage.get_main_photo_by_name(product_name)
 
     def update_by_name(self, product_update: ProductUpdate) -> ProductUpdateResponse:
         if not product_update.validate():
@@ -75,8 +73,9 @@ class ProductService:
 
 
 def product_service_dependency(
-        product_repo: ProductRepository = Depends(product_repository_dependency)
+        product_repo: ProductRepository = Depends(product_repository_dependency),
+        photo_storage: ProductPhotoStorage = Depends(product_photo_storage_dependency),
 ):
-    service = ProductService(product_repo)
+    service = ProductService(product_repo, photo_storage)
     yield service
 

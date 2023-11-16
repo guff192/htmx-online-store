@@ -1,6 +1,7 @@
 from typing import Any
 
 from pydantic import BaseModel
+from pydantic_core import Url
 
 from schema import SchemaUtils
 
@@ -42,6 +43,7 @@ class ProductUpdateResponse(BaseModel):
 
 class Product(ProductBase):
     id: int
+    main_photo_url: Url | None = None
 
     @property
     def absolute_url(self) -> str:

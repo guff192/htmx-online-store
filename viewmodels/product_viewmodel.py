@@ -16,10 +16,13 @@ class ProductViewModel:
 
         for orm_product in products:
             product_dict = orm_product.__dict__
+            product_name = product_dict.get('name', '')
+            main_photo = self.service.get_main_photo(product_name)
 
             product_list.products.append(Product(
                 id=product_dict.get('_id', 0),
-                name=product_dict.get('name', ''),
+                name=product_name,
+                main_photo_url=main_photo,
                 description=product_dict.get('description', ''),
                 price=product_dict.get('price', 0)
             ))

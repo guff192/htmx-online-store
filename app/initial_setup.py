@@ -5,6 +5,7 @@ from app.config import Settings
 from repository.product_repository import ProductRepository
 from schema.product_schema import ProductCreate
 from services.product_service import ProductService
+from storage.photo_storage import S3ProductPhotoStorage
 
 
 settings = Settings()
@@ -17,7 +18,7 @@ def fetch_and_load_products(db: Session):
 
     # Initialize the service and repository
     product_repository = ProductRepository(db)
-    product_service = ProductService(product_repository)
+    product_service = ProductService(product_repository, S3ProductPhotoStorage())
 
     for product_data in data:
         # Validate data using the schema

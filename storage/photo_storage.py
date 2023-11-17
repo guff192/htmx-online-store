@@ -1,11 +1,10 @@
-from collections.abc import Mapping
 from typing import Generator
 
 import boto3
 from loguru import logger
 from pydantic_core import Url
-from app.config import Settings
 
+from app.config import Settings
 from schema.product_schema import ProductPhotoPath
 
 
@@ -45,9 +44,6 @@ class S3ProductPhotoStorage(ProductPhotoStorage):
         )
         self._bucket_name = bucket_name
         self._public_bucket_url = public_bucket_url
-
-        for url in self.get_all_by_name(name='Apple MacBook Pro 16, M1 Pro 10c, 3456x2234, Retina'):
-            logger.debug(str(url))
 
     def get_one(self, product_path: ProductPhotoPath) -> Url:
         return Url(f'{self._public_bucket_url}{product_path.full_path}')

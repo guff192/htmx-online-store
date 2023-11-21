@@ -11,16 +11,17 @@
     <!-- JS -->
     <script src="{{ url_for('static', path='js/htmx.min.js') }}"></script>
 </head>
-<body>
+
+<body class="bg-sky-950">
     {% block navbar %}
         {% include 'partials/navbar.html' %}
     {% endblock %}
 
-    <header class="mt-1">
+    <header class="mt-20">
         {% block header %}<h1 id="page-header">Default Header</h1>{% endblock %}</h1>
     </header>
 
-    <main id="content" class="w-8/12 mx-auto mt-1">
+    <main id="content" class="w-full md:w-8/12 mx-auto mt-1">
         {% block content %}{% endblock %}
     </main>
 
@@ -28,4 +29,5 @@
         {% block footer %}Default Footer{% endblock %}
     </footer>
 </body>
+
 </html>

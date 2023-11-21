@@ -62,7 +62,6 @@ class AdminMiddleware(BaseHTTPMiddleware):
         call_next: RequestResponseEndpoint
     ) -> Response:
         client, path = request.client, request.url.path
-        logger.debug(f'{path = }\n\n')
 
         # Check the path
         if not path.startswith(self.admin_path):

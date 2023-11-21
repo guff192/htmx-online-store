@@ -9,18 +9,18 @@ class ProductRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_all(self) -> list[Product]:
-        return self.db.query(Product).all()
+    def get_all(self, offset: int) -> list[Product]:
+        return self.db.query(Product).slice(offset, offset + 10).all()
 
     def get_by_id(self, product_id: int) -> Product | None:
         return self.db.query(Product).get(product_id)
-    
+
     def get_by_name(self, name: str) -> Product | None:
         return self.db.query(Product).filter(Product.name == name).first()
 
     def search(self, name: str) -> list[Product]:
         return self.db.query(Product).\
-                filter(Product.name.like(f'%{name}%')).all()
+            filter(Product.name.like(f'%{name}%')).all()
 
     def create(self,
                name: str,

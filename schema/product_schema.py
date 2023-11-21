@@ -42,6 +42,7 @@ class ProductUpdateResponse(BaseModel):
 
 class Product(ProductBase):
     id: int
+    photos: list[ProductPhotoPath] = []
 
     @property
     def absolute_url(self) -> str:
@@ -54,8 +55,9 @@ class Product(ProductBase):
 
 class ProductList(BaseModel):
     products: list[Product]
+    offset: int = 0
 
     @utils.add_shop_to_context
     def build_context(self) -> dict[str, Any]:
-        return {'products': self.products}
+        return {'products': self.products, 'offset': self.offset}
 

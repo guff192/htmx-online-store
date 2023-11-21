@@ -9,14 +9,15 @@ from loguru import logger
 
 from app.admin import get_admin_app
 from app.config import Settings, log_settings
+from app.initial_setup import fetch_and_load_products
 from db import init_db
 from db.session import get_db
-from initial_setup import fetch_and_load_products
 from middleware.auth_middleware import AdminMiddleware, LoginMiddleware
 from routes.auth_routes import router as auth_router
 from routes.cart_routes import router as cart_router
 from routes.home_routes import router as home_router
 from routes.product_routes import router as product_router
+from routes.product_photos_routes import router as product_photos_router
 from services.auth_service import get_auth_service
 
 
@@ -46,10 +47,13 @@ async def lifecycle(app: FastAPI):
         print(f'Error running tailwindcss: {e}')
 
     # add loggers
-    # LOGURU_AUTOINIT=False
+    logger.remove()  # remove default logger
     if settings.debug:
-        logger.add(sys.stdout, level='DEBUG', colorize=True, format='[{time:HH:mm:ss}] <level>{level}</level> <cyan>{message}</cyan>')
+        logger.add(sys.stdout, level='DEBUG', colorize=True,
+                   format='[{time:HH:mm:ss}] <level>{level}</level> <cyan>{message}</cyan>')
         log_settings()
+    else:
+        pass  # TODO: Create production logger
 
     yield
 
@@ -85,6 +89,7 @@ def get_app() -> FastAPI:
     # =======
     app.include_router(auth_router)
     app.include_router(product_router)
+    app.include_router(product_photos_router)
     app.include_router(home_router)
     app.include_router(cart_router)
 

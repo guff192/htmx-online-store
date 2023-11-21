@@ -2,6 +2,7 @@ from pathlib import Path
 
 from loguru import logger
 from pydantic import Field
+from pydantic_core import Url
 from pydantic_settings import BaseSettings
 
 
@@ -59,11 +60,17 @@ class Settings(BaseSettings):
     )
 
     # storage settings
+    # s3 settings
     aws_access_key_id: str = Field(default='', alias='AWS_ACCESS_KEY_ID')
     aws_secret_access_key: str = Field(
         default='',
         alias='AWS_SECRET_ACCESS_KEY'
     )
+
+    # custom storage settings
+    cloudflare_account_id: str = Field(default='', alias='CLOUDFLARE_ACCOUNT_ID')
+    bucket_name: str = Field(default='', alias='BUCKET_NAME')
+    public_bucket_url: Url = Field(default='', alias='PUBLIC_BUCKET_URL')
 
 
 def log_settings():

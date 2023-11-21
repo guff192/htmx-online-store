@@ -1,11 +1,20 @@
 {% extends '_base.html' %}
 
+{% block title %}{{ shop.name }} | Catalog{% endblock %}
 
 {% block header %}
-<h1 id="page-header" class="text-4xl font-bold text-center mb-5 mt-2">Products Catalog</h1>
+<h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-5 mt-2">Products Catalog</h1>
 {% endblock %}
 
 
 {% block content %}
-{% include 'partials/product_list.html' %}
+<div id="products" class="md:grid md:grid-cols-3 md:gap-3">
+    <img
+        src="{{ url_for('static', path='images/loading.webp') }}"
+        id="products-loader"
+        hx-trigger="intersect once"
+        hx-get="/products?offset=0"
+        hx-swap="outerHTML"
+        ></img>
+</div>
 {% endblock %}

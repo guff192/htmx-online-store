@@ -1,0 +1,59 @@
+{% if photo_urls %}
+
+{% if photo_urls[1:] %}
+<div class="w-full h-5/6 border border-gray-800 rounded shadow-2xl shadow-indigo-800 md:p-2">
+      <img id="large-photo" src="{{ photo_urls[0] }}" class="mx-auto h-5/6">
+</div>
+
+<div id="small-photos" class="h-1/6 mt-2 flex flex-wrap justify-between md:p-2">
+    <div class="w-1/5 md:w-1/12 h-full p-1 border border-gray-800 rounded shadow-xl shadow-sky-400 transition-all duration-300">
+        <img class="w-full" src="{{ photo_urls[0] }}"/>
+    </div>
+    {% for link in photo_urls[1:] %}
+    <div class="w-1/5 md:w-1/12 h-full p-1 border border-gray-300 shadow-l shadow-gray-800 rounded cursor-pointer transition-all duration-300">
+        <img class="w-full" src="{{ link }}"/>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+
+document.querySelectorAll('#small-photos div').forEach(photo => {
+    photo.addEventListener('click', () => {
+        let largePhoto = document.querySelector('#large-photo'); 
+        let previousSelectedPhoto = document.querySelector('#small-photos div.shadow-xl');
+        let smallPhotoSrc = photo.querySelector('img').getAttribute('src');
+
+        // Change large photo source
+        largePhoto.setAttribute('src', smallPhotoSrc);
+        
+        // Change shadows and borders
+        // Remove previous shadow and border
+        previousSelectedPhoto.classList.remove('shadow-xl');
+        previousSelectedPhoto.classList.remove('shadow-sky-400');
+        previousSelectedPhoto.classList.remove('border-gray-800');
+
+        // Set new shadow and border for previous selected photo
+        previousSelectedPhoto.classList.add('shadow-l');
+        previousSelectedPhoto.classList.add('border-gray-300');
+
+
+        // Set new selected photo shadow and border
+        photo.classList.remove('shadow-l');
+        photo.classList.add('shadow-xl');
+        photo.classList.add('shadow-sky-400');
+
+        photo.classList.remove('border-gray-300');
+        photo.classList.add('border-gray-800');
+
+    });
+});
+</script>
+{% else %}
+<div class="w-full h-5/6 border rounded">
+    <img id="large-photo" src="{{ photo_urls[0] }}" class="self-start">
+</div>
+{% endif %}
+
+{% endif %}
+

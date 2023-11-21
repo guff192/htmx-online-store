@@ -104,6 +104,6 @@ def process_logout():
     response = Response(
         headers={"hx-redirect": "/auth/login"},
     )
-    response.delete_cookie("credential")
+    response.delete_cookie("_session")
     return response
 

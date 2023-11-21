@@ -1,12 +1,13 @@
-<nav class="bg-black text-white" hx-boost="true">
-    <div class="flex justify-between items-center w-8/12 h-16 mx-auto">
+<nav class="bg-black text-white fixed top-0 w-full z-10" hx-boost="true">
+    <div class="flex justify-between items-center w-full md:w-8/12 h-16 mx-auto">
         <p class="text-2xl font-bold w-5/12 h-min p-2 self-center text-center"><a hx-boost="false" href="/">{{ shop.name }}</a></p>
         <menu class="grow flex justify-evenly">
-            <a href="/products" hx-target="#content"><div class="p-4">Products</div></a>
-                {% if request.state.user %}
+            <a href="/products/catalog"><div class="p-4">Products</div></a>
+            {% if request.state.user %}
             <a href="/cart" hx-target="#content"><div class="p-4">Cart</div></a>
             {% endif %}
         </menu>
+
         <div class="border-2 border-white rounded flex justify-evenly">
             {% if request.state.user %}
                 {% if request.state.user.is_admin %}

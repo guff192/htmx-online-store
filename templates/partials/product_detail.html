@@ -1,21 +1,34 @@
-{% if request.headers.get('hx-request') %}
-
 <script>
     // Replace page header text
     var pageHeader = document.getElementById('page-header');
     pageHeader.innerText = '{{ product.name }}'
     pageHeader.classList.remove('uppercase');
+    pageHeader.classList.add('text-indigo-50');
+
+    // Replace page title text
+    document.title = '{{ shop.name }} | {{ product.name }}'
 </script>
 
-{% endif %}
+<div id="product{{ product.id }}photos"
+    class="border-4 border-gray-500 rounded flex flex-col justify-center w-full md:p-3">
+    <div class="w-full h-full border border-gray-800 rounded shadow-2xl shadow-indigo-800">
+        <img
+            src="{{ url_for('static', path='images/loading.webp') }}"
+            class="w-full h-full"
+            hx-trigger="load"
+            hx-get="/photos/all?product_name={{ product.name }}"
+            hx-swap="outerHTML"
+        >
+    </div>
+</div>
 
-<div id="product{{ product.id }}detail" class="border rounded flex justify-around w-full h-full p-3">
-    <div id="product{{ product.id }}description" class="grow w-full h-full p-1 text-left">
+<div id="product{{ product.id }}description" class="border rounded flex justify-around w-full h-full p-3">
+    <div id="product{{ product.id }}description" class="grow w-full h-full p-1 text-left text-indigo-50">
         <p>
             {{ product.description.replace('\n', '<br>') | safe }}
         </p>
     </div>
-    <div id="product{{ product.id }}price" class="border rounded w-min h-full p-1 ml-3 text-center">
+    <div id="product{{ product.id }}price" class="border-l rounded w-min h-full p-1 ml-3 text-center bg-indigo-600 text-white">
         <strong>{{ product.price }}₽</strong>
     </div>
 </div>

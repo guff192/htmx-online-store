@@ -1,6 +1,10 @@
-from fastapi import Depends
-from exceptions.product_exceptions import ErrInvalidProduct, ErrProductNotFound
+import time
 
+from fastapi import Depends
+from loguru import logger
+from pydantic_core import Url
+
+from exceptions.product_exceptions import ErrInvalidProduct, ErrProductNotFound
 from models.product import Product
 from repository.product_repository import (
     ProductRepository,
@@ -9,6 +13,7 @@ from repository.product_repository import (
 from schema.product_schema import (
     Product as ProductSchema,
     ProductCreate,
+    ProductPhotoPath,
     ProductUpdate,
     ProductUpdateResponse,
 )
@@ -24,8 +29,8 @@ class ProductService:
         self.repo = product_repo
         self.photo_storage = photo_storage
 
-    def get_all(self) -> list[Product]:
-        return self.repo.get_all()
+    def get_all(self, offset: int) -> list[Product]:
+        return self.repo.get_all(offset=offset)
 
     def get_by_id(self, product_id: int) -> Product:
         return self.repo.get_by_id(product_id)
@@ -33,8 +38,18 @@ class ProductService:
     def get_by_name(self, name: str) -> Product:
         return self.repo.get_by_name(name)
 
-    def get_main_photo(self, product_name: str):
-        return self.photo_storage.get_main_photo_by_name(product_name)
+    def get_url_by_photo_path(self, photo_path: ProductPhotoPath) -> Url:
+        return self.photo_storage.get_one(photo_path)
+
+    def get_main_photo(self, product_name: str) -> ProductPhotoPath | None:
+        start = time.time()
+        result = self.photo_storage.get_main_photo_by_name(product_name)
+        logger.debug(f'Get main photo time: {time.time() - start}')
+
+        return result
+
+    def get_all_photos_by_name(self, name: str) -> list[ProductPhotoPath]:
+        return self.photo_storage.get_all_by_name(name)
 
     def update_by_name(self, product_update: ProductUpdate) -> ProductUpdateResponse:
         if not product_update.validate():

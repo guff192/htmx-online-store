@@ -18,10 +18,10 @@ class ProductPhotoStorage:
     def get_one(self, product_path: ProductPhotoPath) -> Url:
         raise NotImplementedError
 
-    def get_main_photo_by_name(self, name: str) -> Url:
+    def get_main_photo_by_name(self, name: str) -> ProductPhotoPath | None:
         raise NotImplementedError
 
-    def get_all_by_name(self, name: str) -> list[Url]:
+    def get_all_by_name(self, name: str) -> list[ProductPhotoPath]:
         raise NotImplementedError
 
 
@@ -48,13 +48,13 @@ class S3ProductPhotoStorage(ProductPhotoStorage):
     def get_one(self, product_path: ProductPhotoPath) -> Url:
         return Url(f'{self._public_bucket_url}{product_path.full_path}')
 
-    def get_main_photo_by_name(self, name: str) -> Url | None:
+    def get_main_photo_by_name(self, name: str) -> ProductPhotoPath | None:
         urls = self.get_all_by_name(name=name)
         if not urls:
             return None
         return urls[0]
 
-    def get_all_by_name(self, name: str) -> list[Url]:
+    def get_all_by_name(self, name: str) -> list[ProductPhotoPath]:
         response = self._s3.list_objects_v2(
             Bucket=self._bucket_name,
             Prefix=f'{name}/',
@@ -70,7 +70,7 @@ class S3ProductPhotoStorage(ProductPhotoStorage):
             for product in response['Contents']
         ]
 
-        return [self.get_one(product_path) for product_path in product_photo_paths]
+        return product_photo_paths
 
 
 def product_photo_storage_dependency() -> Generator[ProductPhotoStorage, None, None]:

@@ -10,6 +10,7 @@ class DefaultViewModel:
     def build_context(self) -> dict[str, Any]:
         return self.schema.build_context()
 
+
 def default_viewmodel_dependency():
     vm = DefaultViewModel()
     yield vm

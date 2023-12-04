@@ -1,5 +1,4 @@
 from fastapi import Depends
-from loguru import logger
 from pydantic_core import Url
 
 from schema.product_schema import Product, ProductList, ProductPhotoPath
@@ -58,7 +57,9 @@ class ProductViewModel:
         return self.service.get_main_photo(product_name)
 
 
-def product_viewmodel_dependency(product_service: ProductService = Depends(product_service_dependency)):
+def product_viewmodel_dependency(
+    product_service: ProductService = Depends(product_service_dependency)
+):
     vm = ProductViewModel(product_service)
     yield vm
 

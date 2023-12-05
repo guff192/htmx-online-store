@@ -1,5 +1,4 @@
 from typing import Any, Callable
-from fastapi import Request
 
 from pydantic import BaseModel
 
@@ -15,7 +14,7 @@ class SchemaUtils:
         if not hasattr(cls, 'instance'):
             cls.instance = super(SchemaUtils, cls).__new__(cls)
         return cls.instance
-        
+
     def __init__(self):
         settings = Settings()
         self.shop: Shop = Shop(name=settings.shop_name)

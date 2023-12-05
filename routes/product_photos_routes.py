@@ -1,11 +1,12 @@
 from typing import Any
-from fastapi import APIRouter, Body, Depends, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from exceptions.product_photos_exceptions import ErrProductPhotoNotFound
 from schema.product_schema import ProductPhotoPath
 
-from viewmodels.product_viewmodel import ProductViewModel, product_viewmodel_dependency
+from viewmodels.product_viewmodel import \
+    ProductViewModel, product_viewmodel_dependency
 
 
 router = APIRouter(prefix='/photos', tags=['Photos'])
@@ -19,16 +20,15 @@ def get_one_photo(
     path: str,
     product_vm: ProductViewModel = Depends(product_viewmodel_dependency)
 ):
-    # if not request.headers.get('hx-request'):
-    #     return RedirectResponse('/products/catalog')
-
     photo_path = ProductPhotoPath(file_name=file_name, path=path)
-
     photo_url = product_vm.get_photo_url(photo_path)
+
     context_data: dict[str, Any] = {'request': request}
     context_data.update(photo_urls=[photo_url])
 
-    return templates.TemplateResponse('partials/product_photos.html', context=context_data)
+    return templates.TemplateResponse(
+        'partials/product_photos.html', context=context_data
+    )
 
 
 @router.get('/all', response_class=HTMLResponse)

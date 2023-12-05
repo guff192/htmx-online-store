@@ -23,7 +23,7 @@ class UserProduct(Base):
     id = Column('id', Integer, primary_key=True, index=True)
 
     user_id = Column(
-        Integer,
+        UUIDType(binary=False),
         ForeignKey('users.id', ondelete='CASCADE'),
         nullable=False
     )

@@ -46,7 +46,11 @@ def get_all_photos(
     context_data: dict[str, Any] = {'request': request}
     context_data.update(photo_urls=photo_urls)
 
-    return templates.TemplateResponse('partials/product_photos.html', context=context_data)
+    # Add response caching
+    response = templates.TemplateResponse('partials/product_photos.html', context=context_data)
+    response.headers.update({'Cache-Control': 'max-age=86400 public'})
+
+    return response
 
 
 @router.get('/main', response_class=HTMLResponse)
@@ -66,5 +70,9 @@ def get_main_photo(
     context_data: dict[str, Any] = {'request': request}
     context_data.update(photo_urls=[photo_url])
 
-    return templates.TemplateResponse('partials/product_photos.html', context=context_data)
+    # Add response caching
+    response = templates.TemplateResponse('partials/product_photos.html', context=context_data)
+    response.headers.update({'Cache-Control': 'max-age=86400 public'})
+
+    return response
 

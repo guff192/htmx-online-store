@@ -10,7 +10,10 @@ class ProductRepository:
         self.db = db
 
     def get_all(self, offset: int) -> list[Product]:
-        return self.db.query(Product).slice(offset, offset + 10).all()
+        return self.db.query(Product)\
+            .order_by(Product.name)\
+            .slice(offset, offset + 10)\
+            .all()
 
     def get_by_id(self, product_id: int) -> Product | None:
         return self.db.query(Product).get(product_id)

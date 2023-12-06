@@ -48,7 +48,7 @@ def get_all_photos(
 
     # Add response caching
     response = templates.TemplateResponse('partials/product_photos.html', context=context_data)
-    response.headers.update({'Cache-Control': 'max-age=86400 public'})
+    response.headers.update({'Cache-Control': 'max-age=86400, public'})
 
     return response
 
@@ -72,7 +72,7 @@ def get_main_photo(
 
     # Add response caching
     response = templates.TemplateResponse('partials/product_photos.html', context=context_data)
-    response.headers.update({'Cache-Control': 'max-age=86400 public'})
+    response.headers.update({'Cache-Control': 'max-age=86400, public'})
 
     return response
 

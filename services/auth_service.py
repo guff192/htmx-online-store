@@ -101,7 +101,7 @@ class AuthService:
                 token=session_token,
                 key=settings.jwt_secret,
                 algorithms=[settings.jwt_algorithm],
-                options={'require_exp': False},
+                options={'require_exp': True, 'verify_exp': True},
             )
         except JWTError:
             raise ErrWrongCredentials()

@@ -9,7 +9,7 @@ from loguru import logger
 
 from app.admin import get_admin_app
 from app.config import Settings, log_settings
-from app.initial_setup import fetch_and_load_products
+from app.initial_setup import fetch_products
 from db import init_db
 from db.session import get_db
 from middleware.auth_middleware import AdminMiddleware, LoginMiddleware
@@ -32,7 +32,7 @@ async def lifecycle(app: FastAPI):
     '''
     # initialize database (create all tables if they don't exist)
     init_db()
-    fetch_and_load_products(get_db())
+    fetch_products(get_db())
 
     # reload tailwindcss
     try:

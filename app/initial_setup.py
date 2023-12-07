@@ -11,7 +11,7 @@ from storage.photo_storage import S3ProductPhotoStorage
 settings = Settings()
 
 
-def fetch_and_load_products(db: Session):
+def fetch_products(db: Session):
     # Fetch data from Google Spreadsheet via REST API
     response = requests.get(settings.posting_endpoint)
     data = response.json()

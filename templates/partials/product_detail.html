@@ -16,10 +16,21 @@
             src="{{ url_for('static', path='images/loading.webp') }}"
             class="w-full h-full"
             hx-trigger="load"
-            hx-get="/photos/all?product_name={{ product.name }}"
+            hx-get="/photos/main?product_name={{ product.name }}"
             hx-swap="outerHTML"
         >
     </div>
+
+    <div id="small-photos" class="h-1/6 mt-2 flex flex-wrap justify-between md:p-2">
+        <img
+            src="{{ url_for('static', path='images/loading.webp') }}"
+            class="w-full h-full"
+            hx-trigger="load"
+            hx-get="/photos/all?product_name={{ product.name }}&size=thumbs"
+            hx-swap="outerHTML"
+        >
+    </div>
+
 </div>
 
 <div id="product{{ product.id }}description" class="border rounded flex justify-around w-full h-full p-3">

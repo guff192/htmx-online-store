@@ -1,3 +1,4 @@
+from typing import Literal
 from fastapi import Depends
 from pydantic_core import Url
 
@@ -47,14 +48,19 @@ class ProductViewModel:
             price=product_dict.get('price', 0)
         )
 
-    def get_all_photos_by_name(self, name: str) -> list[ProductPhotoPath]:
-        return self.service.get_all_photos_by_name(name)
+    def get_all_photos_by_name(
+            self, name: str, size: Literal['', 'small', 'thumbs'] = ''
+    ) -> list[ProductPhotoPath]:
+        return self.service.get_all_photos_by_name(name, size)
 
-    def get_photo_url(self, photo_path: ProductPhotoPath) -> Url:
-        return self.service.get_url_by_photo_path(photo_path)
+    def get_photo_url(self, photo_path: ProductPhotoPath, small: bool = False) -> Url:
+        return self.service.get_url_by_photo_path(photo_path, small)
 
-    def get_main_photo(self, product_name: str) -> ProductPhotoPath | None:
-        return self.service.get_main_photo(product_name)
+    def get_main_photo(
+            # TODO: change size to enum
+            self, product_name: str, size: Literal['', 'small', 'thumbs'] = ''
+    ) -> ProductPhotoPath | None:
+        return self.service.get_main_photo(product_name, size)
 
 
 def product_viewmodel_dependency(

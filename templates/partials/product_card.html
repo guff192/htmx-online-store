@@ -6,7 +6,7 @@
     <img
         class="mx-auto"
         hx-trigger="load"
-        hx-get="/photos/main?product_name={{ product.name }}"
+        hx-get="/photos/main?product_name={{ product.name }}&size=small"
         hx-swap="outerHTML"
         src="{{ url_for('static', path='images/loading.webp') }}"
         alt="{{ product.name }}"

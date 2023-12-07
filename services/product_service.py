@@ -1,4 +1,5 @@
 import time
+from typing import Literal
 
 from fastapi import Depends
 from loguru import logger
@@ -38,18 +39,26 @@ class ProductService:
     def get_by_name(self, name: str) -> Product:
         return self.repo.get_by_name(name)
 
-    def get_url_by_photo_path(self, photo_path: ProductPhotoPath) -> Url:
-        return self.photo_storage.get_one(photo_path)
+    def get_url_by_photo_path(
+        self,
+        photo_path: ProductPhotoPath,
+        small: bool = False
+    ) -> Url:
+        return self.photo_storage.get_url(photo_path, small)
 
-    def get_main_photo(self, product_name: str) -> ProductPhotoPath | None:
+    def get_main_photo(
+            self, product_name: str, size: Literal['', 'small', 'thumbs'] = ''
+    ) -> ProductPhotoPath | None:
         start = time.time()
-        result = self.photo_storage.get_main_photo_by_name(product_name)
+        result = self.photo_storage.get_main_photo_by_name(product_name, size)
         logger.debug(f'Get main photo time: {time.time() - start}')
 
         return result
 
-    def get_all_photos_by_name(self, name: str) -> list[ProductPhotoPath]:
-        return self.photo_storage.get_all_by_name(name)
+    def get_all_photos_by_name(
+            self, name: str, size: Literal['', 'small', 'thumbs'] = ''
+    ) -> list[ProductPhotoPath]:
+        return self.photo_storage.get_all_by_name(name, size)
 
     def update_by_name(self, product_update: ProductUpdate) -> ProductUpdateResponse:
         if not product_update.validate():

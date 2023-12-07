@@ -16,6 +16,14 @@ class ProductPhotoPath(BaseModel):
     def full_path(self) -> str:
         return f'{self.path}/{self.file_name}'
 
+    @property
+    def large_path(self) -> str:
+        return f'{self.path}/{self.file_name}'
+
+    @property
+    def small_path(self) -> str:
+        return f'{self.path}/small/{self.file_name}'
+
 
 class ProductBase(BaseModel):
     name: str

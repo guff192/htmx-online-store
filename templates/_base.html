@@ -20,7 +20,7 @@
 
     <header class="mt-20">
         {% block header %}<h1 id="page-header">Default Header</h1>{% endblock %}</h1>
-        <div id="loader" class="htmx-indicator h-full md:w-8/12 mx-auto fixed z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div id="loader" class="htmx-indicator md:h-full w-full md:w-8/12 mx-auto ">
             <img class="w-full h-full" src="{{ url_for('static', path='images/loading.webp') }}"/>
         </div>
     </header>

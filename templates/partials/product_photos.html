@@ -55,10 +55,9 @@
 
     <div>
         <img
-            class="large-photo w-full
-            {% if request.query_params.get('size') == '' %} loading"
+            class="large-photo w-full"
+            {% if request.query_params.get('size') == '' %}
                 id="large-photo"
-            {% else %} "
             {% endif %}
             src="{{ photo_urls[0] }}"
         >

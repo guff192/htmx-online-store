@@ -27,6 +27,7 @@ def get_catalog(
 ):
     context = default_vm.build_context()
     context.update({'request': request})
+
     return templates.TemplateResponse(
         'catalog.html',
         context=context

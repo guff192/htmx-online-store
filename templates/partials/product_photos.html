@@ -1,27 +1,35 @@
 {% if photo_urls %}
 
-    {% if photo_urls[1:] %}
-        <div class="w-1/5 md:w-1/12 h-full p-1 border border-gray-800 shadow-xl shadow-sky-400 rounded cursor-pointer transition-all duration-300">
-            <img class="w-full" src="{{ photo_urls[0] }}"/>
-        </div>
+{% if photo_urls[1:] %}
+    <div
+        class="w-1/5 md:w-1/12 h-full p-1 border border-gray-800 shadow-xl shadow-sky-400 rounded cursor-pointer transition-all duration-300">
+        <img class="w-full" src="{{ photo_urls[0] }}"/>
+    </div>
 
-        {% for link in photo_urls[1:] %}
-        <div class="w-1/5 md:w-1/12 h-full p-1 border border-gray-300 shadow-l shadow-gray-800 rounded cursor-pointer transition-all duration-300">
-            <img class="w-full" src="{{ link }}"/>
-        </div>
-        {% endfor %}
+    {% for link in photo_urls[1:] %}
+    <div
+        class="w-1/5 md:w-1/12 h-full p-1 border border-gray-300 shadow-l shadow-gray-800 rounded cursor-pointer transition-all duration-300">
+        <img class="w-full" src="{{ link }}" />
+    </div>
+    {% endfor %}
     <script>
 
     document.querySelectorAll('#small-photos div').forEach(photo => {
         photo.addEventListener('click', () => {
-            let largePhoto = document.querySelector('#large-photo'); 
-            let previousSelectedPhoto = document.querySelector('#small-photos div.shadow-xl');
-            let smallPhotoSrc = photo.querySelector('img').getAttribute('src');
+            const largePhoto = document.querySelector('#large-photo');
+
+            // Set loading class
+            largePhoto.classList.add('loading');
+
+            // Get new photo source
+            let newSrc = photo.querySelector('img').getAttribute('src').replace('thumbs/', '');
 
             // Change large photo source
-            largePhoto.setAttribute('src', smallPhotoSrc.replace('thumbs/', ''));
-            
+            largePhoto.src = newSrc;
+
             // Change shadows and borders
+            let previousSelectedPhoto = document.querySelector('#small-photos div.shadow-xl');
+
             // Remove previous shadow and border
             previousSelectedPhoto.classList.remove('shadow-xl');
             previousSelectedPhoto.classList.remove('shadow-sky-400');
@@ -31,8 +39,7 @@
             previousSelectedPhoto.classList.add('shadow-l');
             previousSelectedPhoto.classList.add('border-gray-300');
 
-
-            // Set new selected photo shadow and border
+            // Set shadow and border for new selected photo
             photo.classList.remove('shadow-l');
             photo.classList.add('shadow-xl');
             photo.classList.add('shadow-sky-400');
@@ -44,12 +51,29 @@
     });
     </script>
 
+{% else %}
 
-    {% else %}
-    <div class="w-full h-5/6 border rounded">
-        <img id="large-photo" src="{{ photo_urls[0] }}" class="self-start">
+    <div>
+        <img
+            class="large-photo w-full
+            {% if request.query_params.get('size') == '' %} loading"
+                id="large-photo"
+            {% else %} "
+            {% endif %}
+            src="{{ photo_urls[0] }}"
+        >
     </div>
+    <script>
+        document.querySelector('#large-photo').onload = (e) => {
+            e.target.classList.remove('loading');
+        };
+    </script>
+
+    {% if request.query_params.get('size') == '' %}
+        <div id="loader" class="w-full h-full"> </div>
+
     {% endif %}
 
 {% endif %}
 
+{% endif %}

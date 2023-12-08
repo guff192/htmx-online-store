@@ -1,3 +1,4 @@
+/* indicator when using htmx */
 .htmx-indicator {
     display: none;
     opacity: 0.8 !important;
@@ -13,4 +14,19 @@
 }
 .htmx-indicator .htmx-request{
     display: block;
+}
+
+/* indicator when using vanilla js */
+.loading {
+  opacity: 0.5; /* Reduce opacity to indicate loading */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 50px 50px; /* Adjust size as needed */
+}
+#loader {
+    background: url('/static/images/loading.webp') center/contain no-repeat;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -10;
 }

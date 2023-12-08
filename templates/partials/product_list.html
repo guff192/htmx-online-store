@@ -1,12 +1,12 @@
 {% if not request.headers.get('hx-request') %}
-<div id="products" class="md:grid md:grid-cols-3 md:gap-3">
+    <div id="products" class="md:grid md:grid-cols-3 md:gap-3">
 {% endif %}
-    {% for product in products %}
+{% for product in products %}
 
     {% include 'partials/product_card.html' %}
 
-    {% endfor %}
-    {% if offset > 0 %}
+{% endfor %}
+{% if offset > 0 %}
     <img
         src="{{ url_for('static', path='images/loading.webp') }}"
         id="products-loader"
@@ -14,7 +14,8 @@
         hx-get="/products?offset={{ offset }}"
         hx-swap="outerHTML"
         ></img>
-    {% endif %}
+{% endif %}
+
 {% if not request.headers.get('hx-request') %}
 </div>
 {% endif %}

@@ -1,0 +1,9 @@
+.htmx-indicator {
+    display: none;
+}
+.htmx-indicator.htmx-request{
+    display: block;
+}
+.htmx-indicator .htmx-request{
+    display: block;
+}

@@ -69,7 +69,6 @@ class S3ProductPhotoStorage(ProductPhotoStorage):
         paths = self.get_all_by_name(name=name, size=size)
         if not paths:
             return None
-        logger.debug(f'{paths[0]=}')
         return paths[0]
 
     def get_all_by_name(
@@ -77,7 +76,7 @@ class S3ProductPhotoStorage(ProductPhotoStorage):
         name: str,
         size: ProductPhotoSize = ProductPhotoSize.thumbs
     ) -> list[ProductPhotoPath]:
-        prefix = f'{name}/{size}' if size else f'{name}'
+        prefix = f'{name}/{size.value}' if size.value else f'{name}'
         response = self._s3.list_objects_v2(
             Bucket=self._bucket_name,
             Prefix=prefix,
@@ -89,10 +88,10 @@ class S3ProductPhotoStorage(ProductPhotoStorage):
         if not response_contents:
             return []
 
-        objects = list(map(
-            lambda product: product.get('Key', None),
+        objects = map(
+            lambda obj: obj.get('Key', None),
             response_contents
-        ))
+        )
         product_photo_paths: list[ProductPhotoPath] = [
             ProductPhotoPath(file_name=obj.split('/')[-1], path=prefix)
             for obj in objects

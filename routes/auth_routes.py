@@ -52,6 +52,9 @@ def google_oauth_user_dependency(
     yield user
 
 
+# ----------------------------------------------------
+# Routes
+# ----------------------------------------------------
 @router.get("/login", response_class=HTMLResponse)
 def get_login_page(
     request: Request,

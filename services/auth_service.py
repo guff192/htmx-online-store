@@ -31,7 +31,7 @@ class OauthProvider(Protocol):
     @abstractmethod
     def verify_oauth(
         self,
-        credential: OAuthCredentials,
+        credentials: OAuthCredentials,
     ) -> Mapping[str, Any]:
         pass
 

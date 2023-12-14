@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Any
 
 from pydantic import BaseModel
@@ -6,6 +7,12 @@ from schema import SchemaUtils
 
 
 utils = SchemaUtils()
+
+
+class ProductPhotoSize(str, Enum):
+    large = ''
+    small = 'small'
+    thumbs = 'thumbs'
 
 
 class ProductPhotoPath(BaseModel):

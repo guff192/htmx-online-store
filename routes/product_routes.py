@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
-from exceptions.product_exceptions import ErrProductNotFound
 
 from schema.product_schema import (
     ProductList,
@@ -13,7 +12,10 @@ from schema.product_schema import (
 )
 from services.product_service import ProductService, product_service_dependency
 from viewmodels import DefaultViewModel, default_viewmodel_dependency
-from viewmodels.product_viewmodel import ProductViewModel, product_viewmodel_dependency
+from viewmodels.product_viewmodel import (
+    ProductViewModel,
+    product_viewmodel_dependency
+)
 
 
 router = APIRouter(prefix='/products', tags=['Products'])
@@ -69,8 +71,6 @@ def get_product_details(
 ):
 
     product = product_vm.get_by_id(product_id)
-    if not product:
-        return ErrProductNotFound()
 
     context_data: dict[str, Any] = {'request': request}
     context_data.update(product.build_context())

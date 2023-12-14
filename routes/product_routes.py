@@ -69,8 +69,6 @@ def get_product_details(
 ):
 
     product = product_vm.get_by_id(product_id)
-    if not product:
-        return ErrProductNotFound()
 
     context_data: dict[str, Any] = {'request': request}
     context_data.update(product.build_context())

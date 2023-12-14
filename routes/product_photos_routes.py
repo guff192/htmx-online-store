@@ -1,10 +1,10 @@
-from typing import Any, Literal
+from typing import Any
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 from exceptions.product_photos_exceptions import ErrProductPhotoNotFound
-from schema.product_schema import ProductPhotoPath
+from schema.product_schema import ProductPhotoPath, ProductPhotoSize
 
 from viewmodels.product_viewmodel import \
     ProductViewModel, product_viewmodel_dependency
@@ -36,7 +36,7 @@ def get_one_photo(
 def get_all_photos(
     request: Request,
     product_name: str,
-    size: Literal['', 'small', 'thumbs'] = '',
+    size: ProductPhotoSize = ProductPhotoSize.thumbs,
     product_vm: ProductViewModel = Depends(product_viewmodel_dependency)
 ):
     if not request.headers.get('hx-request'):
@@ -66,7 +66,7 @@ def get_all_photos(
 def get_main_photo(
         request: Request,
         product_name: str,
-        size: Literal['', 'small', 'thumbs'] = '',
+        size: ProductPhotoSize = ProductPhotoSize.small,
         product_vm: ProductViewModel = Depends(product_viewmodel_dependency)
 ):
     if not request.headers.get('hx-request'):

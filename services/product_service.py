@@ -1,5 +1,4 @@
 import time
-from typing import Literal
 
 from fastapi import Depends
 from loguru import logger
@@ -15,6 +14,7 @@ from schema.product_schema import (
     Product as ProductSchema,
     ProductCreate,
     ProductPhotoPath,
+    ProductPhotoSize,
     ProductUpdate,
     ProductUpdateResponse,
 )
@@ -31,10 +31,16 @@ class ProductService:
         self.photo_storage = photo_storage
 
     def get_all(self, offset: int) -> list[Product]:
+        if offset < 0:
+            raise ErrProductNotFound()
         return self.repo.get_all(offset=offset)
 
     def get_by_id(self, product_id: int) -> Product:
-        return self.repo.get_by_id(product_id)
+        product = self.repo.get_by_id(product_id)
+        if not product:
+            raise ErrProductNotFound()
+
+        return product
 
     def get_by_name(self, name: str) -> Product:
         return self.repo.get_by_name(name)
@@ -42,12 +48,13 @@ class ProductService:
     def get_url_by_photo_path(
         self,
         photo_path: ProductPhotoPath,
-        small: bool = False
     ) -> Url:
-        return self.photo_storage.get_url(photo_path, small)
+        return self.photo_storage.get_url(photo_path)
 
     def get_main_photo(
-            self, product_name: str, size: Literal['', 'small', 'thumbs'] = ''
+            self,
+            product_name: str,
+            size: ProductPhotoSize = ProductPhotoSize.small
     ) -> ProductPhotoPath | None:
         start = time.time()
         result = self.photo_storage.get_main_photo_by_name(product_name, size)
@@ -56,7 +63,7 @@ class ProductService:
         return result
 
     def get_all_photos_by_name(
-            self, name: str, size: Literal['', 'small', 'thumbs'] = ''
+            self, name: str, size: ProductPhotoSize = ProductPhotoSize.thumbs
     ) -> list[ProductPhotoPath]:
         return self.photo_storage.get_all_by_name(name, size)
 

@@ -1,5 +1,3 @@
-import time
-
 from fastapi import Depends
 from loguru import logger
 from pydantic_core import Url
@@ -56,9 +54,7 @@ class ProductService:
             product_name: str,
             size: ProductPhotoSize = ProductPhotoSize.small
     ) -> ProductPhotoPath | None:
-        start = time.time()
         result = self.photo_storage.get_main_photo_by_name(product_name, size)
-        logger.debug(f'Get main photo time: {time.time() - start}')
 
         return result
 

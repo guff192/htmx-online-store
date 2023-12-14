@@ -1,4 +1,4 @@
-from typing import Any, Mapping
+from typing import Any, Generator, Mapping
 
 from fastapi import Depends
 
@@ -11,19 +11,19 @@ from services.user_service import (
 
 
 class UserViewModel:
-    def __init__(self, user_service: UserService):
+    def __init__(self, user_service: UserService) -> None:
         self.user_service = user_service
 
     def get_by_google_id_or_create(
         self, id_info: Mapping[str, Any]
     ) -> UserResponse:
-        user: UserResponse = self.user_service.get_or_create_by_google_id(id_info)
+        user = self.user_service.get_or_create_by_google_id(id_info)
         return user
 
 
 def user_viewmodel_dependency(
     user_service: UserService = Depends(user_service_dependency),
-):
+) -> Generator[UserViewModel, None, None]:
     vm = UserViewModel(user_service)
     yield vm
 

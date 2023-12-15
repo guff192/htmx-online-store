@@ -44,9 +44,9 @@ def get_all_photos(
     main_photo_path = product_vm.get_main_photo(product_name, size)
     if not main_photo_path:
         raise ErrProductPhotoNotFound()
+
     photo_paths: list[ProductPhotoPath] = [main_photo_path]
     photo_paths += product_vm.get_all_photos_by_name(product_name, size)[1:]
-
     photo_urls = [product_vm.get_photo_url(photo_path)
                   for photo_path in photo_paths]
 

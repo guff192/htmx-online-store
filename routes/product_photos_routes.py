@@ -1,12 +1,14 @@
 from typing import Any
+
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from loguru import logger
+
 from exceptions.product_photos_exceptions import ErrProductPhotoNotFound
 from schema.product_schema import ProductPhotoPath, ProductPhotoSize
-
-from viewmodels.product_viewmodel import ProductViewModel, product_viewmodel_dependency
+from viewmodels.product_viewmodel import (
+    ProductViewModel, product_viewmodel_dependency
+)
 
 
 router = APIRouter(prefix='/photos', tags=['Photos'])

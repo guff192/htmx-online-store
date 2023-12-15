@@ -43,14 +43,14 @@ class ProductRepository:
                price: int) -> int | None:
 
         self.db.begin(nested=True)
-        updated_id = self.db.query(Product).filter(Product._id == id).update({
+        updated_count = self.db.query(Product).filter(Product._id == id).update({
             'name': name,
             'description': description,
             'price': price
         })
         self.db.commit()
 
-        return updated_id
+        return updated_count
 
 
 def product_repository_dependency(db: Session = Depends(db_dependency)):

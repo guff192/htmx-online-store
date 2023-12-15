@@ -64,32 +64,35 @@ class ProductService:
         return self.photo_storage.get_all_by_name(name, size)
 
     def update_by_name(self, product_update: ProductUpdate) -> ProductUpdateResponse:
-        if not product_update.validate():
+        if not product_update.is_valid():
             raise ErrInvalidProduct()
 
         found_product = self.repo.get_by_name(product_update.name)
         if not found_product:
             raise ErrProductNotFound()
 
-        updated_product_id = self.repo.update(
+        updated_products_count = self.repo.update(
             id=found_product.__dict__['_id'],
             **product_update.model_dump()
         )
-        if not updated_product_id:
+        if not updated_products_count:
             raise ErrInvalidProduct()
-        return ProductUpdateResponse(count=updated_product_id)
+        return ProductUpdateResponse(count=updated_products_count)
 
     def search(self, name: str) -> list[Product]:
         return self.repo.search(name)
 
     def create(self, product_create: ProductCreate) -> ProductSchema:
-        if not product_create.validate():
+        if not product_create.is_valid():
             raise ErrInvalidProduct()
 
         found_product = self.repo.get_by_name(product_create.name)
         if found_product:
-            found_product = found_product.__dict__
-            return ProductSchema(id=found_product['_id'], **found_product)
+            self.repo.update(
+                id=found_product.__dict__['_id'],
+                **product_create.model_dump()
+            )
+            return ProductSchema(id=found_product['_id'], **found_product.__dict__)
 
         created_product = self.repo.create(
             name=product_create.name,

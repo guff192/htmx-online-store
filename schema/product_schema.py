@@ -37,7 +37,7 @@ class ProductBase(BaseModel):
     description: str
     price: int
 
-    def validate(self) -> bool:
+    def is_valid(self) -> bool:
         if not self.name or not self.price:
             return False
         return True

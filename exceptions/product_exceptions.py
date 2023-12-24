@@ -1,6 +1,14 @@
 from fastapi import HTTPException, status
 
 
+class ErrProductAlreadyExists(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Product already exists'
+        )
+
+
 class ErrInvalidProduct(HTTPException):
     def __init__(self):
         super().__init__(

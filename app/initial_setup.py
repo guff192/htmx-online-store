@@ -1,3 +1,4 @@
+from loguru import logger
 import requests
 from sqlalchemy.orm import Session
 
@@ -13,6 +14,7 @@ settings = Settings()
 
 def fetch_products(db: Session):
     # Fetch data from Google Spreadsheet via REST API
+    logger.info("Fetching data from Google Spreadsheet...")
     response = requests.get(settings.posting_endpoint)
     data = response.json()
 
@@ -33,6 +35,9 @@ def fetch_products(db: Session):
             price=price
         )
 
-        # Use the service to create the product
-        product_service.create(product_create)
+        try:
+            # Use the service to create the product
+            product_service.create(product_create)
+        except Exception as e:
+            logger.info(f"Error creating product: {e}")
 

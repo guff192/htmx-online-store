@@ -3,7 +3,12 @@ from typing import Generator
 from fastapi import Depends
 from pydantic_core import Url
 
-from schema.product_schema import Product, ProductList, ProductPhotoPath, ProductPhotoSize
+from schema.product_schema import (
+    Product,
+    ProductList,
+    ProductPhotoPath,
+    ProductPhotoSize,
+)
 from services.product_service import ProductService, product_service_dependency
 
 
@@ -22,12 +27,14 @@ class ProductViewModel:
             product_dict = orm_product.__dict__
             product_name = product_dict.get('name', '')
 
-            product_list.products.append(Product(
-                id=product_dict.get('_id', 0),
-                name=product_name,
-                description=product_dict.get('description', ''),
-                price=product_dict.get('price', 0)
-            ))
+            product_list.products.append(
+                Product(
+                    id=product_dict.get('_id', 0),
+                    name=product_name,
+                    description=product_dict.get('description', ''),
+                    price=product_dict.get('price', 0),
+                )
+            )
 
         return product_list
 
@@ -43,28 +50,28 @@ class ProductViewModel:
             photos=product_photos,
             name=product_dict.get('name', ''),
             description=product_dict.get('description', ''),
-            price=product_dict.get('price', 0)
+            price=product_dict.get('price', 0),
         )
 
     def get_all_photos_by_name(
-            self, name: str, size: ProductPhotoSize = ProductPhotoSize.thumbs
+        self, name: str, size: ProductPhotoSize = ProductPhotoSize.thumbs
     ) -> list[ProductPhotoPath]:
         return self._service.get_all_photos_by_name(name, size)
 
-    def get_photo_url(
-        self, photo_path: ProductPhotoPath
-    ) -> Url:
+    def get_photo_url(self, photo_path: ProductPhotoPath) -> Url:
         return self._service.get_url_by_photo_path(photo_path)
 
     def get_main_photo(
-            # TODO: change size to enum
-            self, product_name: str, size: ProductPhotoSize = ProductPhotoSize.small
+        # TODO: change size to enum
+        self,
+        product_name: str,
+        size: ProductPhotoSize = ProductPhotoSize.small,
     ) -> ProductPhotoPath | None:
         return self._service.get_main_photo(product_name, size)
 
 
 def product_viewmodel_dependency(
-    product_service: ProductService = Depends(product_service_dependency)
+    product_service: ProductService = Depends(product_service_dependency),
 ) -> Generator[ProductViewModel, None, None]:
     vm = ProductViewModel(product_service)
     yield vm

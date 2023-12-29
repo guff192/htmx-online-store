@@ -1,8 +1,11 @@
 from fastapi import Depends
-from loguru import logger
 from pydantic_core import Url
 
-from exceptions.product_exceptions import ErrInvalidProduct, ErrProductNotFound
+from exceptions.product_exceptions import (
+    ErrInvalidProduct,
+    ErrProductAlreadyExists,
+    ErrProductNotFound,
+)
 from models.product import Product
 from repository.product_repository import (
     ProductRepository,
@@ -16,14 +19,17 @@ from schema.product_schema import (
     ProductUpdate,
     ProductUpdateResponse,
 )
-from storage.photo_storage import ProductPhotoStorage, product_photo_storage_dependency
+from storage.photo_storage import (
+    ProductPhotoStorage,
+    product_photo_storage_dependency
+)
 
 
 class ProductService:
     def __init__(
-            self,
-            product_repo: ProductRepository,
-            photo_storage: ProductPhotoStorage
+        self,
+        product_repo: ProductRepository,
+        photo_storage: ProductPhotoStorage
     ):
         self.repo = product_repo
         self.photo_storage = photo_storage
@@ -50,46 +56,49 @@ class ProductService:
         return self.photo_storage.get_url(photo_path)
 
     def get_main_photo(
-            self,
-            product_name: str,
-            size: ProductPhotoSize = ProductPhotoSize.small
+        self,
+        product_name: str,
+        size: ProductPhotoSize = ProductPhotoSize.small
     ) -> ProductPhotoPath | None:
         result = self.photo_storage.get_main_photo_by_name(product_name, size)
 
         return result
 
     def get_all_photos_by_name(
-            self, name: str, size: ProductPhotoSize = ProductPhotoSize.thumbs
+        self,
+        name: str,
+        size: ProductPhotoSize = ProductPhotoSize.thumbs
     ) -> list[ProductPhotoPath]:
         return self.photo_storage.get_all_by_name(name, size)
 
-    def update_by_name(self, product_update: ProductUpdate) -> ProductUpdateResponse:
-        if not product_update.validate():
+    def update_by_name(
+        self,
+        product_update: ProductUpdate
+    ) -> ProductUpdateResponse:
+        if not product_update.is_valid():
             raise ErrInvalidProduct()
 
         found_product = self.repo.get_by_name(product_update.name)
         if not found_product:
             raise ErrProductNotFound()
 
-        updated_product_id = self.repo.update(
+        updated_products_count = self.repo.update(
             id=found_product.__dict__['_id'],
             **product_update.model_dump()
         )
-        if not updated_product_id:
+        if not updated_products_count:
             raise ErrInvalidProduct()
-        return ProductUpdateResponse(count=updated_product_id)
+        return ProductUpdateResponse(count=updated_products_count)
 
     def search(self, name: str) -> list[Product]:
         return self.repo.search(name)
 
     def create(self, product_create: ProductCreate) -> ProductSchema:
-        if not product_create.validate():
+        if not product_create.is_valid():
             raise ErrInvalidProduct()
 
-        found_product = self.repo.get_by_name(product_create.name)
-        if found_product:
-            found_product = found_product.__dict__
-            return ProductSchema(id=found_product['_id'], **found_product)
+        if self.repo.get_by_name(product_create.name):
+            raise ErrProductAlreadyExists()
 
         created_product = self.repo.create(
             name=product_create.name,
@@ -100,8 +109,8 @@ class ProductService:
 
 
 def product_service_dependency(
-        product_repo: ProductRepository = Depends(product_repository_dependency),
-        photo_storage: ProductPhotoStorage = Depends(product_photo_storage_dependency),
+    product_repo: ProductRepository = Depends(product_repository_dependency),
+    photo_storage: ProductPhotoStorage = Depends(product_photo_storage_dependency),
 ):
     service = ProductService(product_repo, photo_storage)
     yield service

@@ -1,6 +1,6 @@
 from loguru import logger
-from fastapi import APIRouter, Depends, Request
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Depends, Request, status
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from exceptions.auth_exceptions import ErrUnauthorized
 from routes.auth_routes import google_oauth_user_dependency
@@ -36,23 +36,26 @@ def get_cart(
     )
 
 
-@router.post('/{product_id}')
+@router.post('/add')
 def add_to_cart(
     request: Request,
-    vm: DefaultViewModel = Depends(default_viewmodel_dependency),
-    user: UserBase | None = Depends(google_oauth_user_dependency),
+    product_id: int,
+    vm: CartViewModel = Depends(cart_viewmodel_dependency),
+    user: LoggedUser | None = Depends(google_oauth_user_dependency),
 ):
     if not user:
         raise ErrUnauthorized()
 
-    context = vm.build_context()
-    context.update({'user': user})
+    product_dict = (
+        vm
+        .add_to_cart(product_id=product_id, user_id=str(user.id))
+        .build_context()
+    )
+    context = {'request': request, 'user': user, **product_dict}
+
     if request.headers.get('hx-request'):
         return templates.TemplateResponse(
-            'partials/cart.html', context={'request': request, **context}
+            'partials/product_counter.html', context=context
         )
 
-    return templates.TemplateResponse(
-        'cart.html', context={'request': request, **context}
-    )
-
+    return RedirectResponse('/cart', status_code=status.HTTP_303_SEE_OTHER)

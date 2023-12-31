@@ -9,9 +9,9 @@
 
 {% endif %}
 
-{% if product_list.products %}
+{% if product_list %}
 <div id="cart" class="md:grid md:grid-cols-3 md:gap-3">
-    {% for product in product_list.products %}
+    {% for product in product_list %}
     {% include 'partials/product_card.html' %}
     {% endfor %}
 </div>

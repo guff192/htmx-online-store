@@ -12,6 +12,12 @@ class CartViewModel:
     def get_cart(self, user_id: str) -> Cart:
         return self._service.get_cart(user_id)
 
+    def add_to_cart(self, user_id: str, product_id: int):
+        return self._service.add_to_cart(user_id, product_id)
+
+    def remove_from_cart(self, user_id: str, product_id: int):
+        return self._service.remove_from_cart(user_id, product_id)
+
 
 def cart_viewmodel_dependency(
     cart_service: CartService = Depends(cart_service_dependency),

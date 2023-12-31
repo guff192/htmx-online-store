@@ -40,6 +40,9 @@ class UserService:
             logger.debug(f"Error parsing user schema: {e}")
             return None
 
+    def get_by_id(self, user_id: str) -> User | None:
+        return self.repo.get_by_id(user_id)
+
     def get_or_create_by_google_id(self, id_info: Mapping[str, Any]) -> UserResponse:
         user_schema = self._parse_user_create_google_schema(id_info)
         if not user_schema:

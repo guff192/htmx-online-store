@@ -17,7 +17,7 @@ from repository.user_repository import (
     user_repository_dependency,
 )
 from schema.auth_schema import GoogleOAuthCredentials, OAuthCredentials
-from schema.user_schema import UserBase
+from schema.user_schema import LoggedUser
 
 
 settings = Settings()
@@ -95,7 +95,7 @@ class AuthService:
         )
         return encoded_jwt
 
-    def verify_session_token(self, session_token: str) -> UserBase:
+    def verify_session_token(self, session_token: str) -> LoggedUser:
         try:
             payload = jwt.decode(
                 token=session_token,
@@ -114,7 +114,7 @@ class AuthService:
         if not user_data:
             raise ErrUserNotFound()
 
-        return UserBase(**user_data.__dict__)
+        return LoggedUser(**user_data.__dict__)
 
 
 def auth_service_dependency(

@@ -16,6 +16,8 @@ class Product(Base):
     manufacturer_id = Column(Integer, ForeignKey('manufacturers.id'))
     manufacturer = relationship('Manufacturer')
 
+    users = relationship('UserProduct', back_populates='product')
+
 
 class Manufacturer(Base):
     __tablename__ = 'manufacturers'

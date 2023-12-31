@@ -4,15 +4,17 @@ from fastapi.responses import RedirectResponse
 from flask.app import Flask
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-from loguru import logger
+from flask_admin.form import Select2Field
 from sqlalchemy.orm import Session
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.middleware.base import (
+    BaseHTTPMiddleware, RequestResponseEndpoint
+)
 from starlette.types import ASGIApp
 from wtforms.fields import TextAreaField
 
 from db.session import get_db
 from models.product import Manufacturer, Product
-from models.user import User
+from models.user import User, UserProduct
 from schema.user_schema import UserBase
 from services.auth_service import AuthService, get_auth_service
 from viewmodels.user_viewmodel import UserViewModel, get_user_viewmodel
@@ -62,7 +64,35 @@ class UserModelView(ModelView):
     can_delete = False
     can_create = False
 
+    column_list: list[str] = ['id', 'name', 'is_admin']
     column_exclude_list: list[str] = ['google_id', 'profile_img_url']
+    form_columns: list[str] = ['name', 'google_id', 'profile_img_url', 'is_admin']
+
+
+class UserProductModelView(ModelView):
+    can_view_details = True
+    can_edit = True
+    can_delete = True
+    can_create = True
+
+    column_list: list[str] = ['user.name', 'product.name', 'count']
+    form_columns: list[str] = ['user_id', 'product_id', 'count']
+
+    # form_overrides = dict(
+    #     user=Select2Field,
+    #     product=Select2Field,
+    # )
+
+    # form_args = {
+    #     'user': {
+    #         'label': 'User',
+    #         'choices': ([(u.name, u.id) for u in get_db().query(User).all()]),
+    #     },
+    #     'product': {
+    #         'label': 'Product',
+    #         'choices': ([(p.name, p._id) for p in get_db().query(Product).all()]),
+    #     },
+    # }
 
 
 # ---------------------------------------------------------
@@ -123,6 +153,7 @@ def get_admin_app(session: Session = get_db()) -> ASGIApp:
     flask_admin.add_view(ProductModelView(Product, session))
     flask_admin.add_view(ManufacturerModelView(Manufacturer, session))
     flask_admin.add_view(UserModelView(User, session))
+    flask_admin.add_view(UserProductModelView(UserProduct, session))
 
     return WSGIMiddleware(flask_app)
 

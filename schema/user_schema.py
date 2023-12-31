@@ -13,6 +13,10 @@ class UserResponse(UserBase):
     id: UUID
 
 
+class LoggedUser(UserBase):
+    id: UUID
+
+
 class UserCreateGoogle(UserBase):
     google_id: str
     email: str

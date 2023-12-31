@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Cookie, Depends, Form, Request, Response, status
@@ -6,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 from loguru import logger
 
 from schema.auth_schema import GoogleLoginForm, GoogleOAuthCredentials
-from schema.user_schema import UserBase, UserResponse
+from schema.user_schema import LoggedUser, UserBase, UserResponse
 from services.auth_service import (
     AuthService,
     auth_service_dependency,
@@ -36,14 +37,14 @@ templates = Jinja2Templates(directory="templates")
 def google_oauth_user_dependency(
     request: Request,
     auth_service: AuthService = Depends(auth_service_dependency),
-):
-    credential = request.cookies.get("credential")
+) -> Generator[LoggedUser | None, None, None]:
+    credential = request.cookies.get("_session")
     if not credential:
         yield None
         return
 
     try:
-        user: UserBase = auth_service.verify_session_token(credential)
+        user: LoggedUser = auth_service.verify_session_token(credential)
     except Exception as e:
         logger.debug(f"Failed google authentication: {e}")
         yield None

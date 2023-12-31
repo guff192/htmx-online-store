@@ -1,14 +1,23 @@
-{{ product.product }}
 {% if product.count %}
 <p class="my-2" id="product{{ product.id }}counter">
-    <span class="text-2xl" hx-trigger="click">-</span>
+    <span class="text-2xl cursor-pointer" hx-trigger="click">-</span>
     <span class="bg-indigo-500 rounded p-2 font-bold">{{ product.count }}</span>
     <span
-        class="text-2xl"
+        class="text-2xl cursor-pointer"
         hx-trigger="click"
         hx-post="/cart/add?product_id={{ product.id }}"
         hx-target="#product{{ product.id }}counter"
         hx-swap="outerHTML"
     >+</span>
 </p>
+{% else %}
+<p
+    id="product{{ product.id }}counter"
+    class="my-2 cursor-pointer"
+    hx-trigger="click"
+    hx-post="/cart/add?product_id={{ product.id }}"
+    hx-target="#product{{ product.id }}counter"
+    hx-swap="outerHTML"
+
+>Add to cart</p>
 {% endif %}

@@ -2,9 +2,11 @@
     id="product{{ product.id }}"
     class="border border-gray-800 bg-indigo-50 rounded flex flex-col justify-between w-full h-full p-3 mb-2 text-center"
     hx-boost="true">
+
     <h3 class="text-l font-bold uppercase mb-2">
         <a hx-target="#content" href="{{ product.absolute_url }}">{{ product.name }}</a>
     </h3>
+
     <img
         class="mx-auto"
         hx-trigger="load"

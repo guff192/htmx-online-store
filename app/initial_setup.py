@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from loguru import logger
 import requests
 from sqlalchemy.orm import Session

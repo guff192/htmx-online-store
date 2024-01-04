@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Generator
 
 import boto3

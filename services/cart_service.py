@@ -73,6 +73,7 @@ class CartService:
             orm_product_dict.get('count', 0)
         )
         if not product_id:
+            logger.debug(orm_product_dict)
             raise ErrProductNotFound()
 
         product_info = self._products.get_by_id(product_id).__dict__
@@ -87,8 +88,28 @@ class CartService:
 
         return product_schema
 
-    def remove_from_cart(self, user_id: str, product_id: int):
-        raise NotImplementedError()
+    def remove_from_cart(self, user_id: str, product_id: int) -> ProductInCart:
+        orm_product_dict = self._repo.remove_from_cart(user_id, product_id)
+        if not orm_product_dict:
+            raise ErrProductNotFound()
+
+        product_id, product_count = (
+            orm_product_dict.get('product_id', 0),
+            orm_product_dict.get('count', 0)
+        )
+        if not product_id:
+            raise ErrProductNotFound()
+
+        product_info = self._products.get_by_id(product_id).__dict__
+        product_schema = ProductInCart(
+            id=product_id,
+            count=product_count,
+            name=product_info.get('name', ''),
+            description=product_info.get('description', ''),
+            price=product_info.get('price', 0),
+        )
+
+        return product_schema
 
 
 def get_cart_service() -> CartService:

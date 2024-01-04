@@ -13,10 +13,14 @@
         src="{{ url_for('static', path='images/loading.webp') }}"
         alt="{{ product.name }}"
     >
+
     <p class="text-sm">{{ product.description.replace('\n', '<br>') | safe | truncate(50) }}</p>
     <a class="font-bold hover:underline" hx-target="#content" href="{{ product.absolute_url }}">More info</a>
+
     <p class="my-2">
         <span class="bg-gray-200 rounded p-2 font-bold">{{ product.price }} ₽</span>
     </p>
+
     {% include 'partials/product_counter.html' %}
+
 </div>

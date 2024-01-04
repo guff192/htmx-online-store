@@ -1,4 +1,5 @@
 {% if product.count %}
+
 <p class="my-2" id="product{{ product.id }}counter">
     <a class="text-2xl cursor-pointer" hx-boost="true" hx-trigger="click">-</a>
     <span class="bg-indigo-500 rounded p-2 font-bold">{{ product.count }}</span>
@@ -11,7 +12,9 @@
         hx-swap="outerHTML"
     >+</a>
 </p>
+
 {% else %}
+
 <a
     id="product{{ product.id }}counter"
     class="my-2 cursor-pointer bg-indigo-500 rounded p-2 font-bold"
@@ -22,4 +25,5 @@
     hx-swap="outerHTML"
 
 >Add to cart</a>
+
 {% endif %}

@@ -5,6 +5,8 @@
     var pageHeader = document.getElementById('page-header');
     pageHeader.innerText = '{{ user.name }}\'s Cart'
     pageHeader.classList.remove('uppercase');
+
+    document.title = '{{ shop.name }} | Cart'
 </script>
 
 {% endif %}

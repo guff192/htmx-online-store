@@ -7,6 +7,7 @@ from sqlalchemy.orm import Query, Session
 
 from db.session import db_dependency
 from exceptions.product_exceptions import ErrProductNotFound
+from models.product import Product
 from models.user import UserProduct
 from repository.product_repository import (
     ProductRepository,
@@ -28,7 +29,7 @@ class CartRepository:
         self._product_repo = product_repo
         self._user_repo = user_repo
 
-    def get_user_product(
+    def _get_user_product_query(
             self,
             user_id: str,
             product_id: int
@@ -43,58 +44,61 @@ class CartRepository:
     def get_user_products(self, user_id: str) -> list[UserProduct]:
         user_products = (
             self._db.query(UserProduct).
+            join(Product).
             filter(UserProduct.user_id == user_id).all()
         )
 
         return user_products
 
-    def add_to_cart(self, user_id: str, product_id: int) -> dict[str, Any]:
-        found_product = self.get_user_product(user_id, product_id)
+    def add_to_cart(self, user_id: str, product_id: int) -> UserProduct | None:
+        found_product = self._get_user_product_query(user_id, product_id)
 
         # Check if product is already in cart
-        if not found_product:
-            user_product = UserProduct(user_id=user_id, product_id=product_id)
+        if not found_product.first():
+            user_product = UserProduct(
+                user_id=user_id, product_id=product_id, count=1
+            )
             self._db.add(user_product)
         else:
             # Increment product count
             found_product.update({UserProduct.count: UserProduct.count + 1})
 
         self._db.commit()
-        updated_product_dict = (
+        updated_product: UserProduct | None = (
             self
-            .get_user_product(user_id, product_id)
+            ._get_user_product_query(user_id, product_id)
             .first()
-            .__dict__
-            .copy()
         )
 
-        return updated_product_dict
+        return updated_product
 
     def remove_from_cart(
             self,
             user_id: str,
             product_id: int
-    ) -> dict[str, Any] | None:
-        found_product = self.get_user_product(user_id, product_id)
-        if not found_product:
+    ) -> UserProduct | None:
+        found_product: Query[UserProduct] = (
+            self._get_user_product_query(user_id, product_id)
+        )
+        if not found_product.first():
             raise ErrProductNotFound()
 
-        if found_product.count == 1:
-            self._db.delete(found_product)
+        # Check if removing last product
+        if found_product.first().__dict__.get('count', 0) == 1:
+            logger.debug('Removing last product')
+            found_product.delete()
+            self._db.flush((found_product, ))
+            self._db.commit()
             return
         else:
             found_product.update({UserProduct.count: UserProduct.count - 1})
 
         self._db.commit()
-        updated_product_dict = (
-            self
-            .get_user_product(user_id, product_id)
-            .first()
-            .__dict__
-            .copy()
+        updated_product: UserProduct | None = (
+            self._get_user_product_query(user_id, product_id).first()
         )
 
-        return updated_product_dict
+        return updated_product
 
 
 def cart_repository_dependency(

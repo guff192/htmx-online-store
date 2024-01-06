@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from loguru import logger
 import requests
 from sqlalchemy.orm import Session
@@ -38,6 +39,6 @@ def fetch_products(db: Session):
         try:
             # Use the service to create the product
             product_service.create(product_create)
-        except Exception as e:
-            logger.info(f"Error creating product: {e}")
+        except HTTPException as e:
+            logger.info(f"Error creating product: {e.detail}")
 

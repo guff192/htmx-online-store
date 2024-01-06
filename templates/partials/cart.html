@@ -5,6 +5,8 @@
     var pageHeader = document.getElementById('page-header');
     pageHeader.innerText = '{{ user.name }}\'s Cart'
     pageHeader.classList.remove('uppercase');
+
+    document.title = '{{ shop.name }} | Cart'
 </script>
 
 {% endif %}
@@ -16,6 +18,6 @@
     {% endfor %}
 </div>
 {% else %}
-<p class="text-center font-bold">No products in cart</p>
+<p class="text-center font-bold text-white">No products in cart</p>
 {% endif %}
 

@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Generator
 
 import boto3
@@ -12,7 +13,7 @@ from schema.product_schema import ProductPhotoPath, ProductPhotoSize
 settings = Settings()
 
 
-class ProductPhotoStorage:
+class ProductPhotoStorage(ABC):
     def __init__(self) -> None:
         raise NotImplementedError
 

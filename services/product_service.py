@@ -110,7 +110,9 @@ class ProductService:
 
 def product_service_dependency(
     product_repo: ProductRepository = Depends(product_repository_dependency),
-    photo_storage: ProductPhotoStorage = Depends(product_photo_storage_dependency),
+    photo_storage: ProductPhotoStorage = Depends(
+        product_photo_storage_dependency
+    ),
 ):
     service = ProductService(product_repo, photo_storage)
     yield service

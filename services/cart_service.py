@@ -1,9 +1,10 @@
 from collections.abc import Generator
+from typing import Any
 
 from fastapi import Depends
 from loguru import logger
 from exceptions.auth_exceptions import ErrUserNotFound
-from exceptions.product_exceptions import ErrProductNotFound
+from models.user import User, UserProduct
 from schema.user_schema import UserResponse
 from services.user_service import UserService, user_service_dependency
 from services.product_service import ProductService, product_service_dependency
@@ -14,8 +15,6 @@ from repository.cart_repository import (
 from schema.cart_schema import Cart
 from schema.product_schema import (
     ProductInCart,
-    ProductList,
-    Product as ProductSchema
 )
 
 
@@ -30,33 +29,42 @@ class CartService:
         self._users = user_service
         self._products = product_service
 
+    def _userproduct_model_to_productincart_schema(
+        self,
+        userproduct: UserProduct | None
+    ) -> ProductInCart:
+        if not userproduct:
+            return ProductInCart(
+                id=0,
+                count=0,
+                name='',
+                description='',
+                price=0,
+            )
+
+        orm_dict: dict[str, Any] = userproduct.__dict__
+        product_orm_dict: dict[str, Any] = userproduct.product.__dict__
+
+        product_in_cart = ProductInCart(
+            id=orm_dict.get('product_id', 0),
+            count=orm_dict.get('count', 0),
+            name=product_orm_dict.get('name', ''),
+            description=product_orm_dict.get('description', ''),
+            price=product_orm_dict.get('price', 0),
+        )
+
+        return product_in_cart
+
     def get_cart(self, user_id: str) -> Cart:
         # Get products in user's cart
-        orm_product_dicts = map(
-            lambda product: product.__dict__,
-            self._repo.get_user_products(user_id)
-        )
-        products: list[ProductInCart] = []
-        for product_dict in orm_product_dicts:
-            product_id, product_count = \
-                product_dict.get('product_id', 0), product_dict.get('count', 0)
-            if product_count == 0:
-                continue
+        orm_products: list[UserProduct] = self._repo.get_user_products(user_id)
+        products: list[ProductInCart] = [
+            self._userproduct_model_to_productincart_schema(userproduct)
+            for userproduct in orm_products
+        ]
 
-            product_schema = self._products.get_by_id(product_id).__dict__
-            product_in_cart = ProductInCart(
-                id=product_id,
-                count=product_count,
-                name=product_schema.get('name', ''),
-                description=product_schema.get('description', ''),
-                price=product_schema.get('price', 0),
-            )
-            products.append(product_in_cart)
-        if not products:
-            raise ErrProductNotFound()
-
-        # Get user
-        orm_user = self._users.get_by_id(user_id)
+        # Get user info for response
+        orm_user: User | None = self._users.get_by_id(user_id)
         if not orm_user:
             raise ErrUserNotFound()
         user_schema = UserResponse(**orm_user.__dict__)
@@ -67,46 +75,21 @@ class CartService:
         )
 
     def add_to_cart(self, user_id: str, product_id: int) -> ProductInCart:
-        orm_product_dict = self._repo.add_to_cart(user_id, product_id)
-        product_id, product_count = (
-            orm_product_dict.get('product_id', 0),
-            orm_product_dict.get('count', 0)
+        orm_product: UserProduct | None = (
+            self._repo.add_to_cart(user_id, product_id)
         )
-        if not product_id:
-            logger.debug(orm_product_dict)
-            raise ErrProductNotFound()
-
-        product_info = self._products.get_by_id(product_id).__dict__
-
-        product_schema = ProductInCart(
-            id=product_id,
-            count=product_count,
-            name=product_info.get('name', ''),
-            description=product_info.get('description', ''),
-            price=product_info.get('price', 0),
+        product_schema: ProductInCart = (
+            self._userproduct_model_to_productincart_schema(orm_product)
         )
 
         return product_schema
 
     def remove_from_cart(self, user_id: str, product_id: int) -> ProductInCart:
-        orm_product_dict = self._repo.remove_from_cart(user_id, product_id)
-        if not orm_product_dict:
-            raise ErrProductNotFound()
-
-        product_id, product_count = (
-            orm_product_dict.get('product_id', 0),
-            orm_product_dict.get('count', 0)
+        orm_product: UserProduct | None = (
+            self._repo.remove_from_cart(user_id, product_id)
         )
-        if not product_id:
-            raise ErrProductNotFound()
-
-        product_info = self._products.get_by_id(product_id).__dict__
-        product_schema = ProductInCart(
-            id=product_id,
-            count=product_count,
-            name=product_info.get('name', ''),
-            description=product_info.get('description', ''),
-            price=product_info.get('price', 0),
+        product_schema: ProductInCart = (
+            self._userproduct_model_to_productincart_schema(orm_product)
         )
 
         return product_schema

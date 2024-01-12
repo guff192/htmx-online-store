@@ -1,4 +1,3 @@
-from loguru import logger
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -14,7 +13,6 @@ class ProductRepository:
         self.db = db
 
     def get_all(self, offset: int) -> list[ProductDTO]:
-        logger.debug('Getting products without user info')
         return [
             ProductDTO(
                 id=orm_product.__dict__.get('_id', 0),
@@ -34,7 +32,6 @@ class ProductRepository:
         user_id: str,
         offset: int
     ) -> list[ProductDTO]:
-        logger.debug(f'Getting products for user {user_id}')
         result: list[ProductDTO] = []
 
         stmt = (

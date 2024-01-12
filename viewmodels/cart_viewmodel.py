@@ -2,6 +2,7 @@ from typing import Generator
 
 from fastapi import Depends
 from schema.cart_schema import Cart
+from schema.product_schema import ProductInCart
 from services.cart_service import CartService, cart_service_dependency
 
 
@@ -12,10 +13,10 @@ class CartViewModel:
     def get_cart(self, user_id: str) -> Cart:
         return self._service.get_cart(user_id)
 
-    def add_to_cart(self, user_id: str, product_id: int):
+    def add_to_cart(self, user_id: str, product_id: int) -> ProductInCart:
         return self._service.add_to_cart(user_id, product_id)
 
-    def remove_from_cart(self, user_id: str, product_id: int):
+    def remove_from_cart(self, user_id: str, product_id: int) -> ProductInCart:
         return self._service.remove_from_cart(user_id, product_id)
 
 

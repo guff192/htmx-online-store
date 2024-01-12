@@ -85,7 +85,6 @@ class CartRepository:
 
         # Check if removing last product
         if found_product.first().__dict__.get('count', 0) == 1:
-            logger.debug('Removing last product')
             found_product.delete()
             self._db.flush((found_product, ))
             self._db.commit()

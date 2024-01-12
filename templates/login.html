@@ -52,5 +52,31 @@
     tidSdk.addButton(uiParams);
 </script>
 
+<!-- Yandex sign-in -->
+<script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
+<div id="yaButtonContainer"></div>
+<script type="text/javascript" async>
+  window.YaAuthSuggest.init(
+    {
+      client_id: 'a84759ce6fca43beab9f850640f933ca',
+      response_type: 'token',
+      redirect_uri: '{{ shop.public_url }}home',
+    },
+    '{{ shop.public_url }}auth/login/yandex',
+    {
+      view: "button",
+      parentId: "yaButtonContainer",
+      buttonSize: 'm',
+      buttonView: 'main',
+      buttonTheme: 'dark',
+      buttonBorderRadius: "22",
+      buttonIcon: 'ya',
+    }
+  )
+  .then(({handler}) => handler())
+  .then(data => console.log('Сообщение с токеном', data))
+  .catch(error => console.log('Обработка ошибки', error))
+</script>
+
 {% endblock %}
 

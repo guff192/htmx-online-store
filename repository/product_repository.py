@@ -41,7 +41,6 @@ class ProductRepository:
             select(Product._id, Product.name, Product.description,
                    Product.price, UserProduct.count, UserProduct.user_id).
             join(UserProduct, isouter=True).
-            order_by(Product.name).
             slice(offset, offset + 10)
         )
 

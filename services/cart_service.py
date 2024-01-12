@@ -31,11 +31,12 @@ class CartService:
 
     def _userproduct_model_to_productincart_schema(
         self,
-        userproduct: UserProduct | None
+        userproduct: UserProduct | None,
+        product_id: int = 0
     ) -> ProductInCart:
         if not userproduct:
             return ProductInCart(
-                id=0,
+                id=product_id,
                 count=0,
                 name='',
                 description='',
@@ -89,7 +90,9 @@ class CartService:
             self._repo.remove_from_cart(user_id, product_id)
         )
         product_schema: ProductInCart = (
-            self._userproduct_model_to_productincart_schema(orm_product)
+            self._userproduct_model_to_productincart_schema(
+                orm_product, product_id
+            )
         )
 
         return product_schema

@@ -53,7 +53,7 @@ class CartRepository:
     def add_to_cart(self, user_id: str, product_id: int) -> UserProduct | None:
         found_product = self._get_user_product_query(user_id, product_id)
 
-        # Check if product is already in cart
+        # Check if product is not already in cart
         if not found_product.first():
             user_product = UserProduct(
                 user_id=user_id, product_id=product_id, count=1

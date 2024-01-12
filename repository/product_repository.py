@@ -35,31 +35,17 @@ class ProductRepository:
         result: list[ProductDTO] = []
 
         stmt = (
-            select(
-                Product._id,
-                Product.name,
-                Product.description,
-                Product.price,
-                UserProduct.count,
-                UserProduct.user_id
-            ).
+            select(Product._id, Product.name, Product.description,
+                   Product.price, UserProduct.count, UserProduct.user_id).
             join(UserProduct, isouter=True).
             slice(offset, offset + 10)
         )
         for row in self.db.execute(stmt).all():
-            id_ = row[0]
-            name = row[1]
-            description = row[2]
-            price = row[3]
+            id_, name, description, price = row[0], row[1], row[2], row[3]
             count = row[4] if row[4] and str(row[5]) == user_id else None
 
-            product = ProductDTO(
-                id=id_,
-                name=name,
-                description=description,
-                price=price,
-                count=count
-            )
+            product = ProductDTO(id=id_, name=name, description=description,
+                                 price=price, count=count)
             result.append(product)
 
         return result

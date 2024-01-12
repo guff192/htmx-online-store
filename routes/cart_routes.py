@@ -34,7 +34,7 @@ def get_cart(
     )
 
 
-@router.post('/add')
+@router.put('/add')
 def add_to_cart(
     request: Request,
     product_id: int,
@@ -59,7 +59,7 @@ def add_to_cart(
     return RedirectResponse('/cart', status_code=status.HTTP_303_SEE_OTHER)
 
 
-@router.post('/remove')
+@router.put('/remove')
 def remove_from_cart(
     request: Request,
     product_id: int,

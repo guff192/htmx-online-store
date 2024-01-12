@@ -5,7 +5,7 @@
         class="text-2xl cursor-pointer"
         hx-boost="true"
         hx-trigger="click"
-        hx-post="/cart/remove?product_id={{ product.id }}"
+        hx-put="/cart/remove?product_id={{ product.id }}"
         hx-target="#product{{ product.id }}counter"
         hx-swap="outerHTML"
     >-</a>
@@ -14,7 +14,7 @@
         class="text-2xl cursor-pointer"
         hx-boost="true"
         hx-trigger="click"
-        hx-post="/cart/add?product_id={{ product.id }}"
+        hx-put="/cart/add?product_id={{ product.id }}"
         hx-target="#product{{ product.id }}counter"
         hx-swap="outerHTML"
     >+</a>
@@ -27,7 +27,7 @@
     class="my-2 cursor-pointer bg-indigo-500 rounded p-2 font-bold"
     hx-boost="true"
     hx-trigger="click"
-    hx-post="/cart/add?product_id={{ product.id }}"
+    hx-put="/cart/add?product_id={{ product.id }}"
     hx-target="#product{{ product.id }}counter"
     hx-swap="outerHTML"
 

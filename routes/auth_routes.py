@@ -103,6 +103,18 @@ def login_with_google_account(
     # TODO: Create profile template and redirect to it here
 
 
+@router.post("/login/tinkoff")
+def login_with_tinkoff_account(
+):
+    pass
+
+
+@router.post("/login/yandex")
+def login_with_yandex_account(
+):
+    pass
+
+
 @router.post("/logout")
 def process_logout():
     response = Response(

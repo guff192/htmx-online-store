@@ -69,7 +69,7 @@ class Product(ProductBase):
 
 
 class ProductInCart(Product):
-    count: int
+    count: int | None
 
 
 class ProductList(BaseModel):

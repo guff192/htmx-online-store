@@ -1,5 +1,6 @@
 from fastapi import Depends
 from pydantic_core import Url
+from dto.product_dto import ProductDTO
 
 from exceptions.product_exceptions import (
     ErrInvalidProduct,
@@ -7,6 +8,7 @@ from exceptions.product_exceptions import (
     ErrProductNotFound,
 )
 from models.product import Product
+from models.user import UserProduct
 from repository.product_repository import (
     ProductRepository,
     product_repository_dependency,
@@ -19,6 +21,7 @@ from schema.product_schema import (
     ProductUpdate,
     ProductUpdateResponse,
 )
+from schema.user_schema import LoggedUser
 from storage.photo_storage import (
     ProductPhotoStorage,
     product_photo_storage_dependency
@@ -34,9 +37,16 @@ class ProductService:
         self.repo = product_repo
         self.photo_storage = photo_storage
 
-    def get_all(self, offset: int) -> list[Product]:
+    def get_all(
+        self,
+        offset: int,
+        user: LoggedUser | None = None
+    ) -> list[ProductDTO]:
         if offset < 0:
             raise ErrProductNotFound()
+
+        if user:
+            return self.repo.get_all_with_cart_info(str(user.id), offset)
         return self.repo.get_all(offset=offset)
 
     def get_by_id(self, product_id: int) -> Product:

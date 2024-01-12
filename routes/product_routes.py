@@ -4,12 +4,14 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
+from routes.auth_routes import google_oauth_user_dependency
 
 from schema.product_schema import (
     ProductList,
     ProductUpdate,
     ProductUpdateResponse,
 )
+from schema.user_schema import LoggedUser
 from services.product_service import ProductService, product_service_dependency
 from viewmodels import DefaultViewModel, default_viewmodel_dependency
 from viewmodels.product_viewmodel import (
@@ -40,12 +42,13 @@ def get_catalog(
 def get_product_list(
     request: Request,
     offset: int = 0,
-    product_vm: ProductViewModel = Depends(product_viewmodel_dependency)
+    product_vm: ProductViewModel = Depends(product_viewmodel_dependency),
+    user: LoggedUser | None = Depends(google_oauth_user_dependency),
 ):
     if not request.headers.get('hx-request'):
         return RedirectResponse('/products/catalog')
 
-    products_data: ProductList = product_vm.get_all(offset=offset)
+    products_data: ProductList = product_vm.get_all(offset=offset, user=user)
 
     context_data: dict[str, Any] = {'request': request}
     context_data.update(products_data.build_context())

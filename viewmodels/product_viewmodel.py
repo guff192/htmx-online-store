@@ -5,36 +5,39 @@ from pydantic_core import Url
 
 from schema.product_schema import (
     Product,
+    ProductInCart,
     ProductList,
     ProductPhotoPath,
     ProductPhotoSize,
 )
+from schema.user_schema import LoggedUser
 from services.product_service import ProductService, product_service_dependency
 
 
 class ProductViewModel:
-    def __init__(self, product_service: ProductService) -> None:
+    def __init__(
+        self,
+        product_service: ProductService,
+    ) -> None:
         self._service = product_service
 
-    def get_all(self, offset: int) -> ProductList:
-        products = self._service.get_all(offset=offset)
+    def get_all(
+        self,
+        offset: int,
+        user: LoggedUser | None = None
+    ) -> ProductList:
+        products = self._service.get_all(offset=offset, user=user)
         if not products:
             return ProductList(products=[], offset=-5)
 
-        product_list = ProductList(products=[], offset=offset + 10)
-
-        for orm_product in products:
-            product_dict = orm_product.__dict__
-            product_name = product_dict.get('name', '')
-
-            product_list.products.append(
-                Product(
-                    id=product_dict.get('_id', 0),
-                    name=product_name,
-                    description=product_dict.get('description', ''),
-                    price=product_dict.get('price', 0),
-                )
-            )
+        product_list = ProductList(
+            offset=offset + 10,
+            products=[
+                ProductInCart(id=product_dto.id, name=product_dto.name,
+                              description=product_dto.description,
+                              price=product_dto.price, count=product_dto.count)
+                for product_dto in products],
+        )
 
         return product_list
 

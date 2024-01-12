@@ -38,9 +38,11 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(default='very strong secret', alias='JWT_SECRET')
     jwt_algorithm: str = Field(default='HS256', alias='JWT_ALGORITHM')
 
+    # Shop settings
     shop_name: str = Field(default='Shop name', alias='SHOP_NAME')
+    shop_public_url: Url = Field(default='', alias='SHOP_PUBLIC_URL')
 
-    # google settings
+    # google oauth settings
     google_oauth2_token_uri: str = Field(
         default='https://oauth2.googleapis.com/token',
         alias='GOOGLE_OAUTH2_TOKEN_URI'
@@ -49,14 +51,15 @@ class Settings(BaseSettings):
         default='',
         alias='GOOGLE_OAUTH2_CLIENT_ID'
     )
-
-    posting_endpoint: str = Field(
-        default='',
-        alias='POSTING_ENDPOINT'
-    )
     google_client_secret: str = Field(
         default='',
         alias='GOOGLE_CLIENT_SECRET'
+    )
+
+    # Google spreadsheets settings
+    posting_endpoint: str = Field(
+        default='',
+        alias='POSTING_ENDPOINT'
     )
 
     # storage settings

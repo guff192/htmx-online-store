@@ -1,19 +1,59 @@
 from fastapi import Depends
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from db.session import db_dependency
+from dto.product_dto import ProductDTO
 from models.product import Product
+from models.user import UserProduct
 
 
 class ProductRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_all(self, offset: int) -> list[Product]:
-        return self.db.query(Product)\
-            .order_by(Product.name)\
-            .slice(offset, offset + 10)\
+    def get_all(self, offset: int) -> list[ProductDTO]:
+        return [
+            # DTO creation
+            ProductDTO(
+                id=orm_product.__dict__.get('_id', 0),
+                name=orm_product.__dict__.get('name', ''),
+                description=orm_product.__dict__.get('description', ''),
+                price=orm_product.__dict__.get('price', 0),
+                count=None
+            ) for orm_product in
+            # Orm query
+            self.db.query(Product)
+            .order_by(Product.name)
+            .slice(offset, offset + 10)
             .all()
+        ]
+
+    def get_all_with_cart_info(
+        self,
+        user_id: str,
+        offset: int
+    ) -> list[ProductDTO]:
+        result: list[ProductDTO] = []
+
+        # Create query
+        stmt = (
+            select(Product._id, Product.name, Product.description,
+                   Product.price, UserProduct.count, UserProduct.user_id).
+            join(UserProduct, isouter=True).
+            slice(offset, offset + 10)
+        )
+
+        # Execute and add to result
+        for row in self.db.execute(stmt).all():
+            id_, name, description, price = row[0], row[1], row[2], row[3]
+            count = row[4] if row[4] and str(row[5]) == user_id else None
+
+            product = ProductDTO(id=id_, name=name, description=description,
+                                 price=price, count=count)
+            result.append(product)
+
+        return result
 
     def get_by_id(self, product_id: int) -> Product | None:
         return self.db.query(Product).get(product_id)
@@ -59,7 +99,10 @@ def product_repository_dependency(db: Session = Depends(db_dependency)):
 
 
 def test_product_repository():
+    USER_ID = 'a7e02df8-e3d8-4aa5-bc52-ce70fb214647'
     session = next(db_dependency())
     repo = ProductRepository(session)
-    print(repo.get_by_id(2).__dict__)
+
+    for product in repo.get_all_with_cart_info(USER_ID, 10):
+        print(product.__dict__)
 

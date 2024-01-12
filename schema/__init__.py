@@ -19,7 +19,10 @@ class SchemaUtils:
         settings = Settings()
         self.shop: Shop = Shop(name=settings.shop_name)
 
-    def add_shop_to_context(self, func: Callable[..., dict[str, Any]]) -> Callable[..., dict[str, Any]]:
+    def add_shop_to_context(
+        self,
+        func: Callable[..., dict[str, Any]]
+    ) -> Callable[..., dict[str, Any]]:
         def wrapper(*args, **kwargs):
             context = func(*args, **kwargs)
             context['shop'] = self.shop

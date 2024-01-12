@@ -28,5 +28,29 @@
      data-logo_alignment="left">
 </div>
 
+<!-- Tinkoff sign-in -->
+<script src="https://sso-forms-prod.cdn-tinkoff.ru/tinkoff-id/widget.js"></script>
+<div id="container-for-tid-button" class="w-1/2 mx-auto my-5 flex justify-center"></div>
+<script type="text/javascript" async>
+    const authParams = {
+      redirectUri: '{{ shop.public_url }}home',
+      responseType: 'code',
+      clientId: 'sadfsfasfaszfsa',
+      state: 'some-state',
+    }
+
+    const uiParams = {
+      container: '#container-for-tid-button',
+      size: 'm',
+      color: 'primary',
+      text: 'Tinkoff',
+      target: '_self'
+    }
+
+    const tidSdk = new TidSDK(authParams);
+
+    tidSdk.addButton(uiParams);
+</script>
+
 {% endblock %}
 

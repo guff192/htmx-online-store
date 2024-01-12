@@ -14,6 +14,7 @@ class ProductRepository:
 
     def get_all(self, offset: int) -> list[ProductDTO]:
         return [
+            # DTO creation
             ProductDTO(
                 id=orm_product.__dict__.get('_id', 0),
                 name=orm_product.__dict__.get('name', ''),
@@ -21,6 +22,7 @@ class ProductRepository:
                 price=orm_product.__dict__.get('price', 0),
                 count=None
             ) for orm_product in
+            # Orm query
             self.db.query(Product)
             .order_by(Product.name)
             .slice(offset, offset + 10)
@@ -34,12 +36,15 @@ class ProductRepository:
     ) -> list[ProductDTO]:
         result: list[ProductDTO] = []
 
+        # Create query
         stmt = (
             select(Product._id, Product.name, Product.description,
                    Product.price, UserProduct.count, UserProduct.user_id).
             join(UserProduct, isouter=True).
             slice(offset, offset + 10)
         )
+
+        # Execute and add to result
         for row in self.db.execute(stmt).all():
             id_, name, description, price = row[0], row[1], row[2], row[3]
             count = row[4] if row[4] and str(row[5]) == user_id else None

@@ -13,9 +13,9 @@
                 {% if request.state.user.is_admin %}
                     <a href="/admin" hx-boost="false"><div class="p-4">Admin</div></a>
                 {% endif %}
-                <a href="/auth/logout" hx-post="/auth/logout"><div class="p-4">Logout</div></a>
+                <a href="/auth/logout" hx-boost="false" hx-post="/auth/logout"><div class="p-4">Logout</div></a>
             {% else %}
-                <a href="/auth/login"><div class="p-4">Login</div></a>
+                <a href="/auth/login" hx-boost="false"><div class="p-4">Login</div></a>
             {% endif %}
         </div>
     </div>

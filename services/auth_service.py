@@ -4,10 +4,12 @@ import time
 from typing import Any, Mapping, Protocol
 
 from fastapi import Depends
-from google.auth.transport import requests
+from google.auth.transport import requests as google_auth_requests
 from google.oauth2 import id_token
 from jose import JWTError, jwt
 from loguru import logger
+import requests
+from sqlalchemy.sql.functions import user
 
 from app.config import Settings
 from exceptions.auth_exceptions import ErrUserNotFound, ErrWrongCredentials
@@ -16,7 +18,11 @@ from repository.user_repository import (
     get_user_repository,
     user_repository_dependency,
 )
-from schema.auth_schema import GoogleOAuthCredentials, OAuthCredentials
+from schema.auth_schema import (
+    GoogleOAuthCredentials,
+    OAuthCredentials,
+    YandexOauthCredentials
+)
 from schema.user_schema import LoggedUser
 
 
@@ -38,7 +44,8 @@ class OauthProvider(Protocol):
 
 class GoogleOAuthProvider(OauthProvider):
     def verify_oauth(
-            self, credentials: GoogleOAuthCredentials,
+        self,
+        credentials: GoogleOAuthCredentials,
     ) -> Mapping[str, Any]:
         if credentials.form_data.g_csrf_token != credentials.cookie_csrf_token:
             raise ErrWrongCredentials()
@@ -47,7 +54,7 @@ class GoogleOAuthProvider(OauthProvider):
             # geting user info
             id_info: Mapping[str, Any] = id_token.verify_oauth2_token(
                 credentials.form_data.credential,
-                requests.Request(),
+                google_auth_requests.Request(),
                 settings.google_oauth2_client_id,
                 int(time.time())
             )
@@ -55,6 +62,26 @@ class GoogleOAuthProvider(OauthProvider):
             return id_info
         except Exception as e:
             logger.debug(f'Failed google authentication: {e}')
+            raise ErrWrongCredentials()
+
+
+class YandexOAuthProvider(OauthProvider):
+    def verify_oauth(
+        self,
+        credentials: YandexOauthCredentials
+    ) -> Mapping[str, Any]:
+        if not credentials.expires_in > 0:
+            raise ErrWrongCredentials()
+
+        response = requests.get(
+            settings.yandex_oauth2_token_uri,
+            headers={'Authorization': f'OAuth {credentials.access_token}'},
+        )
+        try:
+            yandex_user_info: Mapping[str, Any] = response.json()
+            return yandex_user_info
+        except requests.exceptions.JSONDecodeError as e:
+            logger.debug(f'Failed yandex authentication: {e}')
             raise ErrWrongCredentials()
 
 
@@ -78,8 +105,8 @@ class AuthService:
 
     def create_access_token(
         self,
-            data: dict,
-            expires_delta: timedelta | None = None
+        data: dict,
+        expires_delta: timedelta | None = None
     ) -> str:
         to_encode = data.copy()
         if expires_delta:
@@ -114,7 +141,15 @@ class AuthService:
         if not user_data:
             raise ErrUserNotFound()
 
-        return LoggedUser(**user_data.__dict__)
+        return LoggedUser(
+            id=user_id,
+            name=str(user_data.name),
+            email=str(user_data.email),
+            profile_img_url=str(user_data.profile_img_url),
+            google_id=str(user_data.google_id),
+            yandex_id=str(user_data.yandex_id),
+            is_admin=bool(user_data.is_admin),
+        )
 
 
 def auth_service_dependency(

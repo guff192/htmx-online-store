@@ -1,7 +1,9 @@
 from fastapi import Request, Response
 from fastapi.responses import RedirectResponse
 from loguru import logger
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.middleware.base import (
+    BaseHTTPMiddleware, RequestResponseEndpoint
+)
 
 from exceptions.auth_exceptions import ErrWrongCredentials
 from services.auth_service import AuthService
@@ -28,11 +30,13 @@ class LoginMiddleware(BaseHTTPMiddleware):
 
         try:
             user = self._service.verify_session_token(session_cookie)
+            logger.debug(f'User in middleware: {user}')
         except ErrWrongCredentials:
             user = None
 
         request.state.user = user
 
+        logger.info('Finished login middleware')
         return await call_next(request)
 
 
@@ -72,5 +76,6 @@ class AdminMiddleware(BaseHTTPMiddleware):
         if not client or not client.host or not self._check_admin(request):
             return RedirectResponse('/')
 
+        logger.info('Finished admin middleware')
         return await call_next(request)
 

@@ -4,8 +4,10 @@ from pydantic import BaseModel
 
 class UserBase(BaseModel):
     name: str
+    email: str
     profile_img_url: str
     google_id: str | None
+    yandex_id: str | None
     is_admin: bool = False
 
 
@@ -19,7 +21,6 @@ class LoggedUser(UserBase):
 
 class UserCreateGoogle(UserBase):
     google_id: str
-    email: str
     email_verified: bool
     hd: str
 
@@ -30,3 +31,17 @@ class UserCreateGoogle(UserBase):
             return True
 
         return False
+
+
+class UserCreateYandex(UserBase):
+    yandex_id: str
+    is_avatar_empty: bool
+
+    def verify(self) -> bool:
+        if self.email.endswith('@yandex.ru'):
+            return True
+        elif self.is_avatar_empty:
+            return True
+
+        return False
+

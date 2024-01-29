@@ -16,15 +16,23 @@ class UserRepository:
         logger.debug(f'Getting user with user id: {user_id}')
         return self.db.query(User).get(user_uuid)
 
+    def get_by_email(self, email: str) -> User | None:
+        return self.db.query(User).filter_by(email=email).first()
+
     def get_by_google_id(self, google_id: str) -> User | None:
         return self.db.query(User).filter_by(google_id=google_id).first()
 
+    def get_by_yandex_id(self, yandex_id: str) -> User | None:
+        return self.db.query(User).filter_by(yandex_id=yandex_id).first()
+
     def create(self,
                name: str,
+               email: str,
                profile_img_url: str | None,
-               google_id: str | None) -> User | None:
+               google_id: str | None = None,
+               yandex_id: str | None = None) -> User | None:
         # Check if at least one of necessary fields is not None
-        if not any((google_id,)):
+        if not any((google_id, yandex_id)):
             return None
 
         # Create user using given data
@@ -32,6 +40,7 @@ class UserRepository:
             logger.debug(f'Creating user with google_id: {google_id}')
             user = User(
                 id=uuid4(),
+                email=email,
                 name=name,
                 profile_img_url=profile_img_url,
                 google_id=google_id
@@ -39,7 +48,18 @@ class UserRepository:
             self.db.add(user)
             self.db.commit()
             self.db.refresh(user)
-        # elif apple_id:
+        elif yandex_id:
+            logger.debug(f'Creating user with yandex_id: {yandex_id}')
+            user = User(
+                id=uuid4(),
+                email=email,
+                name=name,
+                profile_img_url=profile_img_url,
+                yandex_id=yandex_id
+            )
+            self.db.add(user)
+            self.db.commit()
+            self.db.refresh(user)
         else:
             return None
 

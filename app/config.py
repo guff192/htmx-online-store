@@ -56,6 +56,22 @@ class Settings(BaseSettings):
         alias='GOOGLE_CLIENT_SECRET'
     )
 
+    # yandex oauth settings
+    yandex_oauth2_token_uri: str = Field(
+        default='https://login.yandex.ru/info?format=json',
+        alias='YANDEX_OAUTH2_TOKEN_URI'
+    )
+
+    # avatar settings
+    yandex_avatars_base_url: Url = Field(
+        default='https://avatars.mds.yandex.net/get-yapic/',
+        alias='YANDEX_AVATARS_BASE_URL'
+    )
+    yandex_avatars_default_size: str = Field(
+        default='/islands-200',
+        alias='YANDEX_AVATARS_DEFAULT_SIZE'
+    )
+
     # Google spreadsheets settings
     posting_endpoint: str = Field(
         default='',

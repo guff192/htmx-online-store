@@ -6,8 +6,12 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
-from schema.auth_schema import GoogleLoginForm, GoogleOAuthCredentials
-from schema.user_schema import LoggedUser, UserBase, UserResponse
+from schema.auth_schema import (
+    GoogleLoginForm,
+    GoogleOAuthCredentials,
+    YandexOauthCredentials
+)
+from schema.user_schema import LoggedUser, UserResponse
 from services.auth_service import (
     AuthService,
     auth_service_dependency,
@@ -18,7 +22,7 @@ from viewmodels import (
 )
 from viewmodels.auth_viewmodel import (
     AuthViewModel,
-    get_auth_viewmodel
+    get_auth_viewmodel,
 )
 from viewmodels.user_viewmodel import (
     UserViewModel,
@@ -38,6 +42,7 @@ def google_oauth_user_dependency(
     request: Request,
     auth_service: AuthService = Depends(auth_service_dependency),
 ) -> Generator[LoggedUser | None, None, None]:
+    logger.debug(f'User in dependency: {request.state.user}')
     credential = request.cookies.get("_session")
     if not credential:
         yield None
@@ -101,6 +106,73 @@ def login_with_google_account(
     )
     return response
     # TODO: Create profile template and redirect to it here
+
+
+@router.post("/login/tinkoff")
+def login_with_tinkoff_account(
+):
+    pass
+
+
+@router.get("/login/yandex")
+def login_with_yandex_account(
+    request: Request,
+    default_vm: DefaultViewModel = Depends(default_viewmodel_dependency),
+):
+    # Data is in the form of
+    # /auth/login/yandex#access_token=<access_token>&token_type=bearer&expires_in=<expires_in>
+
+    context_data: dict[str, Any] = {
+        "request": request,
+        **default_vm.build_context(),
+    }
+
+    return templates.TemplateResponse(
+        "yandex_auth.html",
+        context=context_data
+    )
+
+
+@router.post("/login/yandex")
+def process_yandex_login(
+    access_token: Annotated[str, Form()],
+    token_type: Annotated[str, Form()],
+    expires_in: Annotated[int, Form()],
+    auth_vm: AuthViewModel = Depends(get_auth_viewmodel),
+    user_vm: UserViewModel = Depends(get_user_viewmodel),
+):
+    # Request is in the form of
+    # /auth/login/yandex#access_token=<access_token>&token_type=bearer&expires_in=<expires_in>
+    # so, data is in the anchor (why??)
+
+    yandex_credentials = YandexOauthCredentials(
+        access_token=access_token, token_type=token_type, expires_in=expires_in
+    )
+
+    id_info = auth_vm.verify_oauth(yandex_credentials)
+    if not id_info:
+        raise ErrWrongCredentials()
+
+    email: str = id_info.get('default_email', '')
+    if not email:
+        raise ErrWrongCredentials()
+
+    user: UserResponse | None = user_vm.get_by_email(email)
+    if not user:
+        user = user_vm.get_by_yandex_id_or_create(id_info)
+    token = auth_vm.create_session({'sub': str(user.id)})
+
+    response = RedirectResponse(
+        "/home",
+        status_code=status.HTTP_302_FOUND,
+    )
+    response.set_cookie(
+        key="_session",
+        value=token,
+        httponly=True,
+        samesite="strict",
+    )
+    return response
 
 
 @router.post("/logout")

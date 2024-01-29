@@ -2,10 +2,15 @@ from typing import Any, Generator, Mapping
 
 from fastapi import Depends
 
-from schema.auth_schema import GoogleOAuthCredentials, OAuthCredentials
+from schema.auth_schema import (
+    GoogleOAuthCredentials,
+    OAuthCredentials,
+    YandexOauthCredentials
+)
 from services.auth_service import (
     AuthService,
     GoogleOAuthProvider,
+    YandexOAuthProvider,
     get_auth_service
 )
 
@@ -21,6 +26,8 @@ class AuthViewModel:
         # Setup provider
         if isinstance(credentials, GoogleOAuthCredentials):
             self.auth_service.oauth_provider = GoogleOAuthProvider()
+        elif isinstance(credentials, YandexOauthCredentials):
+            self.auth_service.oauth_provider = YandexOAuthProvider()
         else:
             return None
 

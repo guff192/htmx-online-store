@@ -45,6 +45,7 @@ def get_product_list(
     product_vm: ProductViewModel = Depends(product_viewmodel_dependency),
     user: LoggedUser | None = Depends(google_oauth_user_dependency),
 ):
+    logger.debug(f'{request.state.user = }')
     if not request.headers.get('hx-request'):
         return RedirectResponse('/products/catalog')
 

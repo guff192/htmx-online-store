@@ -18,8 +18,8 @@
    <div id="redirect_link"><a href="{{ shop.public_url }}home">Перейти на главную</a></div>
    <script>
       window.onload = function() {
-          window.YaSendSuggestToken("{{ shop.public_url }}auth/login/yandex", {
-            "kek": "test"
+          window.YaSendSuggestToken('{{ shop.public_url }}auth/login/yandex', {
+            'kek': 'test'
           });
 
           let authParams = '';
@@ -34,12 +34,20 @@
           const xhr = new XMLHttpRequest();
 
           xhr.onreadystatechange = () => {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                console.log('Auth params sent');
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 201) {
+                console.log('Auth params received');
             }
           }
+          xhr.onload = (e) => {
+              console.log(e);
+              if(window.opener !== null) {
+                window.opener.location.replace('{{ shop.public_url }}');
+              }
+              window.location.replace('{{ shop.public_url }}');
+              window.postMessage('Credentials received', '{{ shop.public_url }}auth/login');
+          }
 
-          xhr.open('POST', "{{ shop.public_url }}auth/login/yandex");
+          xhr.open('POST', '{{ shop.public_url }}auth/login/yandex');
           xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
           xhr.send(authParams);
       };

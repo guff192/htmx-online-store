@@ -13,7 +13,6 @@ class UserRepository:
 
     def get_by_id(self, user_id: str) -> User | None:
         user_uuid = UUID(user_id)
-        logger.debug(f'Getting user with user id: {user_id}')
         return self.db.query(User).get(user_uuid)
 
     def get_by_email(self, email: str) -> User | None:

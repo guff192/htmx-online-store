@@ -30,13 +30,11 @@ class LoginMiddleware(BaseHTTPMiddleware):
 
         try:
             user = self._service.verify_session_token(session_cookie)
-            logger.debug(f'User in middleware: {user}')
         except ErrWrongCredentials:
             user = None
 
         request.state.user = user
 
-        logger.info('Finished login middleware')
         return await call_next(request)
 
 

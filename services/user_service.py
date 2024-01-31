@@ -101,7 +101,7 @@ class UserService:
             )
 
         user_dict = user.__dict__
-        user_dict['yahex_id'] = str(user_dict['yahex_id'])
+        user_dict['yandex_id'] = str(user_dict['yandex_id'])
         user_schema = UserResponse(**user_dict)
 
         return user_schema
@@ -124,6 +124,7 @@ class UserService:
             )
 
         user_dict = user.__dict__
+        user_dict['yandex_id'] = str(user_dict['yandex_id'])
         user_schema = UserResponse(**user_dict)
 
         return user_schema

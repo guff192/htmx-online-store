@@ -162,9 +162,9 @@ def process_yandex_login(
         user = user_vm.get_by_yandex_id_or_create(id_info)
     token = auth_vm.create_session({'sub': str(user.id)})
 
-    response = RedirectResponse(
-        "/home",
-        status_code=status.HTTP_302_FOUND,
+    response = Response(
+        "Successfully authenticated with yandex ID!",
+        status_code=status.HTTP_201_CREATED,
     )
     response.set_cookie(
         key="_session",

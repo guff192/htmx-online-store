@@ -42,9 +42,10 @@
               console.log(e);
               if(window.opener !== null) {
                 window.opener.location.replace('{{ shop.public_url }}');
+              } else {
+                window.location.replace('{{ shop.public_url }}');
               }
-              window.location.replace('{{ shop.public_url }}');
-              window.postMessage('Credentials received', '{{ shop.public_url }}auth/login');
+              window.opener.postMessage('Credentials received', '{{ shop.public_url }}auth/login');
           }
 
           xhr.open('POST', '{{ shop.public_url }}auth/login/yandex');

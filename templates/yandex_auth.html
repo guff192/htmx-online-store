@@ -35,23 +35,11 @@
 
           xhr.onreadystatechange = () => {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 201) {
-                console.log('Auth params received');
+              console.log('Auth params received');
             }
-          }
-          xhr.onload = (e) => {
-              console.log(e);
-              if(window.opener !== null) {
-                window.opener.location.replace('{{ shop.public_url }}');
-              } else {
-                window.location.replace('{{ shop.public_url }}');
-              }
-              window.opener.postMessage('Credentials received', '{{ shop.public_url }}auth/login');
-          }
-
-          xhr.open('POST', '{{ shop.public_url }}auth/login/yandex');
-          xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-          xhr.send(authParams);
-      };
+            
+            xhr.send(authParams);
+          };
    </script>
 </body>
 

@@ -60,32 +60,27 @@
     if (event.origin !== '{{ shop.public_url }}') {
       
     }});  
-  window.YaAuthSuggest.init(
-    {
-      client_id: 'a84759ce6fca43beab9f850640f933ca',
-      response_type: 'token',
-      redirect_uri: '{{ shop.public_url }}auth/login/yandex',
-    },
-    '{{ shop.public_url }}auth/login/yandex',
-    {
-      view: "button",
-      parentId: "yaButtonContainer",
-      buttonSize: 'm',
-      buttonView: 'main',
-      buttonTheme: 'dark',
-      buttonBorderRadius: "22",
-      buttonIcon: 'ya',
-    }
+
+    window.YaAuthSuggest.init(
+      {
+        client_id: 'a84759ce6fca43beab9f850640f933ca',
+        response_type: 'token',
+        redirect_uri: '{{ shop.public_url }}auth/login/yandex',
+      },
+      '{{ shop.public_url }}auth/login/yandex',
+      {
+        view: "button",
+        parentId: "yaButtonContainer",
+        buttonSize: 'm',
+        buttonView: 'main',
+        buttonTheme: 'dark',
+        buttonBorderRadius: "22",
+        buttonIcon: 'ya',
+      }
   )
   .then(({handler}) => handler())
-      .then(data => { if(data.hasOwnProperty('access_token') && data.hasOwnProperty('expires_in')) { 
-        window.location.replace(
-          '{{ shop.public_url }}auth/login/yandex#access_token='
-          + data.access_token
-          + '&token_type=bearer&expires_in='
-          + data.expires_in
-        );
-  .catch(error => console.log('Обработка ошибки', error))
+  .then(data => console.log('Сообщение с токеном', data))
+  .catch(error => console.log('Обработка ошибки', error));
 </script>
 
 {% endblock %}

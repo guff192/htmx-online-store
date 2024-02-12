@@ -80,7 +80,7 @@ class YandexOAuthProvider(OauthProvider):
         try:
             yandex_user_info: Mapping[str, Any] = response.json()
             return yandex_user_info
-        except requests.exceptions.JSONDecodeError as e:
+        except Exception as e:
             logger.debug(f'Failed yandex authentication: {e}')
             raise ErrWrongCredentials()
 

@@ -29,11 +29,7 @@ class UserRepository:
                email: str,
                profile_img_url: str | None,
                google_id: str | None = None,
-               yandex_id: str | None = None) -> User | None:
-        # Check if at least one of necessary fields is not None
-        if not any((google_id, yandex_id)):
-            return None
-
+               yandex_id: str | None = None) -> User:
         # Create user using given data
         if google_id:
             logger.debug(f'Creating user with google_id: {google_id}')

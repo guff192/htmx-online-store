@@ -1,7 +1,7 @@
 from collections.abc import Generator
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Cookie, Depends, Form, Request, Response, status
+from fastapi import APIRouter, Body, Cookie, Depends, Form, Request, Response, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
@@ -103,6 +103,8 @@ def login_with_google_account(
         value=token,
         httponly=True,
         samesite="strict",
+        secure=True,
+        max_age=2592000,
     )
     return response
     # TODO: Create profile template and redirect to it here
@@ -135,16 +137,12 @@ def login_with_yandex_account(
 
 @router.post("/login/yandex")
 def process_yandex_login(
-    access_token: Annotated[str, Form()],
-    token_type: Annotated[str, Form()],
-    expires_in: Annotated[int, Form()],
+    access_token: Annotated[str, Body()],
+    token_type: Annotated[str, Body()],
+    expires_in: Annotated[int, Body()],
     auth_vm: AuthViewModel = Depends(get_auth_viewmodel),
     user_vm: UserViewModel = Depends(get_user_viewmodel),
 ):
-    # Request is in the form of
-    # /auth/login/yandex#access_token=<access_token>&token_type=bearer&expires_in=<expires_in>
-    # so, data is in the anchor (why??)
-
     yandex_credentials = YandexOauthCredentials(
         access_token=access_token, token_type=token_type, expires_in=expires_in
     )
@@ -171,6 +169,8 @@ def process_yandex_login(
         value=token,
         httponly=True,
         samesite="strict",
+        secure=True,
+        max_age=2592000,
     )
     return response
 

@@ -55,19 +55,7 @@
 <!-- Yandex sign-in -->
 <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
 <div id="yaButtonContainer" class="w-1/4 mx-auto my-5 flex justify-center"></div>
-<button id="yaTestButton">Test yandex</button>
 <script type="text/javascript" async>
-  window.addEventListener('message', (event) => {
-    if (event.origin !== '{{ shop.public_url }}') {
-      
-    }
-  });  
-
-  window.addEventListener("message", (event) => {
-    if(event.source.name === "Yandex Auth") {
-      console.log(event.data);
-    }
-  });
 
   window.YaAuthSuggest.init(
     {
@@ -104,17 +92,12 @@
       })
       .then((response) => {
         const cookie = response.headers.get("set-cookie");
-        console.log(cookie);
         window.location.href = '{{ shop.public_url }}'
       });
     }
   })
   .catch(error => console.log('Обработка ошибки', error));
 
-  const yaTestButton = document.getElementById('yaTestButton');
-  yaTestButton.onclick = () => {
-    window.open("{{ shop.public_url }}auth/login/yandex#access_token=y0_AgAAAAAGqQ8SAAseBQAAAAD4dm1p_pXV7MxBTDqa8yT19OyVEwqNPk4&token_type=bearer&expires_in=29538921", "Yandex Auth", "popup,width=500,height=500");
-  };
 </script>
 
 {% endblock %}

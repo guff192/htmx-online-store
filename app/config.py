@@ -40,6 +40,10 @@ class Settings(BaseSettings):
 
     # Shop settings
     shop_name: str = Field(default='Shop name', alias='SHOP_NAME')
+    shop_logo_name: str | None = Field(
+        default=None,
+        alias='SHOP_LOGO_NAME'
+    )
     shop_public_url: Url = Field(default='', alias='SHOP_PUBLIC_URL')
 
     # google oauth settings

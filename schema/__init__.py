@@ -7,6 +7,7 @@ from app.config import Settings
 
 class Shop(BaseModel):
     name: str
+    logo_name: str | None
     public_url: str
 
 
@@ -20,7 +21,8 @@ class SchemaUtils:
         settings = Settings()
         self.shop: Shop = Shop(
             name=settings.shop_name,
-            public_url=str(settings.shop_public_url)
+            logo_name=settings.shop_logo_name,
+            public_url=str(settings.shop_public_url),
         )
 
     def add_shop_to_context(

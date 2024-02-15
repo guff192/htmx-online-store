@@ -8,6 +8,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/indicator.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/dropdown.css') }}">
 
     <!-- JS -->
     <script src="{{ url_for('static', path='js/htmx.min.js') }}"></script>
@@ -18,11 +19,11 @@
         {% include 'partials/navbar.html' %}
     {% endblock %}
 
-    <header class="mt-20">
+    <header class="mt-32">
         {% block header %}<h1 id="page-header">Default Header</h1>{% endblock %}</h1>
     </header>
 
-    <main id="content" class="w-full md:w-8/12 mx-auto mt-1">
+    <main id="content" class="w-full md:w-8/12 mx-auto mt-2">
         {% block content %}{% endblock %}
     </main>
 

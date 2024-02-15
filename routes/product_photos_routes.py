@@ -89,3 +89,4 @@ def get_main_photo(
     response.headers.update({'Cache-Control': 'max-age=86400, public'})
 
     return response
+

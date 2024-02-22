@@ -32,7 +32,17 @@ class SchemaUtils:
     ) -> Callable[..., dict[str, Any]]:
         def wrapper(*args, **kwargs):
             context = func(*args, **kwargs)
-            context.update(shop=self.shop, debug=self.debug)
+            context.update(shop=self.shop)
+            return context
+        return wrapper
+
+    def add_debug_info_to_context(
+        self,
+        func: Callable[..., dict[str, Any]]
+    ) -> Callable[..., dict[str, Any]]:
+        def wrapper(*args, **kwargs):
+            context = func(*args, **kwargs)
+            context.update(debug=self.debug)
             return context
         return wrapper
 
@@ -41,6 +51,7 @@ utils = SchemaUtils()
 
 
 class DefaultSchema(BaseModel):
+    @utils.add_debug_info_to_context
     @utils.add_shop_to_context
     def build_context(self) -> dict[str, Any]:
         return {}

@@ -42,7 +42,6 @@ def google_oauth_user_dependency(
     request: Request,
     auth_service: AuthService = Depends(auth_service_dependency),
 ) -> Generator[LoggedUser | None, None, None]:
-    logger.debug(f'User in dependency: {request.state.user}')
     credential = request.cookies.get("_session")
     if not credential:
         yield None

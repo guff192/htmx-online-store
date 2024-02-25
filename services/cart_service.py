@@ -41,10 +41,24 @@ class CartService:
                 name='',
                 description='',
                 price=0,
+                manufacturer_name='',
             )
 
+        product = userproduct.product
+        if not product or not hasattr(product, 'manufacturer'):
+            return ProductInCart(
+                id=product_id,
+                count=0,
+                name='',
+                description='',
+                price=0,
+                manufacturer_name='',
+            )
+        manufacturer = product.manufacturer
+
         orm_dict: dict[str, Any] = userproduct.__dict__
-        product_orm_dict: dict[str, Any] = userproduct.product.__dict__
+        product_orm_dict: dict[str, Any] = product.__dict__
+        manufacturer_dict: dict[str, Any] = manufacturer.__dict__
 
         product_in_cart = ProductInCart(
             id=orm_dict.get('product_id', 0),
@@ -52,6 +66,7 @@ class CartService:
             name=product_orm_dict.get('name', ''),
             description=product_orm_dict.get('description', ''),
             price=product_orm_dict.get('price', 0),
+            manufacturer_name=manufacturer_dict.get('name', ''),
         )
 
         return product_in_cart

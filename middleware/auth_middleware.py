@@ -5,7 +5,7 @@ from starlette.middleware.base import (
     BaseHTTPMiddleware, RequestResponseEndpoint
 )
 
-from exceptions.auth_exceptions import ErrWrongCredentials
+from exceptions.auth_exceptions import ErrUserNotFound, ErrWrongCredentials
 from services.auth_service import AuthService
 
 
@@ -30,7 +30,7 @@ class LoginMiddleware(BaseHTTPMiddleware):
 
         try:
             user = self._service.verify_session_token(session_cookie)
-        except ErrWrongCredentials:
+        except (ErrWrongCredentials, ErrUserNotFound):
             user = None
 
         request.state.user = user

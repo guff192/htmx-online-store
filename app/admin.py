@@ -29,14 +29,15 @@ class ProductModelView(ModelView):
     can_create = True
 
     column_details_list: list[str] = [
-        'name', 'description', 'price', 'manufacturer.name']
-    column_editable_list: list[str] = ['price']
+        'name', 'price', 'count', 'newcomer', 'manufacturer'
+    ]
+    column_editable_list: list[str] = [
+        'price', 'count', 'newcomer', 'manufacturer_id'
+    ]
+    column_searchable_list = ('name', 'manufacturer_id')
+
     form_columns: list[str] = [
-        'name',
-        'description',
-        'price',
-        'manufacturer_id',
-        'newcomer',
+        'name', 'description', 'price', 'manufacturer_id', 'newcomer',
     ]
 
     form_overrides = dict(

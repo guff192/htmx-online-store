@@ -26,35 +26,16 @@ class ProductViewModel:
         offset: int,
         user: LoggedUser | None = None
     ) -> ProductList:
-        products = self._service.get_all(offset=offset, user=user)
-        if not products:
-            return ProductList(products=[], offset=-5)
+        return self._service.get_all(offset=offset, user=user)
 
-        product_list = ProductList(
-            offset=offset + 10,
-            products=[
-                ProductInCart(id=product_dto.id, name=product_dto.name,
-                              description=product_dto.description,
-                              price=product_dto.price, count=product_dto.count)
-                for product_dto in products],
-        )
-
-        return product_list
+    def get_newcomers(
+        self,
+        offset: int,
+    ) -> ProductList:
+        return self._service.get_newcomers(offset=offset)
 
     def get_by_id(self, product_id: int) -> Product:
-        orm_product = self._service.get_by_id(product_id)
-
-        product_dict = orm_product.__dict__
-        product_name = product_dict.get('name', '')
-        product_photos = self._service.get_all_photos_by_name(product_name)
-
-        return Product(
-            id=product_dict.get('_id', 0),
-            photos=product_photos,
-            name=product_dict.get('name', ''),
-            description=product_dict.get('description', ''),
-            price=product_dict.get('price', 0),
-        )
+        return self._service.get_by_id(product_id)
 
     def get_all_photos_by_name(
         self, name: str, size: ProductPhotoSize = ProductPhotoSize.thumbs

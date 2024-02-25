@@ -34,12 +34,12 @@
 </div>
 
 <div id="product{{ product.id }}description" class="border rounded flex justify-around w-full h-full p-3">
-    <div id="product{{ product.id }}description" class="grow w-full h-full p-1 text-left text-indigo-50">
+    <div id="product{{ product.id }}description" class="grow w-full h-full p-1 text-left text-white">
         <p>
             {{ product.description.replace('\n', '<br>') | safe }}
         </p>
     </div>
-    <div id="product{{ product.id }}price" class="border-l rounded w-min h-full p-1 ml-3 text-center bg-indigo-600 text-white">
+    <div id="product{{ product.id }}price" class="price rounded w-min h-full p-1 ml-2 text-center bg-lightPink text-darkBlue">
         <strong>{{ product.price }}₽</strong>
     </div>
 </div>

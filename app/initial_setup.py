@@ -4,6 +4,7 @@ import requests
 from sqlalchemy.orm import Session
 
 from app.config import Settings
+from repository.manufacturer_repository import ManufacturerRepository
 from repository.product_repository import ProductRepository
 from schema.product_schema import ProductCreate
 from services.product_service import ProductService
@@ -21,19 +22,27 @@ def fetch_products(db: Session):
 
     # Initialize the service and repository
     product_repository = ProductRepository(db)
-    product_service = ProductService(product_repository, S3ProductPhotoStorage())
+    manufacturer_repository = ManufacturerRepository(db)
+    product_service = ProductService(
+        product_repository, S3ProductPhotoStorage(), manufacturer_repository
+    )
 
     for product_data in data:
-        name = product_data["name"]
-        description = product_data["description"]
-        price = product_data["basicPrice"]
+        logger.debug(product_data)
+        name = product_data.get("name", "")
+        description = product_data.get("description", "")
+        price = product_data.get("price", 0)
+        count = product_data.get("count", 0)
+        manufacturer_name = product_data.get("manufacturer_name", "")
         if not name or not price or price == '#N/A':
             continue
         # Validate data using the schema
         product_create = ProductCreate(
             name=name,
             description=description,
-            price=price
+            price=price,
+            count=count if count != '#N/A' else 0,
+            manufacturer_name=manufacturer_name
         )
 
         try:

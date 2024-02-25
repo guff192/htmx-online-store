@@ -65,6 +65,9 @@ class ProductService:
         for product_dto in dto_list:
             # searching manufacturer
             manufacturer_id = product_dto.manufacturer_id
+            if not manufacturer_id:
+                manufacturer_id = 0
+
             manufacturer = self._manufacturer_repo.get_by_id(manufacturer_id)
             if not manufacturer:
                 manufacturer_name = ''
@@ -83,7 +86,6 @@ class ProductService:
             offset=offset + 10,
             products=products,
         )
-        logger.debug(f'{product_list = }')
 
         return product_list
 
@@ -92,18 +94,18 @@ class ProductService:
 
         products_schema: list[ProductSchema] = []
         for orm_product in orm_products:
+            # getting manufacturer name
+            manufacturer_name = ''
+            if hasattr(orm_product, 'manufacturer'):
+                manufacturer = orm_product.manufacturer
+                if manufacturer and manufacturer.__dict__:
+                    manufacturer_name = manufacturer.__dict__.get('name', '')
+
             orm_product_dict = orm_product.__dict__
             logger.debug(orm_product_dict)
             product_id = orm_product_dict.get('_id', 0)
             product_name = orm_product_dict.get('name', '')
             product_photos = self.get_all_photos_by_name(product_name)
-            manufacturer: Manufacturer = self._manufacturer_repo.get_by_id(
-                orm_product_dict.get('manufacturer_id', 0)
-            )
-            if not manufacturer:
-                manufacturer_name = ''
-            else:
-                manufacturer_name = manufacturer.__dict__.get('name', '')
 
             product = ProductSchema(
                 id=product_id,
@@ -125,13 +127,11 @@ class ProductService:
 
         product_name = orm_product_dict.get('name', '')
         product_photos = self.get_all_photos_by_name(product_name)
-        manufacturer: Manufacturer = self._manufacturer_repo.get_by_id(
-            orm_product_dict.get('manufacturer_id', 0)
-        )
-        if not manufacturer:
-            manufacturer_name = ''
-        else:
+        if hasattr(orm_product, 'manufacturer'):
+            manufacturer: Manufacturer = orm_product.manufacturer
             manufacturer_name = manufacturer.__dict__.get('name', '')
+        else:
+            manufacturer_name = ''
 
         product_schema = ProductSchema(
             id=orm_product_dict.get('__id', 0),

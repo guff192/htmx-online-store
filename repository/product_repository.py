@@ -64,13 +64,14 @@ class ProductRepository:
             id_, name, description, price, manufacturer_id, = \
                 row[0], row[1], row[2], row[3], row[4]
             user_count = row[5]
+            if not manufacturer_id:
+                manufacturer_id = 0
 
             product = ProductDTO(
                 id=id_, name=name, description=description,
                 price=price, count=user_count,
                 manufacturer_id=manufacturer_id
             )
-            logger.debug(product)
             result.append(product)
 
         return result
@@ -83,7 +84,6 @@ class ProductRepository:
         )
 
         return product_list
-
 
     def get_by_id(self, product_id: int) -> Product | None:
         return self.db.query(Product).get(product_id)

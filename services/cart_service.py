@@ -55,6 +55,15 @@ class CartService:
                 manufacturer_name='',
             )
         manufacturer = product.manufacturer
+        if not manufacturer:
+            return ProductInCart(
+                id=product_id,
+                count=0,
+                name='',
+                description='',
+                price=0,
+                manufacturer_name='',
+            )
 
         orm_dict: dict[str, Any] = userproduct.__dict__
         product_orm_dict: dict[str, Any] = product.__dict__

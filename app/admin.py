@@ -29,9 +29,16 @@ class ProductModelView(ModelView):
     can_create = True
 
     column_details_list: list[str] = [
-        'name', 'description', 'price', 'manufacturer.name']
-    column_editable_list: list[str] = ['price']
-    form_columns: list[str] = ['name', 'description', 'price', 'manufacturer_id']
+        'name', 'price', 'count', 'newcomer', 'manufacturer'
+    ]
+    column_editable_list: list[str] = [
+        'price', 'count', 'newcomer', 'manufacturer_id'
+    ]
+    column_searchable_list = ('name', 'manufacturer_id')
+
+    form_columns: list[str] = [
+        'name', 'description', 'price', 'manufacturer_id', 'newcomer',
+    ]
 
     form_overrides = dict(
         description=TextAreaField,
@@ -54,7 +61,9 @@ class ManufacturerModelView(ModelView):
     can_delete = True
     can_create = True
 
-    column_editable_list: list[str] = ['name']
+    column_editable_list: tuple[str] = ('name',)
+    column_exclude_list: tuple[str] = ('products',)
+    form_excluded_columns: tuple[str] = ('products',)
 
 
 class UserModelView(ModelView):

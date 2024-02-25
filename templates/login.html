@@ -8,6 +8,7 @@
 
 {% block content %}
 
+{% if debug %}
 <!-- Google sign-in -->
 <script src="https://accounts.google.com/gsi/client" async></script>
 <div id="g_id_onload"
@@ -27,6 +28,7 @@
      data-size="large"
      data-logo_alignment="left">
 </div>
+{% endif %}
 
 <!-- Tinkoff sign-in -->
 <script src="https://sso-forms-prod.cdn-tinkoff.ru/tinkoff-id/widget.js"></script>

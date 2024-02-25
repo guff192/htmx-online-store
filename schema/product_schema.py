@@ -1,5 +1,6 @@
 from enum import Enum
-from typing import Any
+from typing import Any, Sequence
+from loguru import logger
 
 from pydantic import BaseModel
 
@@ -39,16 +40,24 @@ class ProductBase(BaseModel):
 
     def is_valid(self) -> bool:
         if not self.name or not self.price:
+            logger.debug(f'Invalid product: {self}')
             return False
         return True
 
 
 class ProductCreate(ProductBase):
-    pass
+    count: int
+    manufacturer_name: str
 
 
 class ProductUpdate(ProductBase):
-    pass
+    count: int
+    manufacturer_name: str
+
+    def is_valid(self) -> bool:
+        return super().is_valid() \
+            and self.count > 0 \
+            and self.manufacturer_name != ''
 
 
 class ProductUpdateResponse(BaseModel):
@@ -57,6 +66,7 @@ class ProductUpdateResponse(BaseModel):
 
 class Product(ProductBase):
     id: int
+    manufacturer_name: str
     photos: list[ProductPhotoPath] = []
 
     @property
@@ -73,7 +83,7 @@ class ProductInCart(Product):
 
 
 class ProductList(BaseModel):
-    products: list[Product]
+    products: Sequence[Product]
     offset: int = 0
 
     @utils.add_shop_to_context

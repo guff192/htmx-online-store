@@ -3,10 +3,10 @@
 <script>
     // Replace page header text
     var pageHeader = document.getElementById('page-header');
-    pageHeader.innerText = '{{ user.name }}\'s Cart'
+    pageHeader.innerText = 'Твоя корзина, {{ user.name }}'
     pageHeader.classList.remove('uppercase');
 
-    document.title = '{{ shop.name }} | Cart'
+    document.title = '{{ shop.name }} | Корзина'
 </script>
 
 {% endif %}
@@ -18,6 +18,13 @@
     {% endfor %}
 </div>
 {% else %}
-<p class="text-center font-bold text-white">No products in cart</p>
+<p class="text-center font-bold text-white">
+В твоей корзине пусто 🙃. 
+Перейдём в <a class="underline text-indigo-400" href='/products/catalog'
+    hx-boost="true"
+    hx-target="#content"
+    hx-swap="innerHTML"
+    hx-get="/products/catalog"
+    >каталог</a>?</p>
 {% endif %}
 

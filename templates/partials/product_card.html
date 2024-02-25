@@ -1,6 +1,6 @@
 <div
     id="product{{ product.id }}"
-    class="border border-gray-800 bg-indigo-50 rounded flex flex-col justify-between w-full h-full p-3 mb-2 text-center"
+    class="border border-gray-800 bg-darkPink rounded flex flex-col justify-between w-full h-full p-3 mb-2 text-center"
     hx-boost="true">
 
     <h3 class="text-l font-bold uppercase mb-2">
@@ -19,10 +19,12 @@
     <p class="text-sm">{{ product.description.replace('\n', '<br>') | safe | truncate(50) }}</p>
     <a class="font-bold hover:underline" hx-target="#content" href="{{ product.absolute_url }}">More info</a>
 
-    <p class="my-2">
-        <span class="bg-gray-200 rounded p-2 font-bold">{{ product.price }} ₽</span>
+    <p class="price w-1/2 bg-darkBlue text- rounded my-2 mx-auto">
+        <span class="font-bold">{{ product.price }} ₽</span>
     </p>
 
+    {% if request.state.user %}
     {% include 'partials/product_counter.html' %}
+    {% endif %}
 
 </div>

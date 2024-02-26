@@ -102,7 +102,6 @@ class ProductService:
                     manufacturer_name = manufacturer.__dict__.get('name', '')
 
             orm_product_dict = orm_product.__dict__
-            logger.debug(orm_product_dict)
             product_id = orm_product_dict.get('_id', 0)
             product_name = orm_product_dict.get('name', '')
             product_photos = self.get_all_photos_by_name(product_name)
@@ -127,11 +126,12 @@ class ProductService:
 
         product_name = orm_product_dict.get('name', '')
         product_photos = self.get_all_photos_by_name(product_name)
-        if hasattr(orm_product, 'manufacturer'):
+
+        manufacturer_name = ''
+        if hasattr(orm_product, 'manufacturer') and orm_product.manufacturer:
             manufacturer: Manufacturer = orm_product.manufacturer
-            manufacturer_name = manufacturer.__dict__.get('name', '')
-        else:
-            manufacturer_name = ''
+            if manufacturer:
+                manufacturer_name = manufacturer.__dict__.get('name', '')
 
         product_schema = ProductSchema(
             id=orm_product_dict.get('__id', 0),

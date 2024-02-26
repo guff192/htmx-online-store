@@ -23,8 +23,10 @@
             </div>
 
             <a href="/home#promo" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Акции</div></a>
+            <a href="/about" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">О нас</div></a>
             <a href="#" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Доставка</div></a>
             <a href="#" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Контакты</div></a>
+            
             {% if request.state.user %}
             <a href="/cart" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Корзина</div></a>
             {% endif %}

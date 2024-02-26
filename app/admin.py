@@ -12,6 +12,7 @@ from starlette.types import ASGIApp
 from wtforms.fields import TextAreaField
 
 from db.session import get_db
+from models.banner import Banner
 from models.product import Manufacturer, Product
 from models.user import User, UserProduct
 from schema.user_schema import UserBase
@@ -103,6 +104,16 @@ class UserProductModelView(ModelView):
     # }
 
 
+class BannerModelView(ModelView):
+    can_view_details = True
+    can_edit = True
+    can_delete = True
+    can_create = True
+
+    column_list: list[str] = ['name', 'img_url']
+    column_editable_list: list[str] = ['img_url']
+
+
 # ---------------------------------------------------------
 # Middleware
 # ---------------------------------------------------------
@@ -162,6 +173,7 @@ def get_admin_app(session: Session = get_db()) -> ASGIApp:
     flask_admin.add_view(ManufacturerModelView(Manufacturer, session))
     flask_admin.add_view(UserModelView(User, session))
     flask_admin.add_view(UserProductModelView(UserProduct, session))
+    flask_admin.add_view(BannerModelView(Banner, session))
 
     return WSGIMiddleware(flask_app)
 

@@ -9,7 +9,7 @@
         hx-target="#product{{ product.id }}counter"
         hx-swap="outerHTML"
     >-</a>
-    <span class="bg-indigo-500 rounded p-2 font-bold">{{ product.count }}</span>
+    <span class="bg-lightBlue rounded p-2 font-bold">{{ product.count }}</span>
     <a
         class="text-2xl cursor-pointer"
         hx-boost="true"
@@ -24,7 +24,7 @@
 
 <a
     id="product{{ product.id }}counter"
-    class="my-2 cursor-pointer bg-indigo-500 rounded p-2 font-bold"
+    class="my-2 cursor-pointer bg-lightBlue rounded p-2 font-bold"
     hx-boost="true"
     hx-trigger="click"
     hx-put="/cart/add?product_id={{ product.id }}"

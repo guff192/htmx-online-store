@@ -19,52 +19,33 @@
 {% block content %}
 <div id="main-content" class="container text-center">
     <p class="text-indigo-50 mb-5">
-        Добро пожаловать{% if request.state.user %}, <span class="font-bold">{{ request.state.user.name }}</span>,{% endif %} ну и т.д.<br />
+        Добро пожаловать
+        {% if request.state.user %}, <span class="font-bold">{{ request.state.user.name }}</span>,{% endif %}
+        ну и т.д.<br />
         Здесь вы можете найти корпоративные ноутбуки в замечательном состоянии и по привлекательной цене.
     </p>
 
-    <div id="about">
-        <h2 class="text-3xl font-bold text-center text-indigo-50 mb-1 mt-5">О нас</h2>
-        <p class="text-left text-indigo-50 mb-5">
-            <span class="font-bold text-lg">ЭВМ Стор</span> - это не просто магазин, а философия разумного потребления,
-            где Вы получаете лучшую технику, но значительно дешевле новых масс-маркет моделей.
-        </p>
-    </div>
-
     <div id="promo" class="relative h-0 -top-24 invisible"></div>
-    <div>
+    <div class="relative">
         <h2 class="text-3xl font-bold text-center text-white mb-1 mt-5">Акции</h2>
 
-        <div id="banners" class="md:grid md:grid-cols-3 md:gap-3 mb-1 p-3">
-            <div class="bg-lightPink p-1 flex flex-col justify-between mb-2">
-                <h3 class="text-l font-bold uppercase mb-2">
-                    Беспроводная мышь в подарок!
+        <div id="banners" class="mb-1 p-3 h-dvh">
+            {% for banner in banners %}
+            <div class="bg-lightBlue p-1 flex flex-col justify-between mb-2 h-screen">
+                <h3 class="text-xl font-bold uppercase my-2">
+                    {{ banner.name }}
                 </h3>
-                <img class="mx-auto" hx-trigger="load" hx-swap="outerHTML" src="https://www.adverti.ru/media/catalog/product/1/2/121103.jpg">
-                <p class="text-sm">
-                    При заказе любого ноутбука в подарок идёт беспроводная мышь.
-                </p>
-            </div>
+ 
+                <div class="bg-darkBlue flex flex-col justify-center h-4/5">
+                    <img src="{{ banner.img_url }}">
+                </div>
 
-            <div class="bg-lightPink p-1 flex flex-col justify-between mb-2">
-                <h3 class="text-l font-bold uppercase mb-2">
-                    Расширенная гарантия (5 месяцев)!
-                </h3>
-                <img class="mx-auto" hx-trigger="load" hx-swap="outerHTML" src="data:image/jpeg;base64,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">
                 <p class="text-sm">
-                    Получи расширенную гарантию на 5 месяцев по промокоду «сайт».
+                    {{ banner.description }}
                 </p>
+                
             </div>
-
-            <div class="bg-lightPink p-1 flex flex-col justify-between mb-2">
-                <h3 class="text-l font-bold uppercase mb-2">
-                    Приведи друга!
-                </h3>
-                <img class="mx-auto" hx-trigger="load" hx-swap="outerHTML" src="https://steakcity.ru/uploads/market/product/origin/1656086417.jpg">
-                <p class="text-sm">
-                    Приведи друга и получи бесплатное техническое обслуживание ноутбука.
-                </p>
-            </div>
+            {% endfor %}
         </div>
     </div>
 

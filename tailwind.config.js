@@ -9,8 +9,8 @@ module.exports = {
         },
         colors: {
             'darkBlue': '#1E1E31',
-            'darkPink': '#A555B2',
-            'lightPink': '#FF6AF2',
+            'darkPink': '#FF6AF2',
+            'lightBlue': '#4082F5',
         }
     }
   },

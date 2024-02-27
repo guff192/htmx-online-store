@@ -1,6 +1,5 @@
 from enum import Enum
 from typing import Any, Sequence
-from loguru import logger
 
 from pydantic import BaseModel
 
@@ -40,7 +39,6 @@ class ProductBase(BaseModel):
 
     def is_valid(self) -> bool:
         if not self.name or not self.price:
-            logger.debug(f'Invalid product: {self}')
             return False
         return True
 
@@ -56,7 +54,6 @@ class ProductUpdate(ProductBase):
 
     def is_valid(self) -> bool:
         return super().is_valid() \
-            and self.count > 0 \
             and self.manufacturer_name != ''
 
 

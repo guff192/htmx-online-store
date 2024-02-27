@@ -35,6 +35,7 @@ class CartService:
         product_id: int = 0
     ) -> ProductInCart:
         if not userproduct:
+            logger.debug(f'No userproduct data: {userproduct}')
             return ProductInCart(
                 id=product_id,
                 count=0,
@@ -46,6 +47,7 @@ class CartService:
 
         product = userproduct.product
         if not product or not hasattr(product, 'manufacturer'):
+            logger.debug(f'No product data: {product}')
             return ProductInCart(
                 id=product_id,
                 count=0,
@@ -56,6 +58,7 @@ class CartService:
             )
         manufacturer = product.manufacturer
         if not manufacturer:
+            logger.debug(f'No manufacturer data: {product.__dict__}')
             return ProductInCart(
                 id=product_id,
                 count=0,

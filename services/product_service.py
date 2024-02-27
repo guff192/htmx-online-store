@@ -173,12 +173,14 @@ class ProductService:
         created_product: ProductUpdate
     ) -> ProductUpdateResponse:
         if not created_product.is_valid():
+            logger.debug(f'Invalid product: {created_product}')
             raise ErrInvalidProduct()
 
         manufacturer: Manufacturer = self._manufacturer_repo.get_by_name(
             created_product.manufacturer_name
         )
         if not manufacturer:
+            logger.debug(f'Invalid product: {created_product}')
             raise ErrInvalidProduct()
 
         found_product = self.repo.get_by_name(created_product.name)

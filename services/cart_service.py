@@ -86,10 +86,6 @@ class CartService:
     def get_cart(self, user_id: str) -> Cart:
         # Get products in user's cart
         orm_products: list[UserProduct] = self._repo.get_user_products(user_id)
-        products: list[ProductInCart] = [
-            self._userproduct_model_to_productincart_schema(userproduct)
-            for userproduct in orm_products
-        ]
         products: list[ProductInCart] = []
         for userproduct in orm_products:
             product_id: int = userproduct.__dict__.get('product_id', 0)

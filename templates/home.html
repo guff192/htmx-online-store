@@ -1,19 +1,75 @@
-{% extends '_base.html' %}
+{% if not request.headers.get('hx-request') %}
+    {% extends '_base.html' %}
 
-{% block title %}{{ shop.name }} | Home{% endblock %}
+    {% block title %}{{ shop.name }} | Главная{% endblock %}
 
-{% block header %}
-<h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-5 mt-2">Home Page</h1>
+    {% block header %}
+    <h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-2 mt-2">Эвм стоp - обpатно в лучшее!</h1>
+    {% endblock %}
 
-{% endblock %}
+{% else %}
+    <script type="text/javascript">
+        document.title = '{{ shop.name }} | Главная';
+
+        pageHeader = document.getElementById('page-header');
+        pageHeader.innerText = 'Эвм стоp - обpатно в лучшее!';
+    </script>
+{% endif %}
 
 {% block content %}
-    <div id="content" class="container text-center">
-        <p>
-            Добро пожаловать{% if request.state.user %}, <span class="font-bold">{{ request.state.user.name }}</span>,{% endif %} ну и т.д.<br/>
-            Здесь вы можете найти БУ корпоративные ноутбуки в замечательном состоянии и по привлекательной цене.
-        </p>
+<div id="main-content" class="container text-center">
+    <p class="text-indigo-50 mb-5">
+        Добро пожаловать
+        {% if request.state.user %}, <span class="font-bold">{{ request.state.user.name }}</span>,{% endif %}
+        ну и т.д.<br />
+        Здесь вы можете найти корпоративные ноутбуки в замечательном состоянии и по привлекательной цене.
+    </p>
 
+    <div id="promo" class="relative h-0 -top-24 invisible"></div>
+    <div class="relative">
+        <h2 class="text-3xl font-bold text-center text-white mb-1 mt-5">Акции</h2>
+
+        <div id="banners" class="mb-1 p-3 h-dvh">
+            {% for banner in banners %}
+            <div class="bg-lightBlue p-1 flex flex-col justify-between mb-2 h-screen">
+                <h3 class="text-xl font-bold uppercase my-2">
+                    {{ banner.name }}
+                </h3>
+ 
+                <div class="bg-darkBlue flex flex-col justify-center h-4/5">
+                    <img src="{{ banner.img_url }}">
+                </div>
+
+                <p class="text-sm">
+                    {{ banner.description }}
+                </p>
+                
+            </div>
+            {% endfor %}
+        </div>
     </div>
-{% endblock %}
 
+    <div id="brands">
+        <h2 class="text-3xl font-bold text-center text-white mb-1 mt-5">Бренды</h2>
+        <div id="brands-logos" class="flex flex-wrap justify-center content-center mt-5">
+            <div class="w-1/3 h-20 flex justify-center">
+                <img class="" src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Lenovo_%282015%29.svg" alt="Lenovo">
+            </div>
+            <div class="w-1/3 h-20 flex justify-center">
+                <img class="" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Dell_logo_2016.svg/1200px-Dell_logo_2016.svg.png" alt="Dell">
+            </div>
+            <div class="w-1/3 h-20 flex justify-center">
+                <img class="" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/HP_logo_2012.svg/1200px-HP_logo_2012.svg.png" alt="HP">
+            </div>
+        </div>
+    </div>
+
+   <div id="new-products">
+       <h2 class="text-3xl font-bold text-center text-white mb-1 mt-5">Новинки</h2>
+       <div id="products" class="md:grid md:grid-cols-3 md:gap-3">
+           {% for product in products %}
+               {% include 'partials/product_card.html' %}
+           {% endfor %}
+       </div>
+   </div>
+{% endblock %}

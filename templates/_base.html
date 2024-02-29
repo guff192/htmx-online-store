@@ -6,28 +6,34 @@
     <title>{% block title %}{{shop.name}}{% endblock %}</title>
 
     <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/fonts.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/indicator.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/dropdown.css') }}">
 
     <!-- JS -->
     <script src="{{ url_for('static', path='js/htmx.min.js') }}"></script>
 </head>
 
-<body class="bg-sky-950">
+<body class="bg-darkBlue text-white p-0 m-0">
     {% block navbar %}
         {% include 'partials/navbar.html' %}
     {% endblock %}
 
-    <header class="mt-20">
-        {% block header %}<h1 id="page-header">Default Header</h1>{% endblock %}</h1>
+    <div id="offset" class="h-24 invisible"></div>
+
+    <header class="mt-8">
+        {% block header %}<h1 id="page-header">Default Header</h1>{% endblock %}
     </header>
 
-    <main id="content" class="w-full md:w-8/12 mx-auto mt-1">
+    <main id="content" class="w-full md:w-8/12 mx-auto mt-2">
         {% block content %}{% endblock %}
     </main>
 
-    <footer>
-        {% block footer %}Default Footer{% endblock %}
+    <footer class="mt-4">
+        {% block footer %}
+            {% include 'partials/footer.html' %}
+        {% endblock %}
     </footer>
 </body>
 

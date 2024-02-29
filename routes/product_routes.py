@@ -45,6 +45,7 @@ def get_product_list(
     product_vm: ProductViewModel = Depends(product_viewmodel_dependency),
     user: LoggedUser | None = Depends(google_oauth_user_dependency),
 ):
+    logger.debug(f'{request.state.user = }')
     if not request.headers.get('hx-request'):
         return RedirectResponse('/products/catalog')
 
@@ -53,7 +54,10 @@ def get_product_list(
     context_data: dict[str, Any] = {'request': request}
     context_data.update(products_data.build_context())
 
-    return templates.TemplateResponse('partials/product_list.html', context=context_data)
+    return templates.TemplateResponse(
+        'partials/product_list.html',
+        context=context_data
+    )
 
 
 @router.put('')
@@ -61,9 +65,10 @@ def update_product_by_name(
     product_update: ProductUpdate,
     product_service: ProductService = Depends(product_service_dependency),
 ) -> ProductUpdateResponse:
-    logger.debug(product_update)
-    updated_product_id = product_service.update_by_name(product_update)
-    return updated_product_id
+    logger.debug(f'{product_update = }')
+    updated_product_count = \
+        product_service.update_or_create_by_name(product_update)
+    return updated_product_count
 
 
 @router.get('/{product_id}', response_class=HTMLResponse)

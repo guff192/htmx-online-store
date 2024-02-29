@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ru">
+<head>
+   <meta charSet="utf-8" />
+   <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no, viewport-fit=cover'>
+   <meta http-equiv='X-UA-Compatible' content='ie=edge'>
+   <style>
+      html,
+      body {
+         background: #eee;
+      }
+   </style>
+   <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-token-with-polyfills-latest.js"></script>
+</head>
+
+<body>
+   <div id="redirect_link"><a href="{{ shop.public_url }}home">Перейти на главную</a></div>
+
+   <script type="text/javascript" async="true">
+
+      /**
+      * @param {string} paramsStr
+      * @returns {Object}
+      */
+      function createAuthObjectFromURLParams(paramsStr) {
+        const authObj = Object();
+
+        paramsStr.split('&').forEach((auth_param) => {
+          const [key, value] = auth_param.split('=');
+          if (key !== '' && value !== '') {
+            authObj[key] = value;
+          }
+        });
+
+        return authObj;
+      }
+
+      window.onload = function() {
+        window.YaSendSuggestToken('{{ shop.public_url }}auth/login/yandex', {
+          'kek': 'test'
+        });
+
+        const paramsStr = window.location.href.split('#')[1];
+        window.opener.postMessage(createAuthObjectFromURLParams(paramsStr));
+
+        // send auth params
+        /*
+        let authParams = '';
+        document.URL.split('#')[1].split('&').forEach((auth_param) => {
+          const [key, value] = auth_param.split('=');
+          if (key !== '' && value !== '') {
+            authParams += `${key}=${value}&`;
+          }
+        });
+
+        const xhr = new XMLHttpRequest();
+        if(request.DONE && xhr.status === 201) {
+            console.log('Auth params received');
+          }
+          
+          xhr.send(authParams);
+        };
+        */
+
+      }
+   </script>
+</body>
+
+</html>
+

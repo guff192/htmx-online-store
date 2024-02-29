@@ -1,10 +1,21 @@
-{% extends '_base.html' %}
+{% if not request.headers.get('hx-request') %}
+    {% extends '_base.html' %}
 
-{% block title %}{{ shop.name }} | Catalog{% endblock %}
+    {% block title %}{{ shop.name }} | Каталог{% endblock %}
 
-{% block header %}
-<h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-5 mt-2">Products Catalog</h1>
-{% endblock %}
+    {% block header %}
+    <h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-5 mt-2">Товары в наличии</h1>
+    {% endblock %}
+
+{% else %}
+    <script type="text/javascript">
+        pageHeader = document.getElementById('page-header');
+        pageHeader.innerText = 'Товары в наличии';
+        pageHeader.classList.remove('uppercase');
+
+        document.title = '{{ shop.name }} | Каталог';
+    </script>
+{% endif %}
 
 
 {% block content %}
@@ -15,6 +26,6 @@
         hx-trigger="intersect once"
         hx-get="/products?offset=0"
         hx-swap="outerHTML"
-        ></img>
+        >
 </div>
 {% endblock %}

@@ -12,8 +12,8 @@
         <img class="w-full" src="{{ link }}" />
     </div>
     {% endfor %}
-    <script>
 
+    <script>
     document.querySelectorAll('#small-photos div').forEach(photo => {
         photo.addEventListener('click', () => {
             const largePhoto = document.querySelector('#large-photo');

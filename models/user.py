@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import mapped_column, relationship
-from sqlalchemy_utils import UUIDType
+from sqlalchemy_utils import EmailType, UUIDType
 
 from db.session import Base
 
@@ -10,8 +10,10 @@ class User(Base):
 
     id = Column('id', UUIDType(binary=False), primary_key=True, index=True)
     google_id = Column(String(21), unique=True)
+    yandex_id = Column(Integer, unique=True)
 
     name = Column(String(255), nullable=False)
+    email = Column(EmailType, nullable=False, unique=True)
 
     profile_img_url = Column(String(255))
 

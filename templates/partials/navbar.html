@@ -1,10 +1,34 @@
-<nav class="bg-black text-white fixed top-0 w-full z-20" hx-boost="true">
-    <div class="flex justify-between items-center w-full md:w-8/12 h-16 mx-auto">
+<nav class="bg-black text-white fixed top-0 w-full z-20" hx-boost="true" hx-target="#content" hx-swap="innerHTML">
+    <div class="flex justify-between items-center w-full md:w-3/4 h-24 mx-auto">
+
+        {% if shop.logo_name %}
+        <a href="/home#offset">
+            <img class="h-20 self-center" src="{{ url_for('static', path='images/'+shop.logo_name) }}">
+        </a>
+        {% else %}
         <p class="text-2xl font-bold w-5/12 h-min p-2 self-center text-center"><a hx-boost="false" href="/">{{ shop.name }}</a></p>
+        {% endif %}
+
         <menu class="grow flex justify-evenly">
-            <a href="/products/catalog"><div class="p-4">Products</div></a>
+            <a class="flex justify-center items-center w-20 h-24" href="/home#offset">Главная</a>
+
+            <!-- Simple drop-down menu with brands -->
+            <div class="dropdown-menu">
+                <a class="flex justify-center items-center w-20 h-24" href="/products/catalog">Каталог</a>
+                <div class="dropdown-content top-0 translate-y-full bg-sky-700 w-20">
+                    <a href="/products/catalog/search?manufacturer=Lenovo"><div class="p-1 text-center">Lenovo</div></a>
+                    <a href="/products/catalog/search?manufacturer=HP"><div class="p-1 text-center">HP</div></a>
+                    <a href="/products/catalog/search?manufacturer=Dell"><div class="p-1 text-center">Dell</div></a>
+                </div>
+            </div>
+
+            <a href="/home#promo" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Акции</div></a>
+            <a href="/about" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">О нас</div></a>
+            <a href="#" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Доставка</div></a>
+            <a href="#" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Контакты</div></a>
+            
             {% if request.state.user %}
-            <a href="/cart" hx-target="#content"><div class="p-4">Cart</div></a>
+            <a href="/cart" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Корзина</div></a>
             {% endif %}
         </menu>
 
@@ -13,11 +37,12 @@
                 {% if request.state.user.is_admin %}
                     <a href="/admin" hx-boost="false"><div class="p-4">Admin</div></a>
                 {% endif %}
-                <a href="/auth/logout" hx-boost="false" hx-post="/auth/logout"><div class="p-4">Logout</div></a>
+                <a href="/auth/logout" hx-boost="false" hx-post="/auth/logout"><div class="p-4">Выход</div></a>
             {% else %}
-                <a href="/auth/login" hx-boost="false"><div class="p-4">Login</div></a>
+                <a href="/auth/login" hx-boost="false"><div class="p-4">Вход</div></a>
             {% endif %}
         </div>
+
     </div>
 </nav>
 

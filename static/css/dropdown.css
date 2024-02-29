@@ -1,0 +1,15 @@
+.dropdown-content {
+    display: none;
+    position: absolute;
+    z-index: 10;
+}
+.dropdown-menu:hover .dropdown-content, .dropdown-menu:focus .dropdown-content {
+    display: block;
+}
+.dropdown-content a {
+    display: block;
+}
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+    color: black;
+}

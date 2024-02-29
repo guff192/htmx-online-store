@@ -17,7 +17,15 @@ class UserViewModel:
     def get_by_google_id_or_create(
         self, id_info: Mapping[str, Any]
     ) -> UserResponse:
-        user = self.user_service.get_or_create_by_google_id(id_info)
+        return self.user_service.get_or_create_by_google_id(id_info)
+
+    def get_by_yandex_id_or_create(
+        self, id_info: Mapping[str, Any]
+    ) -> UserResponse:
+        return self.user_service.get_or_create_by_yandex_id(id_info)
+
+    def get_by_email(self, email: str) -> UserResponse:
+        user = self.user_service.get_by_email(email)
         return user
 
 

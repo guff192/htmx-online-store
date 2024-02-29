@@ -40,6 +40,10 @@ class Settings(BaseSettings):
 
     # Shop settings
     shop_name: str = Field(default='Shop name', alias='SHOP_NAME')
+    shop_logo_name: str | None = Field(
+        default=None,
+        alias='SHOP_LOGO_NAME'
+    )
     shop_public_url: Url = Field(default='', alias='SHOP_PUBLIC_URL')
 
     # google oauth settings
@@ -54,6 +58,22 @@ class Settings(BaseSettings):
     google_client_secret: str = Field(
         default='',
         alias='GOOGLE_CLIENT_SECRET'
+    )
+
+    # yandex oauth settings
+    yandex_oauth2_token_uri: str = Field(
+        default='https://login.yandex.ru/info?format=json',
+        alias='YANDEX_OAUTH2_TOKEN_URI'
+    )
+
+    # avatar settings
+    yandex_avatars_base_url: Url = Field(
+        default='https://avatars.mds.yandex.net/get-yapic/',
+        alias='YANDEX_AVATARS_BASE_URL'
+    )
+    yandex_avatars_default_size: str = Field(
+        default='/islands-200',
+        alias='YANDEX_AVATARS_DEFAULT_SIZE'
     )
 
     # Google spreadsheets settings

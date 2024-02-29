@@ -4,7 +4,6 @@ from fastapi.responses import RedirectResponse
 from flask.app import Flask
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-from flask_admin.form import Select2Field
 from sqlalchemy.orm import Session
 from starlette.middleware.base import (
     BaseHTTPMiddleware, RequestResponseEndpoint
@@ -13,6 +12,7 @@ from starlette.types import ASGIApp
 from wtforms.fields import TextAreaField
 
 from db.session import get_db
+from models.banner import Banner
 from models.product import Manufacturer, Product
 from models.user import User, UserProduct
 from schema.user_schema import UserBase
@@ -30,9 +30,16 @@ class ProductModelView(ModelView):
     can_create = True
 
     column_details_list: list[str] = [
-        'name', 'description', 'price', 'manufacturer.name']
-    column_editable_list: list[str] = ['price']
-    form_columns: list[str] = ['name', 'description', 'price', 'manufacturer_id']
+        'name', 'price', 'count', 'newcomer', 'manufacturer'
+    ]
+    column_editable_list: list[str] = [
+        'price', 'count', 'newcomer', 'manufacturer_id'
+    ]
+    column_searchable_list = ('name', 'manufacturer_id')
+
+    form_columns: list[str] = [
+        'name', 'description', 'price', 'manufacturer_id', 'newcomer',
+    ]
 
     form_overrides = dict(
         description=TextAreaField,
@@ -55,7 +62,9 @@ class ManufacturerModelView(ModelView):
     can_delete = True
     can_create = True
 
-    column_editable_list: list[str] = ['name']
+    column_editable_list: tuple[str] = ('name',)
+    column_exclude_list: tuple[str] = ('products',)
+    form_excluded_columns: tuple[str] = ('products',)
 
 
 class UserModelView(ModelView):
@@ -93,6 +102,16 @@ class UserProductModelView(ModelView):
     #         'choices': ([(p.name, p._id) for p in get_db().query(Product).all()]),
     #     },
     # }
+
+
+class BannerModelView(ModelView):
+    can_view_details = True
+    can_edit = True
+    can_delete = True
+    can_create = True
+
+    column_list: list[str] = ['name', 'img_url']
+    column_editable_list: list[str] = ['img_url']
 
 
 # ---------------------------------------------------------
@@ -154,6 +173,7 @@ def get_admin_app(session: Session = get_db()) -> ASGIApp:
     flask_admin.add_view(ManufacturerModelView(Manufacturer, session))
     flask_admin.add_view(UserModelView(User, session))
     flask_admin.add_view(UserProductModelView(UserProduct, session))
+    flask_admin.add_view(BannerModelView(Banner, session))
 
     return WSGIMiddleware(flask_app)
 

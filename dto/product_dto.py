@@ -7,4 +7,5 @@ class ProductDTO(BaseModel):
     description: str
     price: int
     count: int | None
+    manufacturer_id: int
 

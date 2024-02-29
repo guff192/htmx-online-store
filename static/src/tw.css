@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  font-family: "RisingSunRegular", sans-serif;
+}
+.price {
+  font-family: "IBMPlexRegular";
+}

@@ -1,0 +1,29 @@
+{% if not request.headers.get('hx-request') %}
+
+    {% extends '_base.html' %}
+    {% block title %}{{ shop.name }} | О нас{% endblock %}
+
+    {% block header %}
+    <h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-2 mt-2">О нас</h1>
+    {% endblock %}
+
+{% endif %}
+
+<script type="text/javascript">
+    document.title = '{{ shop.name }} | О нас';
+
+    pageHeader = document.getElementById('page-header');
+    pageHeader.innerText = 'О нас';
+</script>
+
+{% block content %}
+<div id="about">
+    <h2 class="text-3xl font-bold text-center text-indigo-50 mb-1 mt-5">Философия</h2>
+    <p class="text-left text-indigo-50 mb-5">
+        <span class="font-bold text-lg">ЭВМ Стор</span> - это не просто магазин, а философия разумного потребления,
+        где Вы получаете лучшую технику, но значительно дешевле новых масс-маркет моделей.
+    </p>
+</div>
+{% endblock %}
+
+

@@ -134,7 +134,7 @@ class ProductService:
                 manufacturer_name = manufacturer.__dict__.get('name', '')
 
         product_schema = ProductSchema(
-            id=orm_product_dict.get('__id', 0),
+            id=orm_product_dict.get('_id', 0),
             photos=product_photos,
             name=product_name,
             description=orm_product_dict.get('description', ''),

@@ -96,7 +96,6 @@ class CartService:
             if product:
                 products.append(product)
 
-
         # Get user info for response
         orm_user: User | None = self._users.get_by_id(user_id)
         if not orm_user:

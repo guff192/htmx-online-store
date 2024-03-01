@@ -68,8 +68,12 @@
         const navbarContent = document.getElementsByClassName("navbar-content")[0];
         navbarContent.classList.toggle('closed-navbar');
         
-        navbar = document.getElementsByTagName('nav')[0].classList.toggle('collapsed-navbar');
+        document.getElementsByTagName('nav')[0].classList.toggle('collapsed-navbar');
     });
+    document.querySelectorAll('menu a').forEach(link => link.addEventListener('click', () => {
+        console.log('clicked');
+        mobileMenuButton.click();
+    }));
 
     window.onload = () => {
         mobileMenuButton.click();

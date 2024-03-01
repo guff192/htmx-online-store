@@ -31,4 +31,12 @@ nav {
     .mobile-menu-button {
         display: block;
     }
+
+    .collapsed-navbar {
+        opacity: 0.9;
+        transform: translateY(0);
+    }
+    .collapsed-navbar .navbar-content {
+        transform: scale(1);
+    }
 }

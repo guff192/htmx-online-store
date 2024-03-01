@@ -1,79 +1,72 @@
-    <script type="text/javascript">
-        function checkScrollDirectionIsUp(event) {
-            if (event.wheelDelta) {
-                return event.wheelDelta > 0;
-            }
-            return event.deltaY < 0;
-        }
 
-        window.onscroll = function() {
-          const navbarContent = document.getElementById("navbar-content");
-          const navbar = document.getElementsByTagName('nav')[0];
-          if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-            navbar.classList.add('collapsed-navbar');
-          } else {
-            navbar.classList.remove('collapsed-navbar');
-          }
-        };
-    </script>
-    <style>
-      nav {
-        transition: transform 0.5s;
-      }
-      .navbar-content {
-        transition: transform 0.5s;
-      }
-      .collapsed-navbar {
-        opacity: 0.5;
-        transform: translateY(-33%);
-      }
-      .collapsed-navbar .navbar-content {
-          transform: scale(0.75);
-      }
-    </style>
-    <div class="navbar-content flex justify-between items-center w-full md:w-5/6 h-24 mx-auto">
+<button id="mobile-menu-button" class="mobile-menu-button my-5 mx-auto"><hr></button>
 
-        {% if shop.logo_name %}
-        <a href="/home#offset">
-            <img class="h-20 self-center" src="{{ url_for('static', path='images/'+shop.logo_name) }}">
-        </a>
-        {% else %}
-        <p class="text-2xl font-bold w-5/12 h-min p-2 self-center text-center"><a hx-boost="false" href="/">{{ shop.name }}</a></p>
-        {% endif %}
+<div class="navbar-content flex flex-col sm:flex-row justify-between items-center w-full md:w-5/6 h-fit sm:h-24 mx-auto">
+    {% if shop.logo_name %}
+    <a href="/home#offset">
+        <img class="h-20 self-center" src="{{ url_for('static', path='images/'+shop.logo_name) }}">
+    </a>
+    {% else %}
+    <p class="text-2xl font-bold w-5/12 h-min p-2 self-center text-center"><a hx-boost="false" href="/">{{ shop.name }}</a></p>
+    {% endif %}
 
-        <menu class="grow flex justify-evenly">
-            <a class="flex justify-center items-center md:w-20 sm:w-36 h-24" href="/home#offset">Главная</a>
+    <menu class="grow flex flex-col sm:flex-row justify-evenly">
+        <a class="flex justify-center items-center md:w-20 sm:w-36 h-24" href="/home#offset">Главная</a>
 
-            <!-- Simple drop-down menu with brands -->
-            <div class="dropdown-menu">
-                <a class="flex justify-center items-center w-20 h-24" href="/products/catalog#offset">Каталог</a>
-                <div class="dropdown-content top-0 translate-y-full bg-sky-700 w-20">
-                    <a href="/products/catalog/search?manufacturer=Lenovo"><div class="p-1 text-center">Lenovo</div></a>
-                    <a href="/products/catalog/search?manufacturer=HP"><div class="p-1 text-center">HP</div></a>
-                    <a href="/products/catalog/search?manufacturer=Dell"><div class="p-1 text-center">Dell</div></a>
-                </div>
+        <!-- Simple drop-down menu with brands -->
+        <div class="dropdown-menu">
+            <a class="flex justify-center items-center w-20 h-24" href="/products/catalog#offset">Каталог</a>
+            <div class="dropdown-content top-0 translate-y-full bg-sky-700 w-20">
+                <a href="/products/catalog/search?manufacturer=Lenovo"><div class="p-1 text-center">Lenovo</div></a>
+                <a href="/products/catalog/search?manufacturer=HP"><div class="p-1 text-center">HP</div></a>
+                <a href="/products/catalog/search?manufacturer=Dell"><div class="p-1 text-center">Dell</div></a>
             </div>
-
-            <a href="/home#banners" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Акции</div></a>
-            <a href="/about#offset" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">О нас</div></a>
-            <a href="#" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Доставка</div></a>
-            <a href="/home#contacts" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Контакты</div></a>
-            
-            {% if request.state.user %}
-            <a href="/cart#offset" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Корзина</div></a>
-            {% endif %}
-        </menu>
-
-        <div class="border-2 border-white rounded flex justify-evenly">
-            {% if request.state.user %}
-                {% if request.state.user.is_admin %}
-                    <a href="/admin" hx-boost="false"><div class="p-4">Admin</div></a>
-                {% endif %}
-                <a href="/auth/logout" hx-boost="false" hx-post="/auth/logout"><div class="p-4">Выход</div></a>
-            {% else %}
-                <a href="/auth/login" hx-boost="false"><div class="p-4">Вход</div></a>
-            {% endif %}
         </div>
 
+        <a href="/home#banners" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Акции</div></a>
+        <a href="/about#offset" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">О нас</div></a>
+        <a href="#" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Доставка</div></a>
+        <a href="/home#contacts" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Контакты</div></a>
+        
+        {% if request.state.user %}
+        <a href="/cart#offset" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Корзина</div></a>
+        {% endif %}
+    </menu>
+
+    <div class="border-2 border-white rounded flex justify-evenly">
+        {% if request.state.user %}
+            {% if request.state.user.is_admin %}
+                <a href="/admin" hx-boost="false"><div class="p-4">Admin</div></a>
+            {% endif %}
+            <a href="/auth/logout" hx-boost="false" hx-post="/auth/logout"><div class="p-4">Выход</div></a>
+        {% else %}
+            <a href="/auth/login" hx-boost="false"><div class="p-4">Личный кабинет</div></a>
+        {% endif %}
     </div>
 
+</div>
+
+<script type="text/javascript" async>
+    function checkScrollDirectionIsUp(event) {
+        if (event.wheelDelta) {
+            return event.wheelDelta > 0;
+        }
+        return event.deltaY < 0;
+    }
+
+    window.onscroll = function() {
+      const navbarContent = document.getElementById("navbar-content");
+      const navbar = document.getElementsByTagName('nav')[0];
+      if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        navbar.classList.add('collapsed-navbar');
+      } else {
+        navbar.classList.remove('collapsed-navbar');
+      }
+    };
+
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    mobileMenuButton.addEventListener('click', () => {
+        const navbarContent = document.getElementsByClassName("navbar-content")[0];
+        navbarContent.classList.toggle('closed-navbar');
+    });
+</script>

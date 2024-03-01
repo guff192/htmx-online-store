@@ -1,9 +1,9 @@
 nav {
-    transition: transform 0.5s;
+    transition: all 0.5s;
 }
 
 .navbar-content {
-    transition: transform 0.5s;
+    transition: all 0.5s;
 }
 
 .collapsed-navbar {
@@ -17,10 +17,10 @@ nav {
 
 .mobile-menu-button {
     display: none;
-    width: 60px;
+    width: 80px;
     height: 40px;
-    border-top: 3px solid white;
-    border-bottom: 3px solid white;
+    border-top: 2px solid white;
+    border-bottom: 2px solid white;
 }
 
 @media (max-width: 640px) {

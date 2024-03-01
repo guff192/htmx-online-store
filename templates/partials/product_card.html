@@ -3,10 +3,6 @@
     class="border border-gray-800 bg-black rounded flex flex-col justify-between w-full h-full p-3 mb-2 text-center"
     hx-boost="true">
 
-    <h3 class="text-l font-bold uppercase mb-2">
-        <a hx-target="#content" href="{{ product.absolute_url }}">{{ product.name }}</a>
-    </h3>
-
     <img
         class="mx-auto"
         hx-trigger="load"
@@ -15,6 +11,10 @@
         src="{{ url_for('static', path='images/loading.webp') }}"
         alt="{{ product.name }}"
     >
+
+    <h3 class="text-l font-bold uppercase mb-2">
+        <a hx-target="#content" href="{{ product.absolute_url }}">{{ product.name }}</a>
+    </h3>
 
     <p class="text-sm">{{ product.description.replace('\n', '<br>') | safe | truncate(50) }}</p>
     <a class="font-bold hover:underline" hx-target="#content" href="{{ product.absolute_url }}">More info</a>

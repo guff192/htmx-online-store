@@ -24,7 +24,14 @@ nav {
 }
 
 @media (max-width: 640px) {
+    .collapsed-navbar {
+        height: 10dvh;
+    }
     .closed-navbar {
+        opacity: 0;
+        height: 0;
+    }
+    .closed-navbar a {
         display: none;
     }
 

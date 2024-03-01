@@ -23,7 +23,7 @@
     </div>
 
     {% block navbar %}
-        <nav class="bg-black text-white fixed top-8 w-full z-20"
+        <nav class="bg-black text-white fixed top-8 w-full z-20 h-screen sm:h-24 "
             hx-boost="true" hx-target="#content" hx-swap="innerHTML">
         {% include 'partials/navbar.html' %}
         </nav>
@@ -47,7 +47,7 @@
                 <hr class="w-2/3 mx-auto">
             </div>
 
-            <nav class="bg-black text-white w-full z-20 sticky scale-105"
+            <nav class="bg-black text-white w-full z-20 sticky scale-105 h-screen sm:h-24 hidden sm:block"
                 hx-boost="true" hx-target="#content" hx-swap="innerHTML">
             {% include 'partials/navbar.html' %}
             </nav>

@@ -1,5 +1,37 @@
-<nav class="bg-black text-white fixed top-0 w-full z-20" hx-boost="true" hx-target="#content" hx-swap="innerHTML">
-    <div class="flex justify-between items-center w-full md:w-3/4 h-24 mx-auto">
+    <script type="text/javascript">
+        function checkScrollDirectionIsUp(event) {
+            if (event.wheelDelta) {
+                return event.wheelDelta > 0;
+            }
+            return event.deltaY < 0;
+        }
+
+        window.onscroll = function() {
+          const navbarContent = document.getElementById("navbar-content");
+          const navbar = document.getElementsByTagName('nav')[0];
+          if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            navbar.classList.add('collapsed-navbar');
+          } else {
+            navbar.classList.remove('collapsed-navbar');
+          }
+        };
+    </script>
+    <style>
+      nav {
+        transition: transform 0.5s;
+      }
+      .navbar-content {
+        transition: transform 0.5s;
+      }
+      .collapsed-navbar {
+        opacity: 0.5;
+        transform: translateY(-33%);
+      }
+      .collapsed-navbar .navbar-content {
+          transform: scale(0.75);
+      }
+    </style>
+    <div class="navbar-content flex justify-between items-center w-full md:w-5/6 h-24 mx-auto">
 
         {% if shop.logo_name %}
         <a href="/home#offset">
@@ -10,11 +42,11 @@
         {% endif %}
 
         <menu class="grow flex justify-evenly">
-            <a class="flex justify-center items-center w-20 h-24" href="/home#offset">Главная</a>
+            <a class="flex justify-center items-center md:w-20 sm:w-36 h-24" href="/home#offset">Главная</a>
 
             <!-- Simple drop-down menu with brands -->
             <div class="dropdown-menu">
-                <a class="flex justify-center items-center w-20 h-24" href="/products/catalog">Каталог</a>
+                <a class="flex justify-center items-center w-20 h-24" href="/products/catalog#offset">Каталог</a>
                 <div class="dropdown-content top-0 translate-y-full bg-sky-700 w-20">
                     <a href="/products/catalog/search?manufacturer=Lenovo"><div class="p-1 text-center">Lenovo</div></a>
                     <a href="/products/catalog/search?manufacturer=HP"><div class="p-1 text-center">HP</div></a>
@@ -22,13 +54,13 @@
                 </div>
             </div>
 
-            <a href="/home#promo" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Акции</div></a>
-            <a href="/about" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">О нас</div></a>
+            <a href="/home#banners" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Акции</div></a>
+            <a href="/about#offset" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">О нас</div></a>
             <a href="#" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Доставка</div></a>
-            <a href="#" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Контакты</div></a>
+            <a href="/home#contacts" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Контакты</div></a>
             
             {% if request.state.user %}
-            <a href="/cart" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Корзина</div></a>
+            <a href="/cart#offset" hx-target="#content"><div class="flex justify-center items-center w-20 h-24">Корзина</div></a>
             {% endif %}
         </menu>
 
@@ -44,5 +76,4 @@
         </div>
 
     </div>
-</nav>
 

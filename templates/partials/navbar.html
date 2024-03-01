@@ -65,6 +65,9 @@
 
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     mobileMenuButton.addEventListener('click', () => {
+        if (window.innerWidth > 640) {
+            return;
+        }
         const navbarContent = document.getElementsByClassName("navbar-content")[0];
         navbarContent.classList.toggle('closed-navbar');
         

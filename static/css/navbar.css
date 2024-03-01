@@ -1,0 +1,34 @@
+nav {
+    transition: transform 0.5s;
+}
+
+.navbar-content {
+    transition: transform 0.5s;
+}
+
+.collapsed-navbar {
+    opacity: 0.5;
+    transform: translateY(-33%);
+}
+
+.collapsed-navbar .navbar-content {
+    transform: scale(0.75);
+}
+
+.mobile-menu-button {
+    display: none;
+    width: 60px;
+    height: 40px;
+    border-top: 3px solid white;
+    border-bottom: 3px solid white;
+}
+
+@media (max-width: 640px) {
+    .closed-navbar {
+        display: none;
+    }
+
+    .mobile-menu-button {
+        display: block;
+    }
+}

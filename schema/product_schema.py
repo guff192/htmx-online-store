@@ -68,7 +68,7 @@ class Product(ProductBase):
 
     @property
     def absolute_url(self) -> str:
-        return f'/products/{self.id}'
+        return f'/products/{self.id}#offset'
 
     @utils.add_shop_to_context
     def build_context(self) -> dict[str, Any]:

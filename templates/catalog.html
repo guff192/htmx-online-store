@@ -9,8 +9,10 @@
 
 {% else %}
     <script type="text/javascript">
-        pageHeader = document.getElementById('page-header');
-        pageHeader.innerText = 'Товары в наличии';
+        pageHeader = document.getElementsByTagName('header')[0];
+        pageHeader.innerHTML = `
+            <h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-5 mt-2">Товары в наличии</h1>
+        `;
         pageHeader.classList.remove('uppercase');
 
         document.title = '{{ shop.name }} | Каталог';

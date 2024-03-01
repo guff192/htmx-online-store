@@ -4,7 +4,30 @@
     {% block title %}{{ shop.name }} | Главная{% endblock %}
 
     {% block header %}
-    <h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-2 mt-2">Эвм стоp - обpатно в лучшее!</h1>
+        <div class="relative">
+            <div id="banners" class="mb-1 w-full">
+                {% for banner in banners %}
+                <div class="bg-lightBlue p-1 flex justify-between items-center mb-2 h-screen">
+                    <div class="bg-darkBlue flex flex-col justify-center w-5/6 h-full overflow-hidden">
+                        <img src="{{ banner.img_url }}">
+                    </div>
+
+                    <div class="flex flex-col justify-around w-1/6 h-full">
+                        <h3 class="text-center text-xl font-bold uppercase">
+                            {{ banner.name }}
+                        </h3>
+
+                        <p class="text-sm">
+                        {{ banner.description }}
+                        </p>
+                    </div>
+
+                    
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
     {% endblock %}
 
 {% else %}
@@ -12,7 +35,31 @@
         document.title = '{{ shop.name }} | Главная';
 
         pageHeader = document.getElementById('page-header');
-        pageHeader.innerText = 'Эвм стоp - обpатно в лучшее!';
+        pageHeader.innerHTML = `
+            <div class="relative">
+                <div id="banners" class="mb-1 w-full overflow-x-hidden">
+                    {% for banner in banners %}
+                    <div class="bg-lightBlue p-1 flex justify-between mb-2 h-screen">
+                        <div class="bg-darkBlue flex flex-col justify-center w-5/6 h-full overflow-hidden">
+                            <img src="{{ banner.img_url }}">
+                        </div>
+                        
+                        <div class="flex flex-col justify-around w-1/6 h-full">
+                            <h3 class="text-center text-xl font-bold uppercase my-2">
+                            {{ banner.name }}
+                            </h3>
+
+                            <p class="text-sm">
+                            {{ banner.description }}
+                            </p>
+                        </div>
+
+                        
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        `;
     </script>
 {% endif %}
 
@@ -24,30 +71,6 @@
         ну и т.д.<br />
         Здесь вы можете найти корпоративные ноутбуки в замечательном состоянии и по привлекательной цене.
     </p>
-
-    <div id="promo" class="relative h-0 -top-24 invisible"></div>
-    <div class="relative">
-        <h2 class="text-3xl font-bold text-center text-white mb-1 mt-5">Акции</h2>
-
-        <div id="banners" class="mb-1 p-3 h-dvh">
-            {% for banner in banners %}
-            <div class="bg-lightBlue p-1 flex flex-col justify-between mb-2 h-screen">
-                <h3 class="text-xl font-bold uppercase my-2">
-                    {{ banner.name }}
-                </h3>
- 
-                <div class="bg-darkBlue flex flex-col justify-center h-4/5">
-                    <img src="{{ banner.img_url }}">
-                </div>
-
-                <p class="text-sm">
-                    {{ banner.description }}
-                </p>
-                
-            </div>
-            {% endfor %}
-        </div>
-    </div>
 
     <div id="brands">
         <h2 class="text-3xl font-bold text-center text-white mb-1 mt-5">Бренды</h2>
@@ -71,5 +94,18 @@
                {% include 'partials/product_card.html' %}
            {% endfor %}
        </div>
+   </div>
+
+   <div id="reviews">
+       <div class="w-full h-full">
+           <h2 class="text-3xl font-bold text-center text-white mb-1 mt-5">Отзывы</h2>
+           <iframe style="width:100%;height:100%;border:1px solid #e6e6e6;border-radius:8px;box-sizing:border-box" src="https://yandex.ru/maps-reviews-widget/119376854596?comments"></iframe>
+       </div>
+   </div>
+
+   <div id="contacts">
+       <h2 class="text-3xl font-bold text-center text-white mb-1 mt-5">Контакты</h2>
+       <p>Москва, Садовая-Кудринская ул., 23, стр. 5</p>
+       <script type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A7cad2bdb25cf08e90987de8958d57e9e429f04eead06db4f723301aed557f4f9&amp;width=900&amp;height=600&amp;lang=ru_RU&amp;scroll=true"></script>
    </div>
 {% endblock %}

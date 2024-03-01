@@ -3,13 +3,16 @@
     position: absolute;
     z-index: 10;
 }
-.dropdown-menu:hover .dropdown-content, .dropdown-menu:focus .dropdown-content {
-    display: block;
-}
 .dropdown-content a {
     display: block;
 }
 .dropdown-content a:hover {
     background-color: #f1f1f1;
     color: black;
+}
+
+@media (min-width: 640px) {
+    .dropdown-menu:hover .dropdown-content, .dropdown-menu:focus .dropdown-content {
+        display: block;
+    }
 }

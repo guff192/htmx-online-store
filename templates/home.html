@@ -4,20 +4,20 @@
     {% block title %}{{ shop.name }} | Главная{% endblock %}
 
     {% block header %}
-        <div class="relative">
+        <div>
             <div id="banners" class="mb-1 w-full">
                 {% for banner in banners %}
                 <div class="bg-lightBlue p-1 flex justify-between items-center mb-2 h-screen">
-                    <div class="bg-darkBlue flex flex-col justify-center w-5/6 h-full overflow-hidden">
+                    <div class="bg-darkBlue flex flex-col justify-center w-5/6 h-full overflow-hidden rounded-lg">
                         <img src="{{ banner.img_url }}">
                     </div>
 
-                    <div class="flex flex-col justify-around w-1/6 h-full">
+                    <div class="flex flex-col justify-around w-1/6 h-full rounded-lg">
                         <h3 class="text-center text-xl font-bold uppercase">
                             {{ banner.name }}
                         </h3>
 
-                        <p class="text-sm">
+                        <p class="text-sm text-center">
                         {{ banner.description }}
                         </p>
                     </div>
@@ -36,25 +36,23 @@
 
         pageHeader = document.getElementById('page-header');
         pageHeader.innerHTML = `
-            <div class="relative">
-                <div id="banners" class="mb-1 w-full overflow-x-hidden">
+            <div>
+                <div id="banners" class="mb-1 w-full overflow-hidden">
                     {% for banner in banners %}
-                    <div class="bg-lightBlue p-1 flex justify-between mb-2 h-screen">
-                        <div class="bg-darkBlue flex flex-col justify-center w-5/6 h-full overflow-hidden">
+                    <div class="bg-lightBlue flex justify-between p-1 mb-2 h-screen">
+                        <div class="bg-darkBlue flex flex-col justify-center w-5/6 h-full overflow-hidden rounded-lg">
                             <img src="{{ banner.img_url }}">
                         </div>
                         
-                        <div class="flex flex-col justify-around w-1/6 h-full">
+                        <div class="flex flex-col justify-around w-1/6 h-full rounded-lg">
                             <h3 class="text-center text-xl font-bold uppercase my-2">
                             {{ banner.name }}
                             </h3>
 
-                            <p class="text-sm">
+                            <p class="text-sm text-center">
                             {{ banner.description }}
                             </p>
                         </div>
-
-                        
                     </div>
                     {% endfor %}
                 </div>

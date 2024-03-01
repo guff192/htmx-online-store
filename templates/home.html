@@ -96,7 +96,7 @@
        </div>
    </div>
 
-   <div id="reviews">
+   <div id="reviews" style="height: 800px;">
        <div class="w-full h-full">
            <h2 class="text-3xl font-bold text-center text-white mb-1 mt-5">Отзывы</h2>
            <iframe style="width:100%;height:100%;border:1px solid #e6e6e6;border-radius:8px;box-sizing:border-box" src="https://yandex.ru/maps-reviews-widget/119376854596?comments"></iframe>
@@ -104,8 +104,10 @@
    </div>
 
    <div id="contacts">
-       <h2 class="text-3xl font-bold text-center text-white mb-1 mt-5">Контакты</h2>
+       <h2 class="text-3xl font-bold text-center text-white mb-1 mt-10">Контакты</h2>
        <p>Москва, Садовая-Кудринская ул., 23, стр. 5</p>
-       <script type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A7cad2bdb25cf08e90987de8958d57e9e429f04eead06db4f723301aed557f4f9&amp;width=900&amp;height=600&amp;lang=ru_RU&amp;scroll=true"></script>
+       <div class="rounded-lg">
+           <iframe style="border-radius: 8px;" src="https://yandex.ru/map-widget/v1/?um=constructor%3A7cad2bdb25cf08e90987de8958d57e9e429f04eead06db4f723301aed557f4f9&amp;source=constructor" width="100%" height="600" frameborder="0"></iframe>       
+       </div>
    </div>
 {% endblock %}

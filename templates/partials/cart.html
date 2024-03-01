@@ -2,9 +2,10 @@
 
 <script>
     // Replace page header text
-    var pageHeader = document.getElementById('page-header');
-    pageHeader.innerText = 'Твоя корзина, {{ user.name }}'
-    pageHeader.classList.remove('uppercase');
+    var pageHeader = document.getElementsByTagName('header')[0];
+    pageHeader.innerHTML = `
+        <h1 id="page-header" class="text-indigo-50 text-4xl font-bold text-center mb-5 mt-2">Твоя корзина, {{ user.name }}</h1>
+    `;
 
     document.title = '{{ shop.name }} | Корзина'
 </script>

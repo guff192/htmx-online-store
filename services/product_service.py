@@ -92,7 +92,7 @@ class ProductService:
     def get_newcomers(self, offset: int) -> ProductList:
         orm_products = self.repo.get_newcomers(offset=offset)
 
-        products_schema: list[ProductSchema] = []
+        schema_products: list[ProductSchema] = []
         for orm_product in orm_products:
             # getting manufacturer name
             manufacturer_name = ''
@@ -114,9 +114,9 @@ class ProductService:
                 price=orm_product_dict.get('price', 0),
                 manufacturer_name=manufacturer_name,
             )
-            products_schema.append(product)
+            schema_products.append(product)
 
-        return ProductList(products=products_schema, offset=offset + 10)
+        return ProductList(products=schema_products, offset=offset + 10)
 
     def get_by_id(self, product_id: int) -> ProductSchema:
         orm_product = self.repo.get_by_id(product_id)

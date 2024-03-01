@@ -34,6 +34,9 @@ nav {
     .closed-navbar a {
         display: none;
     }
+    .closed-navbar a div {
+        display: none;
+    }
 
     .mobile-menu-button {
         display: block;
@@ -42,6 +45,7 @@ nav {
     .collapsed-navbar {
         opacity: 0.9;
         transform: translateY(0);
+        height: 10dvh;
     }
     .collapsed-navbar .navbar-content {
         transform: scale(1);

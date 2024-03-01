@@ -47,29 +47,27 @@
 </div>
 
 <script type="text/javascript" async>
-    function checkScrollDirectionIsUp(event) {
-        if (event.wheelDelta) {
-            return event.wheelDelta > 0;
-        }
-        return event.deltaY < 0;
+    if (window.innerWidth > 640) {
+        window.onscroll = function() {
+            const navbarContent = document.getElementById("navbar-content");
+            const navbar = document.getElementsByTagName('nav')[0];
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                if (!navbar.classList.contains('collapsed-navbar')) {
+                    navbar.classList.add('collapsed-navbar');
+                }
+            } else {
+                if (navbar.classList.contains('collapsed-navbar')) {
+                    navbar.classList.remove('collapsed-navbar');
+                }
+            }
+        };
     }
-
-    window.onscroll = function() {
-      const navbarContent = document.getElementById("navbar-content");
-      const navbar = document.getElementsByTagName('nav')[0];
-      if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-        navbar.classList.add('collapsed-navbar');
-      } else {
-        navbar.classList.remove('collapsed-navbar');
-      }
-    };
 
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     mobileMenuButton.addEventListener('click', () => {
         const navbarContent = document.getElementsByClassName("navbar-content")[0];
         navbarContent.classList.toggle('closed-navbar');
         
-        const navbar = document.getElementsByTagName('nav')[0];
-        navbar.classList.toggle('collapsed-navbar');
+        navbar = document.getElementsByTagName('nav')[0].classList.toggle('collapsed-navbar');
     });
 </script>

@@ -5,7 +5,6 @@ from pydantic_core import Url
 
 from schema.product_schema import (
     Product,
-    ProductInCart,
     ProductList,
     ProductPhotoPath,
     ProductPhotoSize,

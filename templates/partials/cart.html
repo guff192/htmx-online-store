@@ -21,12 +21,8 @@
 {% else %}
 <p class="text-center font-bold text-white">
 В твоей корзине пусто 🙃. 
-Перейдём в <a class="underline text-indigo-400" href='/products/catalog'
-    hx-boost="true"
-    hx-update-url="true"
-    hx-target="#content"
-    hx-swap="innerHTML"
-    hx-get="/products/catalog"
+Перейдём в <a class="hover:underline text-indigo-400"
+    href="/products/catalog#offset"
     >каталог</a>?</p>
 {% endif %}
 

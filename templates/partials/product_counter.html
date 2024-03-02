@@ -1,15 +1,5 @@
 {% if product.count %}
     <p class="my-2" id="product{{ product.id }}counter">
-        {% if product.count == 1 %}
-        <a
-            class="text-2xl cursor-pointer inline-block w-2 bg-darkPink"
-            hx-boost="true"
-            hx-trigger="click"
-            hx-put="/cart/remove?product_id={{ product.id }}"
-            hx-target="#product{{ product.id }}counter"
-            hx-swap="outerHTML"
-        >-</a>
-        {% else %}
         <a
             class="text-2xl cursor-pointer"
             hx-boost="true"
@@ -18,7 +8,7 @@
             hx-target="#product{{ product.id }}counter"
             hx-swap="outerHTML"
         >-</a>
-        {% endif %}
+
         <span class="bg-lightBlue rounded p-2 font-bold">{{ product.count }}</span>
         <a
             class="text-2xl cursor-pointer"
@@ -28,20 +18,10 @@
             hx-target="#product{{ product.id }}counter"
             hx-swap="outerHTML"
         >+</a>
+
     </p>
 
 {% else %}
-    {% if '/cart' in request.headers.get('hx-current-url', '') and '/cart' in request.url.path %}
-    <p 
-        class="text-2xl cursor-pointer"
-        hx-trigger="click"
-        hx-delete="/remove_element"
-        hx-target="#product{{ product.id }}"
-        hx-swap="outerHTML"
-    >❌</p>
-
-    {% endif %}
-
     <a
         id="product{{ product.id }}counter"
         class="my-2 cursor-pointer bg-lightBlue rounded p-2 font-bold"
@@ -52,5 +32,16 @@
         hx-swap="outerHTML"
 
     >Add to cart</a>
+
+    {% if '/cart' in request.headers.get('hx-current-url', '') and '/cart' in request.url.path %}
+    <p 
+        class="text-2xl cursor-pointer"
+        hx-trigger="click"
+        hx-delete="/remove_element"
+        hx-target="#product{{ product.id }}"
+        hx-swap="delete"
+    >❌</p>
+
+    {% endif %}
 
 {% endif %}

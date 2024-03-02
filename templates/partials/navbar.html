@@ -1,7 +1,8 @@
+<button id="mobile-menu-button" class="mobile-menu-button my-5 mx-auto z-10">
+    <hr>
+</button>
 
-<button id="mobile-menu-button" class="mobile-menu-button my-5 mx-auto z-10"><hr></button>
-
-<div class="navbar-content flex flex-col sm:flex-row justify-between items-center w-full md:w-5/6 mx-auto z-20">
+<div hx-update-url="true" class="navbar-content flex flex-col sm:flex-row justify-between items-center w-full md:w-5/6 mx-auto z-20">
     {% if shop.logo_name %}
     <a href="/home#offset">
         <img class="h-20 self-center" src="{{ url_for('static', path='images/'+shop.logo_name) }}">
@@ -17,30 +18,52 @@
         <div class="dropdown-menu">
             <a class="flex justify-center items-center w-20 h-14 sm:h-24" href="/products/catalog#offset">Каталог</a>
             <div class="dropdown-content top-0 translate-y-full bg-sky-700 w-20">
-                <a href="/products/catalog/search?manufacturer=Lenovo"><div class="p-1 text-center">Lenovo</div></a>
-                <a href="/products/catalog/search?manufacturer=HP"><div class="p-1 text-center">HP</div></a>
-                <a href="/products/catalog/search?manufacturer=Dell"><div class="p-1 text-center">Dell</div></a>
+                <a href="/products/catalog/search?manufacturer=Lenovo">
+                    <div class="p-1 text-center">Lenovo</div>
+                </a>
+                <a href="/products/catalog/search?manufacturer=HP">
+                    <div class="p-1 text-center">HP</div>
+                </a>
+                <a href="/products/catalog/search?manufacturer=Dell">
+                    <div class="p-1 text-center">Dell</div>
+                </a>
             </div>
         </div>
 
-        <a href="/home#banners" hx-target="#content"><div class="flex justify-center items-center w-20 h-14 sm:h-24">Акции</div></a>
-        <a href="/about#offset" hx-target="#content"><div class="flex justify-center items-center w-20 h-14 sm:h-24">О нас</div></a>
-        <a href="#" hx-target="#content"><div class="flex justify-center items-center w-20 h-14 sm:h-24">Доставка</div></a>
-        <a href="/home#contacts" hx-target="#content"><div class="flex justify-center items-center w-20 h-14 sm:h-24">Контакты</div></a>
-        
+        <a href="/home#banners" hx-target="#content">
+            <div class="flex justify-center items-center w-20 h-14 sm:h-24">Акции</div>
+        </a>
+        <a href="/about#offset" hx-target="#content">
+            <div class="flex justify-center items-center w-20 h-14 sm:h-24">О нас</div>
+        </a>
+        <a href="#" hx-target="#content">
+            <div class="flex justify-center items-center w-20 h-14 sm:h-24">Доставка</div>
+        </a>
+        <a href="/home#contacts" hx-target="#content">
+            <div class="flex justify-center items-center w-20 h-14 sm:h-24">Контакты</div>
+        </a>
+
         {% if request.state.user %}
-        <a href="/cart#offset" hx-target="#content"><div class="flex justify-center items-center w-20 h-14 sm:h-24">Корзина</div></a>
+        <a href="/cart#offset" hx-target="#content">
+            <div class="flex justify-center items-center w-20 h-14 sm:h-24">Корзина</div>
+        </a>
         {% endif %}
     </menu>
 
     <div class="border-2 border-white rounded flex justify-evenly">
         {% if request.state.user %}
-            {% if request.state.user.is_admin %}
-                <a href="/admin" hx-boost="false"><div class="p-4">Admin</div></a>
-            {% endif %}
-            <a href="/auth/logout" hx-boost="false" hx-post="/auth/logout"><div class="p-4">Выход</div></a>
+        {% if request.state.user.is_admin %}
+        <a href="/admin" hx-boost="false">
+            <div class="p-4">Admin</div>
+        </a>
+        {% endif %}
+        <a href="/auth/logout" hx-boost="false" hx-post="/auth/logout">
+            <div class="p-4">Выход</div>
+        </a>
         {% else %}
-            <a href="/auth/login" hx-boost="false"><div class="p-4">Личный кабинет</div></a>
+        <a href="/auth/login" hx-boost="false">
+            <div class="p-4">Личный кабинет</div>
+        </a>
         {% endif %}
     </div>
 
@@ -48,7 +71,7 @@
 
 <script type="text/javascript" async>
     if (window.innerWidth > 640) {
-        window.onscroll = function() {
+        window.onscroll = function () {
             const navbarContent = document.getElementById("navbar-content");
             const navbar = document.getElementsByTagName('nav')[0];
             if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
@@ -70,7 +93,7 @@
         }
         const navbarContent = document.getElementsByClassName("navbar-content")[0];
         navbarContent.classList.toggle('closed-navbar');
-        
+
         document.getElementsByTagName('nav')[0].classList.toggle('collapsed-navbar');
     });
     document.querySelectorAll('menu a').forEach(link => link.addEventListener('click', () => {

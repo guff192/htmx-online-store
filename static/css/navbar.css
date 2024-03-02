@@ -8,7 +8,6 @@ nav {
 
 .collapsed-navbar {
     opacity: 0.5;
-    transform: translateY(-33%);
 }
 
 .collapsed-navbar .navbar-content {

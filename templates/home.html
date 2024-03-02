@@ -5,13 +5,14 @@
 
     {% block header %}
         <div>
-            <div id="banners" class="mb-1 w-11/12 overflow-hidden mx-auto">
+            <div id="banners" class="mb-1 w-full overflow-hidden mx-auto">
                 {% for banner in banners %}
-                <div class="bg-lightBlue p-1 flex justify-between items-center mb-2 h-screen">
-                    <div class="bg-darkBlue flex flex-col justify-center w-5/6 h-full overflow-hidden rounded-lg">
+                <div class="bg-darkBlue flex justify-between items-center mb-2 h-screen">
+                    <div class="bg-darkBlue flex flex-col justify-center w-full h-full overflow-hidden rounded-lg">
                         <img src="{{ banner.img_url }}">
                     </div>
 
+                    <!-- 
                     <div class="flex flex-col justify-around w-1/6 h-full rounded-lg">
                         <h3 class="text-center text-xl font-bold uppercase">
                             {{ banner.name }}
@@ -20,7 +21,8 @@
                         <p class="text-sm text-center">
                         {{ banner.description }}
                         </p>
-                    </div>
+                    </div> 
+                    -->
 
                     
                 </div>
@@ -39,20 +41,22 @@
             <div>
                 <div id="banners" class="mb-1 w-full overflow-hidden">
                     {% for banner in banners %}
-                    <div class="bg-lightBlue flex justify-between p-1 mb-2 h-screen">
-                        <div class="bg-darkBlue flex flex-col justify-center w-5/6 h-full overflow-hidden rounded-lg">
+                    <div class="bg-black flex justify-between mb-2 h-screen">
+                        <div class="bg-black flex flex-col justify-center w-full h-full overflow-hidden rounded-lg">
                             <img src="{{ banner.img_url }}">
                         </div>
                         
+                        <!-- 
                         <div class="flex flex-col justify-around w-1/6 h-full rounded-lg">
-                            <h3 class="text-center text-xl font-bold uppercase my-2">
-                            {{ banner.name }}
+                            <h3 class="text-center text-xl font-bold uppercase">
+                                {{ banner.name }}
                             </h3>
 
                             <p class="text-sm text-center">
                             {{ banner.description }}
                             </p>
-                        </div>
+                        </div> 
+                        -->
                     </div>
                     {% endfor %}
                 </div>
@@ -79,7 +83,7 @@
        </div>
    </div>
 
-   <div id="reviews" style="height: 1350px; overflow: hidden; border-radius: 8px;">
+   <div id="reviews" style="height: 1350px; width: 720px; overflow: hidden; border-radius: 8px; margin: 0 auto">
        <div class="w-full h-full">
            <h2 class="text-3xl font-bold text-center text-white mb-1 mt-12">Отзывы</h2>
            <iframe style="width:100%;height:100%;border-radius:8px;box-sizing:border-box" src="https://yandex.ru/maps-reviews-widget/119376854596?comments"></iframe>

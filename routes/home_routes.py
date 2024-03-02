@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, Request
 from fastapi import status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from loguru import logger
 
 from viewmodels import DefaultViewModel, default_viewmodel_dependency
 from viewmodels.banner_viewmodel import BannerViewModel, banner_viewmodel_dependency
@@ -21,6 +20,11 @@ templates = Jinja2Templates(directory='templates')
 @router.get('/')
 def root():
     return RedirectResponse('/home', status_code=status.HTTP_301_MOVED_PERMANENTLY)
+
+
+@router.delete('/remove_element', response_class=HTMLResponse, name='remove_element')
+def remove_element():
+    return HTMLResponse('', status_code=status.HTTP_200_OK)
 
 
 @router.get('/home', response_class=HTMLResponse, name='home', dependencies=[])

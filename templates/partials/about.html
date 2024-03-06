@@ -13,7 +13,7 @@
     document.title = '{{ shop.name }} | О нас';
 
     pageHeader = document.getElementById('page-header');
-    pageHeader.innerText = 'О нас';
+    pageHeader.innerHTML = '<h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-2 mt-2">О нас</h1>';
 </script>
 
 {% block content %}

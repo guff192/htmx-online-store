@@ -74,7 +74,7 @@
         window.onscroll = function () {
             const navbarContent = document.getElementById("navbar-content");
             const navbar = document.getElementsByTagName('nav')[0];
-            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            if (document.body.scrollTop > window.innerHeight || document.documentElement.scrollTop > window.innerHeight) {
                 if (!navbar.classList.contains('collapsed-navbar')) {
                     navbar.classList.add('collapsed-navbar');
                 }

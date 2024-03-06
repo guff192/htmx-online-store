@@ -1,68 +1,59 @@
 {% if not request.headers.get('hx-request') %}
+    
     {% extends '_base.html' %}
 
     {% block title %}{{ shop.name }} | Главная{% endblock %}
 
     {% block header %}
-        <div>
-            <div id="banners" class="mb-1 w-11/12 overflow-hidden mx-auto">
-                {% for banner in banners %}
-                <div class="bg-lightBlue p-1 flex justify-between items-center mb-2 h-screen">
-                    <div class="bg-darkBlue flex flex-col justify-center w-5/6 h-full overflow-hidden rounded-lg">
-                        <img src="{{ banner.img_url }}">
-                    </div>
-
-                    <div class="flex flex-col justify-around w-1/6 h-full rounded-lg">
-                        <h3 class="text-center text-xl font-bold uppercase">
-                            {{ banner.name }}
-                        </h3>
-
-                        <p class="text-sm text-center">
-                        {{ banner.description }}
-                        </p>
-                    </div>
-
-                    
+    <div class="banners-container">
+        <div id="banners" class="mb-1 w-full overflow-hidden mx-auto">
+            {% for banner in banners %}
+            <div class="banner bg-darkBlue flex justify-between items-center mb-2 h-screen transition-all duration-500">
+                <div class="bg-darkBlue flex flex-col justify-end w-full h-full overflow-hidden rounded-lg"
+                    style="background: url('{{ banner.img_url }}') center/cover no-repeat;">
+                        
+                        <!--
+                        <h1 class="text-white text-center text-3xl font-bold mb-2" style="text-shadow: 2px 2px 10px white;">{{ banner.name }}</h1>
+                        -->
                 </div>
-                {% endfor %}
             </div>
+            {% endfor %}
         </div>
+    </div>
+
 
     {% endblock %}
 
 {% else %}
     <script type="text/javascript">
-        document.title = '{{ shop.name }} | Главная';
+    document.title = '{{ shop.name }} | Главная';
 
-        pageHeader = document.getElementById('page-header');
-        pageHeader.innerHTML = `
-            <div>
-                <div id="banners" class="mb-1 w-full overflow-hidden">
-                    {% for banner in banners %}
-                    <div class="bg-lightBlue flex justify-between p-1 mb-2 h-screen">
-                        <div class="bg-darkBlue flex flex-col justify-center w-5/6 h-full overflow-hidden rounded-lg">
-                            <img src="{{ banner.img_url }}">
-                        </div>
+    pageHeader = document.getElementById('page-header');
+    pageHeader.innerHTML = `
+    <div class="banners-container">
+        <div id="banners" class="mb-1 w-full overflow-hidden mx-auto">
+            {% for banner in banners %}
+            <div class="banner bg-darkBlue flex justify-between items-center mb-2 h-screen transition-all duration-500">
+                <div class="bg-darkBlue flex flex-col justify-end w-full h-full overflow-hidden rounded-lg"
+                    style="background: url('{{ banner.img_url }}') center/cover no-repeat;">
                         
-                        <div class="flex flex-col justify-around w-1/6 h-full rounded-lg">
-                            <h3 class="text-center text-xl font-bold uppercase my-2">
-                            {{ banner.name }}
-                            </h3>
-
-                            <p class="text-sm text-center">
-                            {{ banner.description }}
-                            </p>
-                        </div>
-                    </div>
-                    {% endfor %}
+                        <h1 class="text-white text-center text-3xl font-bold mb-2" style="text-shadow: 2px 2px 10px white;">{{ banner.name }}</h1>
                 </div>
             </div>
-        `;
+            {% endfor %}
+        </div>
+    </div>
+    `;
+
     </script>
 {% endif %}
 
+<!-- Script for banners -->
+<script type="text/javascript" src="{{ url_for('static', path='js/banners.js') }}" async></script>
+
 {% block content %}
-<div id="main-content" class="container text-center">
+
+<div id="main-content" class="container text-center mx-auto my-8">
     <p class="text-indigo-50">
         Добро пожаловать
         {% if request.state.user %}, <span class="font-bold">{{ request.state.user.name }}</span>,{% endif %}
@@ -79,7 +70,7 @@
        </div>
    </div>
 
-   <div id="reviews" style="height: 1350px; overflow: hidden; border-radius: 8px;">
+   <div id="reviews" style="height: 1350px; width: 720px; overflow: hidden; border-radius: 8px; margin: 0 auto">
        <div class="w-full h-full">
            <h2 class="text-3xl font-bold text-center text-white mb-1 mt-12">Отзывы</h2>
            <iframe style="width:100%;height:100%;border-radius:8px;box-sizing:border-box" src="https://yandex.ru/maps-reviews-widget/119376854596?comments"></iframe>

@@ -4,7 +4,7 @@ const getBanners = () => {
 };
 
 let banners = getBanners();
-window.onload = () => {
+document.onload = () => {
     banners = getBanners();
 };
 
@@ -44,6 +44,8 @@ function showPreviousBanner() {
         banners[currentBannerIndex].style.opacity = 1;
     }, 490);
 }
+
+//setTimeout(function() { banners = getBanners(); }, 200);
 
 // Set interval to automatically change banners every 5 seconds
 setInterval(showNextBanner, 5000);

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi import status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from loguru import logger
 
 from viewmodels import DefaultViewModel, default_viewmodel_dependency
 from viewmodels.banner_viewmodel import BannerViewModel, banner_viewmodel_dependency
@@ -27,7 +28,7 @@ def remove_element():
     return HTMLResponse('', status_code=status.HTTP_200_OK)
 
 
-@router.get('/home', response_class=HTMLResponse, name='home', dependencies=[])
+@router.get('/home', response_class=HTMLResponse, name='home')
 def home(
     request: Request,
     offset: int = 0,
@@ -44,7 +45,14 @@ def home(
         **product_list.build_context(),
         'banners': banner_list,
     }
-    return templates.TemplateResponse('home.html', context=context_data)
+
+    try:
+        response = templates.TemplateResponse('home.html', context=context_data)
+        return response
+    except Exception as e:
+        logger.debug(f'Error while rendering home page: {e}')
+        response = HTMLResponse('Error', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return response
 
 
 @router.get('/about', response_class=HTMLResponse, name='about')

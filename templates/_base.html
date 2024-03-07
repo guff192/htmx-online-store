@@ -23,18 +23,18 @@
 
 <body class="bg-darkBlue text-white p-0 m-0">
     <div id="promocode"
-        class="fixed top-0 w-full h-8 bg-white text-lightBlue text-center leading-loose z-20">
+        class="fixed top-0 w-full h-12 bg-white text-lightBlue text-center leading-loose z-20">
         Введи промокод <i><b>ничего</b></i> и получи <b>скидку 100% на всю техникуу!</b>
     </div>
 
     {% block navbar %}
-        <nav class="bg-black text-white fixed top-8 w-full z-20 h-screen sm:h-24 "
+        <nav class="bg-black text-white fixed top-12 w-full z-20 h-screen sm:h-24 "
             hx-boost="true" hx-target="#content" hx-swap="innerHTML">
         {% include 'partials/navbar.html' %}
         </nav>
     {% endblock %}
 
-    <div id="offset" class="h-32 invisible"></div>
+    <div id="offset" class="h-36 invisible"></div>
 
     <header>
         {% block header %}<h1 id="page-header">Default Header</h1>{% endblock %}

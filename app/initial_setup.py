@@ -1,9 +1,9 @@
 from fastapi import HTTPException
 from loguru import logger
 import requests
-from sqlalchemy.orm import Session
+from db.session import Session, db_dependency
 
-from app.config import Settings
+from .config import Settings
 from repository.manufacturer_repository import ManufacturerRepository
 from repository.product_repository import ProductRepository
 from schema.product_schema import ProductCreate
@@ -50,4 +50,9 @@ def fetch_products(db: Session):
             product_service.create(product_create)
         except HTTPException as e:
             logger.info(f"Error creating product: {e.detail}")
+
+
+if __name__ == "__main__":
+    with next(db_dependency()) as db:
+        fetch_products(db)
 

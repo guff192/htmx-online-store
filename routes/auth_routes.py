@@ -174,10 +174,10 @@ def process_yandex_login(
     return response
 
 
-@router.post("/logout")
+@router.get("/logout")
 def process_logout():
-    response = Response(
-        headers={"hx-redirect": "/auth/login"},
+    response = RedirectResponse(
+        "/auth/login",
     )
     response.delete_cookie("_session")
     return response

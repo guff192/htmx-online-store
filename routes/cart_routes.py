@@ -19,7 +19,7 @@ def get_cart(
     vm: CartViewModel = Depends(cart_viewmodel_dependency),
 ):
     if not user:
-        raise ErrUnauthorized()
+        return RedirectResponse('/auth/login', status_code=status.HTTP_303_SEE_OTHER)
 
     cart = vm.get_cart(str(user.id))
     context = {'request': request, 'user': user, **cart.build_context()}

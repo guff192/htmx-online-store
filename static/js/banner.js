@@ -9,7 +9,7 @@ document.onload = () => {
 };
 
 let currentBannerIndex = 0;
-const totalBanners = banners.length;
+let totalBanners = banners.length;
 let nextBannerIndex = (currentBannerIndex + 1) % totalBanners;
 
 // Hide all banners except the first one

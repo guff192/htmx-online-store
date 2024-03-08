@@ -52,6 +52,7 @@
     {% if product.count %}
     <p class="my-2">Добавлен в корзину ({{ product.count }} шт.)</p>
     <a 
+        class="hover:underline"
         href="/cart#offset"
         hx-boost="true"
         hx-trigger="click"
@@ -71,7 +72,7 @@
         hx-target="#product{{ product.id }}counter"
         hx-swap="outerHTML"
 
-    >Add to cart</a>
+    >Добавить в корзину</a>
 
     {% endif %}
 

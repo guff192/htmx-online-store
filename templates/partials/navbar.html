@@ -44,7 +44,7 @@
         </a>
 
         {% if request.state.user %}
-        <a href="/cart#offset" hx-target="#content">
+        <a href="/cart#offset" hx-boost="false">
             <div class="flex justify-center items-center w-20 h-14 sm:h-24">Корзина</div>
         </a>
         {% endif %}

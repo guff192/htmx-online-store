@@ -66,3 +66,15 @@ def about(
     }
     return templates.TemplateResponse('partials/about.html', context=context_data)
 
+
+@router.get('/contacts', response_class=HTMLResponse, name='contacts')
+def contacts(
+    request: Request,
+    default_vm: DefaultViewModel = Depends(default_viewmodel_dependency),
+):
+    context_data: dict[str, Any] = {
+        'request': request,
+        **default_vm.build_context(),
+    }
+    return templates.TemplateResponse('contacts.html', context=context_data)
+

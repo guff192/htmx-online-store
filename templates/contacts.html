@@ -1,0 +1,20 @@
+{% extends '_base.html' %}
+
+{% block title %}{{ shop.name }} | Контакты{% endblock %}
+
+{% block header %}
+<h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-2 mt-2">Контакты</h1>
+{% endblock %}
+
+{% block content %}
+   <div>
+       <p>Москва, Садовая-Кудринская ул., 23, стр. 5</p>
+       <div class="rounded-lg">
+           <iframe style="border-radius: 8px;" src="https://yandex.ru/map-widget/v1/?um=constructor%3A7cad2bdb25cf08e90987de8958d57e9e429f04eead06db4f723301aed557f4f9&amp;source=constructor" width="100%" height="600" frameborder="0"></iframe>       
+       </div>
+   </div>
+
+{% endblock %}
+
+
+

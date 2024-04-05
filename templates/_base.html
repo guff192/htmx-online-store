@@ -17,30 +17,31 @@
     <script src="{{ url_for('static', path='js/htmx.min.js') }}"></script>
 
     <!-- Custom JS -->
-   <script src="{{ url_for('static', path='js/banner.js') }}" async></script>
+    <script src="{{ url_for('static', path='js/banner.js') }}" async></script>
+    <script src="{{ url_for('static', path='js/yandex_pay.js') }}" async></script>
 
 </head>
 
 <body class="bg-darkBlue text-white p-0 m-0">
     <div id="promocode"
-        class="fixed top-0 w-full h-12 bg-white text-lightBlue text-center leading-loose z-20">
+        class="fixed top-0 w-full h-16 bg-white text-lightBlue text-center leading-loose z-20">
         Введи промокод <i><b>ничего</b></i> и получи <b>скидку 100% на всю техникуу!</b>
     </div>
 
     {% block navbar %}
-        <nav class="bg-black text-white fixed top-12 w-full z-20 h-screen sm:h-24 "
+        <nav class="bg-black text-white fixed top-16 w-full z-20 h-screen sm:h-24 "
             hx-boost="true" hx-target="#content" hx-swap="innerHTML">
         {% include 'partials/navbar.html' %}
         </nav>
     {% endblock %}
 
-    <div id="offset" class="h-36 invisible"></div>
+    <div id="offset" class="h-40 invisible"></div>
 
     <header>
         {% block header %}<h1 id="page-header">Default Header</h1>{% endblock %}
     </header>
 
-    <main id="content" class="w-full md:w-8/12 mx-auto mt-2">
+    <main id="content" class="w-full md:w-9/12 mx-auto mt-2">
         {% block content %}{% endblock %}
     </main>
 
@@ -48,12 +49,11 @@
         {% block footer %}
             {% include 'partials/footer.html' %}
 
-            <div>
-                <hr class="w-2/3 mx-auto">
-            </div>
-
         {% endblock %}
     </footer>
+
+    <!-- Scripts -->
+    <script src="https://pay.yandex.ru/sdk/v1/pay.js" onload="onYaPayLoad()" async></script>
 </body>
 
 </html>

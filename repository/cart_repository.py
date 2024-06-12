@@ -32,13 +32,21 @@ class CartRepository:
     def _get_user_product_query(
             self,
             user_id: str,
-            product_id: int
+            product_id: int,
+            configuration_id: int = 0
     ) -> Query[UserProduct]:
-        return (
+        query_without_configuration = (
             self._db
             .query(UserProduct)
             .filter(UserProduct.user_id == user_id)
             .filter(UserProduct.product_id == product_id)
+        )
+
+        if not configuration_id:
+            return query_without_configuration
+        return (
+            query_without_configuration
+            .filter(UserProduct.selected_configuration_id == configuration_id)
         )
 
     def get_user_products(self, user_id: str) -> list[UserProduct]:

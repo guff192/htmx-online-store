@@ -256,7 +256,7 @@ class ProductService:
 
     def update_or_create_by_name(
         self,
-        product_update: ProductUpdate
+        product_update: ProductCreate
     ) -> ProductUpdateResponse:
         if not product_update.is_valid():
             logger.debug(f'Invalid product: {product_update}')

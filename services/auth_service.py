@@ -140,13 +140,15 @@ class AuthService:
         if not user_data:
             raise ErrUserNotFound()
 
+        yandex_id = user_data.__dict__.get("yandex_id")
+
         return LoggedUser(
             id=user_id,
             name=str(user_data.name),
             email=str(user_data.email),
             profile_img_url=str(user_data.profile_img_url),
             google_id=str(user_data.google_id),
-            yandex_id=str(user_data.yandex_id),
+            yandex_id=yandex_id,
             is_admin=bool(user_data.is_admin),
         )
 

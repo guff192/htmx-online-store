@@ -126,7 +126,7 @@ class ProductRepository:
 
         return product_list
 
-    def get_by_id(self, product_id: int) -> Product | None:
+    def get_by_id(self, product_id) -> Product | None:
         return self.db.query(Product).get(product_id)
 
     def get_by_name(self, name: str) -> Product | None:
@@ -151,18 +151,21 @@ class ProductRepository:
             count=count,
             manufacturer=manufacturer,
         )
-
-        self.db.begin(nested=True)
         self.db.add(product)
+        self.db.flush([product])
+
+        configs: list[AvailableProductConfiguration] = []
         for config in configurations:
             available_configuration = AvailableProductConfiguration(
-                product=product,
+                product_id=product._id,
                 configuration=config
             )
             self.db.add(available_configuration)
+            configs.append(available_configuration)
         self.db.commit()
+        self.db.flush(configs)
 
-        self.db.refresh(product)
+        product = self.get_by_id(product._id)
         return product
 
     def update(self,

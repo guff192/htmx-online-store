@@ -141,6 +141,8 @@ class AuthService:
             raise ErrUserNotFound()
 
         yandex_id = user_data.__dict__.get("yandex_id")
+        if yandex_id is not None:
+            yandex_id = int(yandex_id)
 
         return LoggedUser(
             id=user_id,

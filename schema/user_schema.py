@@ -7,7 +7,7 @@ class UserBase(BaseModel):
     email: str
     profile_img_url: str
     google_id: str | None
-    yandex_id: str | None
+    yandex_id: int | None
     is_admin: bool = False
 
 

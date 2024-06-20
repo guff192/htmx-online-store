@@ -126,7 +126,7 @@ class ProductRepository:
 
         return product_list
 
-    def get_by_id(self, product_id: int) -> Product | None:
+    def get_by_id(self, product_id) -> Product | None:
         return self.db.query(Product).get(product_id)
 
     def get_by_name(self, name: str) -> Product | None:

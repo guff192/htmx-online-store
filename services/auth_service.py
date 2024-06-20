@@ -9,7 +9,6 @@ from google.oauth2 import id_token
 from jose import JWTError, jwt
 from loguru import logger
 import requests
-from sqlalchemy.sql.functions import user
 
 from app.config import Settings
 from exceptions.auth_exceptions import ErrUserNotFound, ErrWrongCredentials
@@ -112,7 +111,7 @@ class AuthService:
         if expires_delta:
             expire = datetime.utcnow() + expires_delta
         else:
-            expire = datetime.utcnow() + timedelta(hours=1)
+            expire = datetime.utcnow() + timedelta(hours=2)
         to_encode.update({"exp": expire})
 
         encoded_jwt = jwt.encode(

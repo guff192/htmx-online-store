@@ -8,6 +8,8 @@ from schema.product_schema import (
     ProductList,
     ProductPhotoPath,
     ProductPhotoSize,
+    ProductConfiguration,
+    ProductPrices
 )
 from schema.user_schema import LoggedUser
 from services.product_service import ProductService, product_service_dependency
@@ -51,6 +53,19 @@ class ProductViewModel:
         size: ProductPhotoSize = ProductPhotoSize.small,
     ) -> ProductPhotoPath | None:
         return self._service.get_main_photo(product_name, size)
+
+    def get_configurations_for_product(
+        self,
+        product_id: int
+    ) -> list[ProductConfiguration]:
+        return self._service.get_configurations_for_product(product_id)
+
+    def get_product_prices(
+        self,
+        product_id: int,
+        configuration_id: int
+    ) -> ProductPrices:
+        return self._service.get_product_prices(product_id, configuration_id)
 
 
 def product_viewmodel_dependency(

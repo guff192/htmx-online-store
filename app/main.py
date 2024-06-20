@@ -13,11 +13,13 @@ from app.initial_setup import fetch_products
 from db import init_db
 from db.session import get_db
 from middleware.auth_middleware import AdminMiddleware, LoginMiddleware
+from repository.order_repository import test_order_repository
 from routes.auth_routes import router as auth_router
 from routes.cart_routes import router as cart_router
 from routes.home_routes import router as home_router
 from routes.product_routes import router as product_router
 from routes.product_photos_routes import router as product_photos_router
+from routes.order_routes import router as order_router
 from services.auth_service import get_auth_service
 
 
@@ -33,6 +35,10 @@ async def lifecycle(app: FastAPI):
     # initialize database (create all tables if they don't exist)
     init_db()
     fetch_products(get_db())
+
+    # token = get_auth_service().create_access_token({'sub': '066b2931e8b4417b9801e6f89ab19b30'})
+    # logger.debug(f'{token = }')
+
 
     # reload tailwindcss
     try:
@@ -92,6 +98,7 @@ def get_app() -> FastAPI:
     app.include_router(product_photos_router)
     app.include_router(home_router)
     app.include_router(cart_router)
+    app.include_router(order_router)
 
     return app
 

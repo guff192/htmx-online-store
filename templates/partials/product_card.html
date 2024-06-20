@@ -1,8 +1,9 @@
 <div
-    id="product{{ product.id }}"
+    id="product{{ product.id }}card{% if product.selected_configuration %}{{ product.selected_configuration.id }}{% endif %}"
     class="border border-gray-800 bg-black rounded-lg flex flex-col justify-between w-full h-full p-3 mb-2 text-center"
     hx-boost="true">
 
+    <!-- Photo -->
     <img
         class="mx-auto"
         hx-trigger="load"
@@ -12,19 +13,38 @@
         alt="{{ product.name }}"
     >
 
-    <h3 class="text-l font-bold uppercase mb-2">
-        <a hx-target="#content" href="{{ product.absolute_url }}">{{ product.name }}</a>
+    <!-- Product name -->
+    <h3 class="text-l font-bold uppercase mb-3">
+        <a hx-target="#content" href="{{ product.absolute_url }}#offset">{{ product.name }}</a>
     </h3>
 
+    <!-- Description -->
     <p class="text-sm">{{ product.description.replace('\n', '<br>') | safe | truncate(50) }}</p>
-    <a class="font-bold hover:underline" hx-target="#content" href="{{ product.absolute_url }}">More info</a>
+    <a class="font-bold hover:underline" hx-target="#content" href="{{ product.absolute_url }}#offset">More info</a>
 
-    <p class="price w-1/2 bg-darkPink rounded my-2 mx-auto">
-        <span class="font-bold">{{ product.price }} ₽</span>
-    </p>
+    <!-- Price and counter -->
+    {% if product.selected_configuration %}
+        <h4 class="text-center mt-3">Конфигурация<br>(RAM/SSD):</h4>
 
-    {% if request.state.user %}
-    {% include 'partials/product_counter.html' %}
+        <div id="product{{ product.id }}priceTabs"
+            role="tabpanel"
+            hx-get="/products/{{ product.id }}/prices/{{ product.selected_configuration.id }}"
+            hx-trigger="load"></div>
+    
+        {% include 'partials/product_counter.html' %}
+
+    {% else %}
+        <div>
+            <strong class="text-3xl">{{ product.price }}₽<span class="text-2xl text-green-600">+</span></strong>
+        </div>
+
+        <a
+            class="my-2 cursor-pointer bg-lightBlue rounded p-2 font-bold"
+            href="{{ product.absolute_url }}#product{{ product.id }}description"
+            hx-boost="false"
+            >Добавить в корзину</a>
+
     {% endif %}
 
 </div>
+

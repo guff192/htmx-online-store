@@ -22,6 +22,27 @@ class UserService:
     def __init__(self, user_repo: UserRepository) -> None:
         self.repo = user_repo
 
+    def user_model_to_userresponse_schema(
+        self, user_model: User
+    ) -> UserResponse:
+        user_model_dict = user_model.__dict__
+        user_id = user_model_dict.get("id", 0)
+        name = user_model_dict.get("name", "")
+        email = user_model_dict.get("email", "")
+        profile_img_url = user_model_dict.get("profile_img_url", "")
+        google_id = user_model_dict.get("google_id", "")
+        yandex_id = user_model_dict.get("yandex_id", "")
+
+        return UserResponse(
+            id=user_id,
+            name=name,
+            email=email,
+            profile_img_url=profile_img_url,
+            google_id=google_id,
+            yandex_id=yandex_id,
+        )
+
+
     def _get_by_google_id(self, google_id: str) -> User | None:
         return self.repo.get_by_google_id(google_id)
 

@@ -19,3 +19,8 @@ class Cart(BaseModel):
             'user': self.user,
         }
 
+
+class ProductAddToCartRequest(BaseModel):
+    product_id: int
+    configuration_id: int
+

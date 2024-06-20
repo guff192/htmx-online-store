@@ -32,13 +32,31 @@ class ProductPhotoPath(BaseModel):
         return f'{self.path}/small/{self.file_name}'
 
 
+class ProductConfiguration(BaseModel):
+    id: int
+    name: str
+    additional_price: int
+
+
+class ProductPrices(BaseModel):
+    product_id: int
+    basic_price: int
+    configurations: list[ProductConfiguration]
+    selected_configuration: ProductConfiguration
+
+    def build_context(self) -> dict[str, Any]:
+        return self.__dict__
+
+
 class ProductBase(BaseModel):
     name: str
     description: str
     price: int
+    configurations: list[ProductConfiguration] = []
+    selected_configuration: ProductConfiguration | None = None
 
     def is_valid(self) -> bool:
-        if not self.name or not self.price:
+        if not self.name or not self.price or not self.configurations:
             return False
         return True
 
@@ -47,14 +65,15 @@ class ProductCreate(ProductBase):
     count: int
     manufacturer_name: str
 
-
-class ProductUpdate(ProductBase):
-    count: int
-    manufacturer_name: str
-
     def is_valid(self) -> bool:
         return super().is_valid() \
-            and self.manufacturer_name != ''
+                and self.manufacturer_name != '' \
+                and self.count > 0
+
+
+class ProductUpdate(ProductCreate):
+    count: int
+    manufacturer_name: str
 
 
 class ProductUpdateResponse(BaseModel):
@@ -68,7 +87,7 @@ class Product(ProductBase):
 
     @property
     def absolute_url(self) -> str:
-        return f'/products/{self.id}#offset'
+        return f'/products/{self.id}'
 
     @utils.add_shop_to_context
     def build_context(self) -> dict[str, Any]:
@@ -76,7 +95,7 @@ class Product(ProductBase):
 
 
 class ProductInCart(Product):
-    count: int | None
+    count: int 
 
 
 class ProductList(BaseModel):

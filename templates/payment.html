@@ -1,0 +1,90 @@
+{% extends "_base.html" %}
+
+{% block title %}Оплата заказа {{ id }}{% endblock %}
+
+{% block header %}
+    <h1 id="page-header" class="text-indigo-50 text-4xl font-bold text-center mb-5 mt-2">Оплата заказа {{ id }}</h1>
+{% endblock %}
+
+{% block content %}
+<div id="payment{{ payment.id }}"
+    class="border border-white p-5">
+    <p>Оплата заказа {{ id }}</p>    
+    <p>На сумму: {{ sum }}₽</p>
+    <p>Статус: {{ payment.status.value }}</p>
+    
+
+    <p class="text-center font-bold">
+        Тут должна рендериться кнопка от Тинькова
+    </p>
+
+    <!-- Tinkoff Button -->
+
+    <!-- Payment form -->
+    <script src="https://securepay.tinkoff.ru/html/payForm/js/tinkoff_v2.js"></script>
+    <form class="payform-tinkoff bg-white text-black" name="payform-tinkoff" id="payform-tinkoff">
+        <input class="payform-tinkoff-row" type="hidden" name="terminalkey" value="1717338239661DEMO">
+        <input class="payform-tinkoff-row" type="hidden" name="frame" value="false">
+        <input class="payform-tinkoff-row" type="hidden" name="language" value="ru">
+        <input class="payform-tinkoff-row" type="hidden" name="receipt" value="">
+        <input class="payform-tinkoff-row" type="hidden" placeholder="Сумма заказа" name="amount" value="{{ sum }}" required>
+        <input class="payform-tinkoff-row" type="hidden" placeholder="Номер заказа" name="order" value="{{ id }}">
+        <input class="payform-tinkoff-row" type="hidden" placeholder="Описание заказа" name="description" value="Оплата заказа {{ id }}">
+        <input class="payform-tinkoff-row" type="text" placeholder="ФИО плательщика" name="name" value="{{ buyer_name }}">
+        <input class="payform-tinkoff-row" type="email" placeholder="E-mail" name="email" value="{{ user.email }}">
+        <input class="payform-tinkoff-row" type="hidden" placeholder="Контактный телефон" name="phone" value="{{ buyer_phone }}">
+        <input class="payform-tinkoff-row payform-tinkoff-btn" type="submit" value="Оплатить">
+    </form>
+
+    <!-- Tinkoff Button setup -->
+    <script type="text/javascript">
+        const TPF = document.getElementById("payform-tinkoff");
+
+        TPF.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const {description, amount, email, phone, receipt} = TPF;
+
+            if (receipt) {
+                if (!email.value && !phone.value)
+                    return alert("Поле E-mail или Phone не должно быть пустым");
+
+                TPF.receipt.value = JSON.stringify({
+                    "EmailCompany": "{{ shop.email }}",
+                    "Taxation": "osn",
+                    "FfdVersion": "1.2",
+                    "Items": [
+                        {% for product in products[:-1] %}
+                        {
+                            "Name": "{{ product.product_name }} + {{ product.selected_configuration.name }}",
+                            "Price": {{ (product.basic_price + product.selected_configuration.additional_price) * 100 }},
+                            "Quantity": {{ product.count }}.00,
+                            "Amount": {{ (product.basic_price + product.selected_configuration.additional_price) * count * 100 }},
+                            "PaymentMethod": "full_prepayment",
+                            "PaymentObject": "commodity",
+                            "Tax": "none",
+                            "MeasurementUnit": "шт."
+                        },
+                        {% endfor %}
+                        {
+                            "Name": "{{ products[-1].product_name }} + {{ products[-1].selected_configuration.name }}",
+                            "Price": {{ (products[-1].basic_price + products[-1].selected_configuration.additional_price) * 100 }},
+                            "Quantity": {{ products[-1].count }}.00,
+                            "Amount": {{ (products[-1].basic_price + products[-1].selected_configuration.additional_price) * 100 }},
+                            "PaymentMethod": "full_prepayment",
+                            "PaymentObject": "commodity",
+                            "Tax": "none",
+                            "MeasurementUnit": "шт."
+                        }
+                    ]
+                });
+            }
+            
+            pay(TPF);
+        })
+    </script>
+
+
+</div>
+
+{% endblock %}
+

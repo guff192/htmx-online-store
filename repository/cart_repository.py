@@ -3,12 +3,14 @@ from typing import Any
 
 from fastapi import Depends
 from loguru import logger
+from pydantic import conset
 from sqlalchemy.orm import Query, Session
 
 from db.session import db_dependency
 from exceptions.product_exceptions import ErrProductNotFound
 from models.product import Product
 from models.user import UserProduct
+from repository.configuration_repository import ConfigurationRepository
 from repository.product_repository import (
     ProductRepository,
     product_repository_dependency,
@@ -32,13 +34,22 @@ class CartRepository:
     def _get_user_product_query(
             self,
             user_id: str,
-            product_id: int
+            product_id: int,
+            configuration_id: int = 0
     ) -> Query[UserProduct]:
-        return (
+        query_without_configuration = (
             self._db
             .query(UserProduct)
             .filter(UserProduct.user_id == user_id)
             .filter(UserProduct.product_id == product_id)
+            .filter(UserProduct.selected_configuration_id == configuration_id)
+        )
+
+        if not configuration_id:
+            return query_without_configuration
+        return (
+            query_without_configuration
+            .filter(UserProduct.selected_configuration_id == configuration_id)
         )
 
     def get_user_products(self, user_id: str) -> list[UserProduct]:
@@ -50,13 +61,25 @@ class CartRepository:
 
         return user_products
 
-    def add_to_cart(self, user_id: str, product_id: int) -> UserProduct | None:
-        found_product = self._get_user_product_query(user_id, product_id)
+    def get_product_in_cart(self, user_id: str, product_id: int) -> UserProduct | None:
+        return (
+            self
+            ._get_user_product_query(user_id, product_id)
+            .first()
+        )
+
+    def add_to_cart(
+        self, user_id: str, product_id: int, configuration_id: int
+    ) -> UserProduct | None:
+        found_product = self._get_user_product_query(user_id,
+                                                     product_id,
+                                                     configuration_id)
 
         # Check if product is not already in cart
         if not found_product.first():
             user_product = UserProduct(
-                user_id=user_id, product_id=product_id, count=1
+                user_id=user_id, product_id=product_id,
+                selected_configuration_id=configuration_id, count=1
             )
             self._db.add(user_product)
         else:
@@ -66,7 +89,7 @@ class CartRepository:
         self._db.commit()
         updated_product: UserProduct | None = (
             self
-            ._get_user_product_query(user_id, product_id)
+            ._get_user_product_query(user_id, product_id, configuration_id)
             .first()
         )
 
@@ -75,10 +98,11 @@ class CartRepository:
     def remove_from_cart(
             self,
             user_id: str,
+            configuration_id: int,
             product_id: int
     ) -> UserProduct | None:
         found_product: Query[UserProduct] = (
-            self._get_user_product_query(user_id, product_id)
+            self._get_user_product_query(user_id, product_id, configuration_id)
         )
         if not found_product.first():
             raise ErrProductNotFound()
@@ -86,15 +110,15 @@ class CartRepository:
         # Check if removing last product
         if found_product.first().__dict__.get('count', 0) == 1:
             found_product.delete()
-            self._db.flush((found_product, ))
-            self._db.commit()
-            return
         else:
             found_product.update({UserProduct.count: UserProduct.count - 1})
 
+        self._db.flush((found_product, ))
         self._db.commit()
+
         updated_product: UserProduct | None = (
-            self._get_user_product_query(user_id, product_id).first()
+            self._get_user_product_query(user_id, product_id,
+                                         configuration_id).first()
         )
 
         return updated_product
@@ -106,17 +130,22 @@ def cart_repository_dependency(
     user_repo: UserRepository = Depends(user_repository_dependency),
 ) -> Generator[CartRepository, None, None]:
     repo = CartRepository(db, product_repo, user_repo)
-    yield repo
+    try:
+        yield repo
+    finally:
+        db.close()
 
 
 def test_cart_repository():
     USER_ID = '5a354f3f-6818-4695-a8e8-98a2a645cd27'
     PRODUCT_ID = 13
+    CONFIGURATION_ID = 1
     session = next(db_dependency())
     repo = CartRepository(
         session,
-        ProductRepository(session),
+        ProductRepository(session, ConfigurationRepository(session)),
         UserRepository(session)
     )
-    logger.debug(repo.remove_from_cart(USER_ID, PRODUCT_ID))
+    user_product = repo.remove_from_cart(USER_ID, PRODUCT_ID, CONFIGURATION_ID)
+    logger.debug(user_product)
 

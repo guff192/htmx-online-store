@@ -1,16 +1,17 @@
-from typing import Sequence
 from fastapi import Depends
 from loguru import logger
 from pydantic_core import Url
-from dto.product_dto import ProductDTO
 
 from exceptions.product_exceptions import (
     ErrInvalidProduct,
     ErrProductAlreadyExists,
     ErrProductNotFound,
 )
-from models.product import Manufacturer, Product
+from exceptions.product_prices_exceptions import ErrPriceNotFound
+from models.product import Product, ProductConfiguration
+from models.manufacturer import Manufacturer
 from models.user import UserProduct
+from repository.configuration_repository import ConfigurationRepository, configuration_repository_dependency
 from repository.manufacturer_repository import ManufacturerRepository, manufacturer_repository_dependency
 from repository.product_repository import (
     ProductRepository,
@@ -23,8 +24,10 @@ from schema.product_schema import (
     ProductList,
     ProductPhotoPath,
     ProductPhotoSize,
+    ProductPrices,
     ProductUpdate,
     ProductUpdateResponse,
+    ProductConfiguration as ProductConfigurationSchema,
 )
 from schema.user_schema import LoggedUser
 from storage.photo_storage import (
@@ -39,10 +42,84 @@ class ProductService:
         product_repo: ProductRepository,
         photo_storage: ProductPhotoStorage,
         manufacturer_repo: ManufacturerRepository,
+        configuration_repo: ConfigurationRepository
     ):
         self.repo = product_repo
         self._manufacturer_repo = manufacturer_repo
+        self.config_repo = configuration_repo
         self.photo_storage = photo_storage
+
+    def get_config_by_id(self, config_id: int) -> ProductConfiguration:
+        return self.config_repo.get_by_id(config_id)
+    
+    def get_configs_by_names(self, names: list[str]) -> list[ProductConfiguration]:
+        return self.config_repo.get_configurations_by_names(names)
+
+    def get_all_basic_configs(
+        self
+    ):
+        orm_configs = self.config_repo.get_default_configurations()
+
+        schema_configs: list[ProductConfigurationSchema] = []
+        for config in orm_configs:
+            config_dict = config.__dict__
+            id = config_dict.get('id')
+            name = config_dict.get('name')
+            additional_price = config_dict.get('additional_price')
+            if not id or not name or additional_price is None:
+                continue
+
+            schema_configs.append(
+                ProductConfigurationSchema(
+                    id=id,
+                    name=name,
+                    additional_price=additional_price
+                )
+            )
+
+        return schema_configs
+
+    def get_configurations_for_product(
+        self,
+        product_id: int
+    ) -> list[ProductConfigurationSchema]:
+        return [
+            ProductConfigurationSchema(
+                id=config.id,
+                name=config.name,
+                additional_price=config.additional_price
+            )
+            for config in self.config_repo.get_configurations_for_product(product_id)
+        ]
+
+
+    def get_product_prices(
+        self,
+        product_id: int,
+        configuration_id: int
+    ) -> ProductPrices:
+        # searching product
+        product = self.repo.get_by_id(product_id)
+        if not product:
+            raise ErrProductNotFound()
+
+        # searching available configurations
+        configurations = self.get_configurations_for_product(product_id)
+
+        # searching selected configuration
+        try:
+            selected_configuration = list(filter(
+                lambda c: c.id == configuration_id, configurations
+            ))[0] if configuration_id else configurations[0]
+        except IndexError:
+            raise ErrPriceNotFound()
+
+        return ProductPrices(
+                product_id=product.__dict__.get('_id', 0),
+                basic_price=product.__dict__.get('price', 0),
+                configurations=configurations,
+                selected_configuration=selected_configuration
+            )
 
     def get_all(
         self,
@@ -125,13 +202,20 @@ class ProductService:
         orm_product_dict = orm_product.__dict__
 
         product_name = orm_product_dict.get('name', '')
-        product_photos = self.get_all_photos_by_name(product_name)
+        try:
+            product_photos = self.get_all_photos_by_name(product_name)
+        except:
+            product_photos = []
 
         manufacturer_name = ''
         if hasattr(orm_product, 'manufacturer') and orm_product.manufacturer:
             manufacturer: Manufacturer = orm_product.manufacturer
             if manufacturer:
                 manufacturer_name = manufacturer.__dict__.get('name', '')
+        
+        available_configurations = self.get_configurations_for_product(
+            product_id
+        )
 
         product_schema = ProductSchema(
             id=orm_product_dict.get('_id', 0),
@@ -140,6 +224,8 @@ class ProductService:
             description=orm_product_dict.get('description', ''),
             price=orm_product_dict.get('price', 0),
             manufacturer_name=manufacturer_name,
+            configurations=available_configurations,
+            selected_configuration=None
         )
         return product_schema
 
@@ -170,37 +256,50 @@ class ProductService:
 
     def update_or_create_by_name(
         self,
-        created_product: ProductUpdate
+        product_update: ProductUpdate
     ) -> ProductUpdateResponse:
-        if not created_product.is_valid():
-            logger.debug(f'Invalid product: {created_product}')
+        if not product_update.is_valid():
+            logger.debug(f'Invalid product: {product_update}')
             raise ErrInvalidProduct()
 
+        # searching manufacturer
         manufacturer: Manufacturer = self._manufacturer_repo.get_by_name(
-            created_product.manufacturer_name
+            product_update.manufacturer_name
         )
         if not manufacturer:
-            logger.debug(f'Invalid product: {created_product}')
+            logger.debug(f'Invalid product: {product_update}')
             raise ErrInvalidProduct()
 
-        found_product = self.repo.get_by_name(created_product.name)
+        # getting configurations
+        update_configurations: list[ProductConfiguration] = self.get_configs_by_names(
+            list(map(lambda x: x.name, product_update.configurations))
+        )
+
+        # searching product
+        found_product: Product | None = self.repo.get_by_name(product_update.name)
         if not found_product:
+            # creating new product
+            logger.debug(f'Creating new product: {product_update}')
             self.repo.create(
-                created_product.name,
-                created_product.description,
-                created_product.price,
-                count=created_product.count,
+                product_update.name,
+                product_update.description,
+                product_update.price,
+                count=product_update.count,
                 manufacturer=manufacturer,
+                configurations=update_configurations
             )
             return ProductUpdateResponse(count=1)
 
+        # updating product
+        logger.debug(f'Updating product: {found_product.__dict__}')
         updated_products_count = self.repo.update(
             id=found_product.__dict__['_id'],
-            name=created_product.__dict__.get("name", ""),
-            description=created_product.__dict__.get("description", ""),
-            price=created_product.__dict__.get("price", ""),
-            count=created_product.__dict__.get("count", ""),
+            name=product_update.__dict__.get("name", ""),
+            description=product_update.__dict__.get("description", ""),
+            price=product_update.__dict__.get("price", ""),
+            count=product_update.__dict__.get("count", ""),
             manufacturer=manufacturer,
+            configurations=update_configurations
         )
         return ProductUpdateResponse(count=updated_products_count)
 
@@ -222,15 +321,18 @@ class ProductService:
                 price=product_create_schema.price,
                 count=product_create_schema.count,
                 manufacturer_name=product_create_schema.manufacturer_name,
+                configurations=product_create_schema.configurations,
             )
             self.update_or_create_by_name(created_product)
+
             product_schema = ProductSchema(
-                id=product_id,
-                name=created_product.name,
-                description=created_product.description,
-                price=created_product.price,
-                manufacturer_name=product_create_schema.manufacturer_name,
-            )
+                    id=product_id,
+                    name=created_product.name,
+                    description=created_product.description,
+                    price=created_product.price,
+                    manufacturer_name=product_create_schema.manufacturer_name,
+                    configurations=product_create_schema.configurations,
+                    )
 
         else:
             created_product = self.repo.create(
@@ -262,8 +364,12 @@ def product_service_dependency(
     ),
     manufacturer_repo: ManufacturerRepository = Depends(
         manufacturer_repository_dependency
+    ),
+    configuration_repo: ConfigurationRepository = Depends(
+        configuration_repository_dependency
     )
 ):
-    service = ProductService(product_repo, photo_storage, manufacturer_repo)
+    service = ProductService(product_repo, photo_storage, manufacturer_repo,
+                             configuration_repo)
     yield service
 

@@ -8,22 +8,25 @@
     document.title = '{{ shop.name }} | {{ product.name }}'
 </script>
 
+
+
+<!-- Photos -->
 <div id="product{{ product.id }}photos"
-    class="border-4 border-gray-500 rounded flex flex-col justify-center w-full md:p-3">
-    <div class="relative w-full h-full border border-gray-800 rounded shadow-2xl shadow-indigo-800">
+    class="border-4 border-gray-500 rounded flex flex-col justify-center w-full h-96 md:p-3">
+    <div class="relative h-72 border border-gray-800 rounded shadow-2xl shadow-indigo-800">
         <img
             src="{{ url_for('static', path='images/loading.webp') }}"
-            class="w-full h-full"
+            class="h-72"
             hx-trigger="load"
             hx-get="/photos/main?product_name={{ product.name }}&size="
             hx-swap="outerHTML"
         >
     </div>
 
-    <div id="small-photos" class="h-1/6 mt-2 flex flex-wrap justify-between md:p-2">
+    <div id="small-photos" class="h-16 mt-2 flex flex-wrap justify-between md:p-2">
         <img
             src="{{ url_for('static', path='images/loading.webp') }}"
-            class="w-full h-full"
+            class="h-full"
             hx-trigger="load"
             hx-get="/photos/all?product_name={{ product.name }}&size=thumbs"
             hx-swap="outerHTML"
@@ -32,14 +35,43 @@
 
 </div>
 
+
+<!-- Description -->
 <div id="product{{ product.id }}description" class="border rounded flex justify-around w-full h-full p-3">
     <div id="product{{ product.id }}description" class="grow w-full h-full p-1 text-left text-white">
         <p>
             {{ product.description.replace('\n', '<br>') | safe }}
         </p>
     </div>
-    <div id="product{{ product.id }}price" class="price rounded w-min h-full p-1 ml-2 text-center bg-darkPink text-white">
-        <strong>{{ product.price }}₽</strong>
-    </div>
 </div>
+
+    
+<!-- Prices -->
+<div id="product{{ product.id }}price" class="price rounded p-1 mx-auto text-center bg-darkPink text-white border-s-white">
+    <div
+        role="tablist"
+        hx-on:htmx:before-request="let currentTab = document.querySelector('#product' + '{{ product.id }}' + 'price [aria-selected=true]');
+                                   currentTab.setAttribute('aria-selected', 'false');
+                                   currentTab.classList.remove('bg-lightBlue');
+                                   let newTab = event.target;
+                                   newTab.setAttribute('aria-selected', 'true');
+                                   newTab.classList.add('bg-lightBlue');">
+
+        <h4 class="text-center">Конфигурации<br>(RAM/SSD):</h4>
+
+        <div id="product{{ product.id }}priceTabs"
+            role="tabpanel"
+            hx-get="/products/{{ product.id }}/prices/0"
+            hx-trigger="load"
+            hx-swap="outerHTML"></div>
+
+    </div>
+    
+</div>
+
+
+<!-- Counter -->
+{% if request.state.user %}
+    {% include 'partials/product_counter.html' %}
+{% endif %}
 

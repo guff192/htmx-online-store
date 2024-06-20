@@ -326,13 +326,13 @@ class ProductService:
             self.update_or_create_by_name(created_product)
 
             product_schema = ProductSchema(
-                    id=product_id,
-                    name=created_product.name,
-                    description=created_product.description,
-                    price=created_product.price,
-                    manufacturer_name=product_create_schema.manufacturer_name,
-                    configurations=product_create_schema.configurations,
-                    )
+                id=product_id,
+                name=created_product.name,
+                description=created_product.description,
+                price=created_product.price,
+                manufacturer_name=product_create_schema.manufacturer_name,
+                configurations=product_create_schema.configurations,
+            )
 
         else:
             created_product = self.repo.create(

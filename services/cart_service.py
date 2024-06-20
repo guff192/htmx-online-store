@@ -128,7 +128,6 @@ class CartService:
         if not orm_user:
             raise ErrUserNotFound()
         user_dict = orm_user.__dict__
-        user_dict['yandex_id'] = str(user_dict['yandex_id'])
         user_schema = UserResponse(**user_dict)
 
         return Cart(

@@ -31,7 +31,7 @@ class UserService:
         email = user_model_dict.get("email", "")
         profile_img_url = user_model_dict.get("profile_img_url", "")
         google_id = user_model_dict.get("google_id", "")
-        yandex_id = user_model_dict.get("yandex_id", "")
+        yandex_id = user_model_dict.get("yandex_id")
 
         return UserResponse(
             id=user_id,
@@ -46,7 +46,7 @@ class UserService:
     def _get_by_google_id(self, google_id: str) -> User | None:
         return self.repo.get_by_google_id(google_id)
 
-    def _get_by_yandex_id(self, yandex_id: str) -> User | None:
+    def _get_by_yandex_id(self, yandex_id: int) -> User | None:
         return self.repo.get_by_yandex_id(yandex_id)
 
     def _parse_user_create_google_schema(
@@ -84,7 +84,7 @@ class UserService:
             ) if not is_avatar_empty else ""
 
             user_schema = UserCreateYandex(
-                yandex_id=str(yandex_user_id_info.get("id", None)),
+                yandex_id=yandex_user_id_info.get("id", None),
                 google_id=None,
                 name=str(yandex_user_id_info.get("real_name", "")),
                 profile_img_url=profile_img_url,
@@ -122,7 +122,6 @@ class UserService:
             )
 
         user_dict = user.__dict__
-        user_dict['yandex_id'] = str(user_dict['yandex_id'])
         user_schema = UserResponse(**user_dict)
 
         return user_schema
@@ -145,7 +144,6 @@ class UserService:
             )
 
         user_dict = user.__dict__
-        user_dict['yandex_id'] = str(user_dict['yandex_id'])
         user_schema = UserResponse(**user_dict)
 
         return user_schema

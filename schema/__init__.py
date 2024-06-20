@@ -9,6 +9,7 @@ class Shop(BaseModel):
     name: str
     logo_name: str | None
     public_url: str
+    email: str
 
 
 class SchemaUtils:
@@ -23,6 +24,7 @@ class SchemaUtils:
             name=settings.shop_name,
             logo_name=settings.shop_logo_name,
             public_url=str(settings.shop_public_url),
+            email=settings.shop_email
         )
         self.debug = settings.debug
 

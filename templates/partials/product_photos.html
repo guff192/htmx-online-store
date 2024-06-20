@@ -1,78 +1,89 @@
 {% if photo_urls %}
 
-{% if photo_urls[1:] %}
-    <div
-        class="w-1/5 md:w-1/12 h-full p-1 border border-gray-800 shadow-xl shadow-sky-400 rounded cursor-pointer transition-all duration-300">
-        <img class="w-full" src="{{ photo_urls[0] }}"/>
-    </div>
 
-    {% for link in photo_urls[1:] %}
-    <div
-        class="w-1/5 md:w-1/12 h-full p-1 border border-gray-300 shadow-l shadow-gray-800 rounded cursor-pointer transition-all duration-300">
-        <img class="w-full" src="{{ link }}" />
-    </div>
-    {% endfor %}
+    {% if photo_urls[1:] %}
+        <div
+            class="w-1/6 md:w-1/12 h-full p-1 border border-gray-800 shadow-xl shadow-sky-400 rounded cursor-pointer transition-all duration-300">
+            <img class="w-full" src="{{ photo_urls[0] }}"/>
+        </div>
 
-    <script>
-    document.querySelectorAll('#small-photos div').forEach(photo => {
-        photo.addEventListener('click', () => {
-            const largePhoto = document.querySelector('#large-photo');
+        {% for link in photo_urls[1:] %}
+        <div
+            class="w-1/6 md:w-1/12 h-full p-1 border border-gray-300 shadow-l shadow-gray-800 rounded cursor-pointer transition-all duration-300"
+            >
+            <img class="w-full" src="{{ link }}" />
+        </div>
+        {% endfor %}
 
-            // Set loading class
-            largePhoto.classList.add('loading');
+        <script>
+        document.querySelectorAll('#small-photos div').forEach(photo => {
+            photo.addEventListener('click', () => {
+                const largePhoto = document.querySelector('#large-photo');
 
-            // Get new photo source
-            let newSrc = photo.querySelector('img').getAttribute('src').replace('thumbs/', '');
+                // Set loading class
+                largePhoto.classList.add('loading');
 
-            // Change large photo source
-            largePhoto.src = newSrc;
+                // Get new photo source
+                let newSrc = photo.querySelector('img').getAttribute('src').replace('thumbs/', '');
 
-            // Change shadows and borders
-            let previousSelectedPhoto = document.querySelector('#small-photos div.shadow-xl');
+                // Change large photo source
+                largePhoto.src = newSrc;
 
-            // Remove previous shadow and border
-            previousSelectedPhoto.classList.remove('shadow-xl');
-            previousSelectedPhoto.classList.remove('shadow-sky-400');
-            previousSelectedPhoto.classList.remove('border-gray-800');
+                // Change shadows and borders
+                let previousSelectedPhoto = document.querySelector('#small-photos div.shadow-xl');
 
-            // Set new shadow and border for previous selected photo
-            previousSelectedPhoto.classList.add('shadow-l');
-            previousSelectedPhoto.classList.add('border-gray-300');
+                // Remove previous shadow and border
+                previousSelectedPhoto.classList.remove('shadow-xl');
+                previousSelectedPhoto.classList.remove('shadow-sky-400');
+                previousSelectedPhoto.classList.remove('border-gray-800');
 
-            // Set shadow and border for new selected photo
-            photo.classList.remove('shadow-l');
-            photo.classList.add('shadow-xl');
-            photo.classList.add('shadow-sky-400');
+                // Set new shadow and border for previous selected photo
+                previousSelectedPhoto.classList.add('shadow-l');
+                previousSelectedPhoto.classList.add('border-gray-300');
 
-            photo.classList.remove('border-gray-300');
-            photo.classList.add('border-gray-800');
+                // Set shadow and border for new selected photo
+                photo.classList.remove('shadow-l');
+                photo.classList.add('shadow-xl');
+                photo.classList.add('shadow-sky-400');
 
+                photo.classList.remove('border-gray-300');
+                photo.classList.add('border-gray-800');
+
+            });
         });
-    });
-    </script>
+        </script>
 
-{% else %}
+    {% else %}
 
-    <div>
-        <img
-            class="large-photo w-full"
-            {% if request.query_params.get('size') == '' %}
+        {% if request.query_params.get('size') == '' %}
+            <img
+                src="{{ photo_urls[0] }}"
+                class="h-72 mx-auto"
                 id="large-photo"
-            {% endif %}
-            src="{{ photo_urls[0] }}"
-        >
-    </div>
-    <script>
-        document.querySelector('#large-photo').onload = (e) => {
-            e.target.classList.remove('loading');
-        };
-    </script>
+                >
+                <!-- <p>Size large</p> -->
 
-    {% if request.query_params.get('size') == '' %}
-        <div id="loader" class="w-full h-full"> </div>
+        {% else %}
+            <img
+                src="{{ photo_urls[0] }}"
+                class="w-52 inline-block"
+            >
+            <!-- <p>Size small</p> -->
+
+        {% endif %}
+
+
+        <script>
+            document.querySelector('#large-photo').onload = (e) => {
+                e.target.classList.remove('loading');
+            };
+        </script>
+
+        {% if request.query_params.get('size') == '' %}
+            <div id="loader" class="h-72"> </div>
+
+        {% endif %}
 
     {% endif %}
-
-{% endif %}
 
 {% endif %}

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ url_for('static', path='css/indicator.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/dropdown.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/tinkoff_pay_form.css') }}">
 
     <!-- JS -->
     <!-- HTMX -->
@@ -18,7 +19,9 @@
 
     <!-- Custom JS -->
     <script src="{{ url_for('static', path='js/banner.js') }}" async></script>
-    <script src="{{ url_for('static', path='js/yandex_pay.js') }}" async></script>
+    <!-- <script src="{{ url_for('static', path='js/yandex_pay.js') }}" async></script> -->
+    <script src="{{ url_for('static', path='js/config_to_cart.js') }}" async></script>
+    
 
 </head>
 
@@ -52,8 +55,6 @@
         {% endblock %}
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://pay.yandex.ru/sdk/v1/pay.js" onload="onYaPayLoad()" async></script>
 </body>
 
 </html>

@@ -32,7 +32,6 @@ class UserRepository:
                yandex_id: str | None = None) -> User:
         # Create user using given data
         if google_id:
-            logger.debug(f'Creating user with google_id: {google_id}')
             user = User(
                 id=uuid4(),
                 email=email,
@@ -44,7 +43,6 @@ class UserRepository:
             self.db.commit()
             self.db.refresh(user)
         elif yandex_id:
-            logger.debug(f'Creating user with yandex_id: {yandex_id}')
             user = User(
                 id=uuid4(),
                 email=email,

@@ -13,16 +13,23 @@ class CartViewModel:
     def get_cart(self, user_id: str) -> Cart:
         return self._service.get_cart(user_id)
 
-    def add_to_cart(self, user_id: str, product_id: int) -> ProductInCart:
-        return self._service.add_to_cart(user_id, product_id)
+    def get_product_in_cart(self, user_id: str, product_id: int) -> ProductInCart:
+        return self._service.get_product_in_cart(user_id, product_id)
 
-    def remove_from_cart(self, user_id: str, product_id: int) -> ProductInCart:
-        return self._service.remove_from_cart(user_id, product_id)
+    def add_to_cart(
+        self, user_id: str, product_id: int, configuration_id: int
+    ) -> ProductInCart:
+        return self._service.add_to_cart(user_id, product_id, configuration_id)
+
+    def remove_from_cart(self, user_id: str,
+                         configuration_id: int,
+                         product_id: int) -> ProductInCart:
+        return self._service.remove_from_cart(user_id,
+                                              configuration_id, product_id)
 
 
 def cart_viewmodel_dependency(
     cart_service: CartService = Depends(cart_service_dependency),
 ) -> Generator[CartViewModel, None, None]:
-
     vm = CartViewModel(cart_service)
     yield vm

@@ -1,78 +1,56 @@
 {% if (request.headers.get('hx-target', '') == 'content' or '/cart' in request.headers.get('hx-current-url', '/cart')) and '/cart' in request.url.path %}
+    
     {% if product.count %}
-        <p class="my-2" id="product{{ product.id }}counter">
+        <p class="my-2" id="product{{ product.id }}counter{{ product.selected_configuration.id }}">
             <a
                 class="text-2xl cursor-pointer"
-                hx-boost="true"
+                hx-boost="{% if product.count == 1 %}false{% else %}true{% endif %}"
                 hx-trigger="click"
-                hx-put="/cart/remove?product_id={{ product.id }}"
-                hx-target="#product{{ product.id }}counter"
+                hx-put="/cart/remove"
+                hx-target="#product{{ product.id }}counter{{ product.selected_configuration.id }}"
                 hx-swap="outerHTML"
             >-</a>
 
             <span class="bg-lightBlue rounded p-2 font-bold">{{ product.count }}</span>
+
             <a
                 class="text-2xl cursor-pointer"
                 hx-boost="true"
                 hx-trigger="click"
-                hx-put="/cart/add?product_id={{ product.id }}"
-                hx-target="#product{{ product.id }}counter"
+                hx-put="/cart/add"
+                hx-target="#product{{ product.id }}counter{{ product.selected_configuration.id }}"
                 hx-swap="outerHTML"
             >+</a>
 
         </p>
-
-    {% else %}
-        <a
-            id="product{{ product.id }}counter"
-            class="my-2 cursor-pointer bg-lightBlue rounded p-2 font-bold"
-            hx-boost="true"
-            hx-trigger="click"
-            hx-put="/cart/add?product_id={{ product.id }}"
-            hx-target="#product{{ product.id }}counter"
-            hx-swap="outerHTML"
-
-        >Add to cart</a>
-
-        {% if '/cart' in request.url.path and '/cart' in request.headers.get('hx-current-url', '') %}
-        <p 
-            class="text-2xl cursor-pointer"
-            hx-trigger="click"
-            hx-delete="/remove_element"
-            hx-target="#product{{ product.id }}"
-            hx-swap="delete"
-        >❌</p>
-
-        {% endif %}
 
     {% endif %}
 
 {% else %}
 
     {% if product.count %}
-    <p class="my-2">Добавлен в корзину ({{ product.count }} шт.)</p>
-    <a 
-        class="hover:underline"
-        href="/cart#offset"
-        hx-boost="true"
-        hx-trigger="click"
-        hx-get="/cart"
-        hx-target="#content"
-        hx-swap="innerHTML"
-        hx-replace-url="true"
-    >Перейти в корзину</a>
+        <p class="my-2">Добавлен в корзину ({{ product.count }} шт.)</p>
+        <a 
+            class="hover:underline"
+            href="/cart#offset"
+            hx-boost="true"
+            hx-trigger="click"
+            hx-get="/cart"
+            hx-target="#content"
+            hx-swap="innerHTML"
+            hx-replace-url="true"
+        >Перейти в корзину</a>
     
     {% else %}
-    <a
-        id="product{{ product.id }}counter"
-        class="my-2 cursor-pointer bg-lightBlue rounded p-2 font-bold"
-        hx-boost="true"
-        hx-trigger="click"
-        hx-put="/cart/add?product_id={{ product.id }}"
-        hx-target="#product{{ product.id }}counter"
-        hx-swap="outerHTML"
-
-    >Добавить в корзину</a>
+        <a
+            id="product{{ product.id }}counter"
+            class="my-2 cursor-pointer bg-lightBlue rounded p-2 font-bold"
+            hx-boost="true"
+            hx-trigger="click"
+            hx-put="/cart/add"
+            hx-target="#product{{ product.id }}counter"
+            hx-swap="outerHTML"
+        >Добавить в корзину</a>
 
     {% endif %}
 

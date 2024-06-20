@@ -44,7 +44,7 @@
         </a>
 
         {% if request.state.user %}
-        <a href="/cart#offset" hx-boost="false">
+        <a href="/cart#offset">
             <div class="flex justify-center items-center w-20 h-14 sm:h-24">Корзина</div>
         </a>
         {% endif %}
@@ -52,18 +52,16 @@
 
     <div class="border-2 border-white rounded flex justify-evenly">
         {% if request.state.user %}
-        {% if request.state.user.is_admin %}
-        <a href="/admin" hx-boost="false">
-            <div class="p-4">Admin</div>
-        </a>
-        {% endif %}
-        <a href="/auth/logout" hx-boost="false">
-            <div class="p-4">Выход</div>
-        </a>
+            <a href="/order/" hx-boost="true">
+                <div class="p-4">Мои заказы</div>
+            </a>
+            <a href="/auth/logout" hx-boost="false">
+                <div class="p-4">Выход</div>
+            </a>
         {% else %}
-        <a href="/auth/login" hx-boost="false">
-            <div class="p-4">Личный кабинет</div>
-        </a>
+            <a href="/auth/login" hx-boost="false">
+                <div class="p-4">Вход</div>
+            </a>
         {% endif %}
     </div>
 

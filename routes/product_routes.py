@@ -1,12 +1,14 @@
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
-from routes.auth_routes import google_oauth_user_dependency
+from routes.auth_routes import oauth_user_dependency
 
 from schema.product_schema import (
+    Product,
+    ProductConfiguration,
     ProductList,
     ProductUpdate,
     ProductUpdateResponse,
@@ -43,9 +45,8 @@ def get_product_list(
     request: Request,
     offset: int = 0,
     product_vm: ProductViewModel = Depends(product_viewmodel_dependency),
-    user: LoggedUser | None = Depends(google_oauth_user_dependency),
+    user: LoggedUser | None = Depends(oauth_user_dependency),
 ):
-    logger.debug(f'{request.state.user = }')
     if not request.headers.get('hx-request'):
         return RedirectResponse('/products/catalog')
 
@@ -86,6 +87,25 @@ def get_product_details(
     if request.headers.get('hx-request'):
         return templates.TemplateResponse('partials/product_detail.html', context=context_data)
     return templates.TemplateResponse('product.html', context=context_data)
+
+
+@router.get('/{product_id}/prices/{product_configuration_id}')
+def get_product_prices(
+    request: Request,
+    product_id: int,
+    product_configuration_id: int,
+    product_vm: ProductViewModel = Depends(product_viewmodel_dependency)
+):
+    if not request.headers.get('hx-request'):
+        return RedirectResponse(f'/products/{product_id}')
+
+    prices = product_vm.get_product_prices(product_id,
+                                           product_configuration_id)
+
+    return templates.TemplateResponse(
+        'partials/price_configurator.html',
+        context={'request': request, **prices.build_context()}
+    )
 
 
 @router.get('/{product_name}/photos', response_class=HTMLResponse)

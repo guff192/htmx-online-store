@@ -13,7 +13,10 @@ from wtforms.fields import TextAreaField
 
 from db.session import get_db
 from models.banner import Banner
-from models.product import Manufacturer, Product
+from models.order import Order
+from models.payment import Payment
+from models.product import AvailableProductConfiguration, Product, ProductConfiguration
+from models.manufacturer import Manufacturer
 from models.user import User, UserProduct
 from schema.user_schema import UserBase
 from services.auth_service import AuthService, get_auth_service
@@ -29,17 +32,16 @@ class ProductModelView(ModelView):
     can_delete = True
     can_create = True
 
-    column_details_list: list[str] = [
-        'name', 'price', 'count', 'newcomer', 'manufacturer'
-    ]
-    column_editable_list: list[str] = [
-        'price', 'count', 'newcomer', 'manufacturer_id'
-    ]
+    column_details_list: list[str] = ['name', 'price', 'count',
+                                      'newcomer', 'manufacturer']
+
+    column_editable_list: list[str] = ['price', 'count',
+                                       'newcomer', 'manufacturer_id']
+
     column_searchable_list = ('name', 'manufacturer_id')
 
-    form_columns: list[str] = [
-        'name', 'description', 'price', 'manufacturer_id', 'newcomer',
-    ]
+    form_columns: list[str] = ['name', 'description', 'price',
+                               'manufacturer_id', 'newcomer']
 
     form_overrides = dict(
         description=TextAreaField,
@@ -85,7 +87,8 @@ class UserProductModelView(ModelView):
     can_create = True
 
     column_list: list[str] = ['user.name', 'product.name', 'count']
-    form_columns: list[str] = ['user_id', 'product_id', 'count']
+    form_columns: list[str] = ['user_id', 'product_id', 'count', 'selected_configuration_id']
+    column_details_list: list[str] = ['user.name', 'product.name', 'count', 'selected_configuration.name']
 
     # form_overrides = dict(
     #     user=Select2Field,
@@ -113,6 +116,51 @@ class BannerModelView(ModelView):
     column_list: list[str] = ['name', 'img_url']
     column_editable_list: list[str] = ['img_url']
 
+
+class ProductConfigurationModelView(ModelView):
+    can_view_details = True
+    can_edit = True
+    can_delete = True
+    can_create = True
+
+    column_list: list[str] = ['name', 'additional_price']
+    column_editable_list: list[str] = ['additional_price']
+    
+    form_excluded_columns: tuple[str] = ('products',)
+
+
+class AvailableProductConfigurationModelView(ModelView):
+    can_view_details = True
+    can_edit = True
+    can_delete = True
+    can_create = True
+
+    column_list: list[str] = ['product.name', 'configuration.name']
+    form_excluded_columns: list[str] = ['product', 'configuration']
+
+
+class OrderModelView(ModelView):
+    can_view_details = True
+    can_edit = True
+    can_delete = True
+    can_create = True
+
+    column_list: list[str] = ['id', 'user.name', 'date', 'payment.status']
+    column_details_list: list[str] = ['id', 'user.name', 'date']
+    column_editable_list: list[str] = ['user_id', 'date']
+
+
+class PaymentModelView(ModelView):
+    can_view_details = True
+    can_edit = True
+    can_delete = False
+    can_create = True
+
+    column_list: list[str] = ['id', 'order_id', 'order.user.id', 'status']
+    column_editable_list: list[str] = ['status']
+    form_columns: list[str] = ['status', 'order_id']
+    column_details_list: list[str] = ['id', 'order_id', 'order.user.email',
+                                      'date', 'status']
 
 # ---------------------------------------------------------
 # Middleware
@@ -174,6 +222,10 @@ def get_admin_app(session: Session = get_db()) -> ASGIApp:
     flask_admin.add_view(UserModelView(User, session))
     flask_admin.add_view(UserProductModelView(UserProduct, session))
     flask_admin.add_view(BannerModelView(Banner, session))
+    flask_admin.add_view(ProductConfigurationModelView(ProductConfiguration, session))
+    flask_admin.add_view(AvailableProductConfigurationModelView(AvailableProductConfiguration, session))
+    flask_admin.add_view(OrderModelView(Order, session))
+    flask_admin.add_view(PaymentModelView(Payment, session))
 
     return WSGIMiddleware(flask_app)
 

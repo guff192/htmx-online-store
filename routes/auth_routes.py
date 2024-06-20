@@ -38,7 +38,7 @@ templates = Jinja2Templates(directory="templates")
 # ----------------------------------------------------
 # Dependencies
 # ----------------------------------------------------
-def google_oauth_user_dependency(
+def oauth_user_dependency(
     request: Request,
     auth_service: AuthService = Depends(auth_service_dependency),
 ) -> Generator[LoggedUser | None, None, None]:

@@ -21,6 +21,8 @@ class User(Base):
 
     products = relationship('UserProduct', back_populates='user')
 
+    orders = relationship('Order', back_populates='user')
+
 
 class UserProduct(Base):
     __tablename__ = 'user_products'
@@ -32,6 +34,13 @@ class UserProduct(Base):
 
     product = relationship('Product', back_populates='users')
     product_id = mapped_column(ForeignKey('products.id'))
+
+    selected_configuration = relationship(
+        'ProductConfiguration',
+    )
+    selected_configuration_id = mapped_column(
+        ForeignKey('product_configurations.id'), nullable=False
+    )
 
     count = Column(Integer, nullable=False, default=1)
 

@@ -45,6 +45,7 @@ class Settings(BaseSettings):
         alias='SHOP_LOGO_NAME'
     )
     shop_public_url: Url = Field(default='', alias='SHOP_PUBLIC_URL')
+    shop_email: str = Field(default='', alias='SHOP_EMAIL')
 
     # google oauth settings
     google_oauth2_token_uri: str = Field(

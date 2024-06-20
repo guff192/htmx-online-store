@@ -1,0 +1,28 @@
+<div class="flex flex-col" id="product{{ product_id }}priceTabs" role="tabpanel"
+    hx-on:htmx:before-request="let currentTab = document.querySelector('#product' + '{{ product_id }}' + 'priceTabs [aria-selected=true]');
+                               currentTab.setAttribute('aria-selected', 'false');
+                               currentTab.classList.remove('bg-lightBlue');
+                               let newTab = event.target;
+                               newTab.setAttribute('aria-selected', 'true');
+                               newTab.classList.add('bg-lightBlue');">
+    {% for config in configurations %}
+        <button
+            role="tab"
+            aria-controls="product{{ product_id }}priceValue"
+            aria-selected="{% if config.id == selected_configuration.id %}true{% else %}false{% endif %}"
+            class="border border-white text-xs {% if config.id == selected_configuration.id %}bg-lightBlue{% endif %}"
+            hx-target="#product{{ product_id }}priceValue"
+            hx-select="#product{{ product_id }}priceValue"
+            hx-get="/products/{{ product_id }}/prices/{{ config.id }}">{{ config.name }} (+{{ config.additional_price }}₽)</button>
+
+    {% endfor %}
+
+        
+</div>
+
+<div id="product{{ product_id }}priceValue" role="tab">
+    <strong class="text-2xl">
+        {{ basic_price }}₽ + {{ selected_configuration.additional_price }}₽ = {{ basic_price + selected_configuration.additional_price }}₽
+    </strong>
+</div>
+

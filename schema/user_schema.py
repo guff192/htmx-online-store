@@ -34,7 +34,7 @@ class UserCreateGoogle(UserBase):
 
 
 class UserCreateYandex(UserBase):
-    yandex_id: str
+    yandex_id: int
     is_avatar_empty: bool
 
     def verify(self) -> bool:

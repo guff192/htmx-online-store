@@ -20,7 +20,7 @@ class UserRepository:
     def get_by_google_id(self, google_id: str) -> User | None:
         return self.db.query(User).filter_by(google_id=google_id).first()
 
-    def get_by_yandex_id(self, yandex_id: str) -> User | None:
+    def get_by_yandex_id(self, yandex_id: int) -> User | None:
         return self.db.query(User).filter_by(yandex_id=yandex_id).first()
 
     def create(self,
@@ -28,7 +28,7 @@ class UserRepository:
                email: str,
                profile_img_url: str | None,
                google_id: str | None = None,
-               yandex_id: str | None = None) -> User:
+               yandex_id: int | None = None) -> User:
         # Create user using given data
         if google_id:
             user = User(
@@ -53,7 +53,7 @@ class UserRepository:
             self.db.commit()
             self.db.refresh(user)
         else:
-            return None
+            raise NotImplementedError
 
         return user
 

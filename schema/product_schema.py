@@ -72,8 +72,7 @@ class ProductCreate(ProductBase):
 
 
 class ProductUpdate(ProductCreate):
-    count: int
-    manufacturer_name: str
+    pass
 
 
 class ProductUpdateResponse(BaseModel):

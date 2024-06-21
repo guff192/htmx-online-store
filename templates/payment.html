@@ -58,7 +58,7 @@
                             "Name": "{{ product.product_name }} + {{ product.selected_configuration.name }}",
                             "Price": {{ (product.basic_price + product.selected_configuration.additional_price) * 100 }},
                             "Quantity": {{ product.count }}.00,
-                            "Amount": {{ (product.basic_price + product.selected_configuration.additional_price) * count * 100 }},
+                            "Amount": {{ (product.basic_price + product.selected_configuration.additional_price) * product.count * 100 }},
                             "PaymentMethod": "full_prepayment",
                             "PaymentObject": "commodity",
                             "Tax": "none",

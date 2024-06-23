@@ -2,12 +2,13 @@ from datetime import datetime
 from typing import Generator
 
 from fastapi import Depends
+from loguru import logger
 
-from exceptions.payment_exceptions import ErrPaymentNotFound
+from exceptions.payment_exceptions import ErrInvalidPaymentData, ErrPaymentNotFound
 from models.payment import Payment
 from repository.payment_repository import PaymentRepository, payment_repository_dependency
 from schema.order_schema import (
-    PaymentSchema, PaymentStatus, OrderWithPaymentSchema
+    PaymentSchema, PaymentStatus, OrderWithPaymentSchema, TinkoffWebhookRequest
 )
 from services.order_service import OrderService, order_service_dependency
 
@@ -88,6 +89,36 @@ class PaymentService:
             delivery_address=order_schema.delivery_address,
             payment=payment_schema
         )
+
+    def update_payment_status(self, schema: TinkoffWebhookRequest):
+        if not schema.is_valid():
+            logger.debug(f'Invalid schema: {schema}')
+            raise ErrInvalidPaymentData
+
+        try:
+            payment_model = self._repo.get_by_order_id(int(schema.order_id))
+        except ValueError:
+            logger.debug(f'Invalid order_id: {schema.order_id} (type: {type(schema.order_id)})')
+            raise ErrInvalidPaymentData
+
+        if payment_model is None:
+            logger.debug(f'Payment not found for order_id: {schema.order_id}')
+            raise ErrPaymentNotFound
+
+        payment_model_dict = payment_model.__dict__
+        payment_id = payment_model_dict.get('id', 0)
+        order_id = payment_model_dict.get('order_id', 0)
+        if order_id != int(schema.order_id):
+            logger.debug(f'Invalid order_id: {schema.order_id}, should be: {order_id}')
+            raise ErrInvalidPaymentData
+
+        payment_amount = self._order_service.get_order_sum(order_id)
+        request_amount = int(schema.amount)
+        if payment_amount * 100 != request_amount:
+            logger.debug(f'Invalid amount: {request_amount}, should be: {payment_amount*100}')
+            raise ErrInvalidPaymentData
+
+        self._repo.update_status_by_id(payment_id, PaymentStatus.success.value)
 
 
 def payment_service_dependency(

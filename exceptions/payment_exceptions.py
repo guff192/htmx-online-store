@@ -10,3 +10,19 @@ class ErrPaymentNotFound(HTTPException):
             detail=detail
         )
 
+
+class ErrUnsuccessfulPayment(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Payment was not successful'
+        )
+
+
+class ErrInvalidPaymentData(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Invalid payment data'
+        )
+

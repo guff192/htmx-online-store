@@ -118,12 +118,15 @@ class OrderService:
         if not order_model:
             raise ErrOrderNotFound(order_id)
 
+        # counting order sum
         order_products = self.get_order_products(order_id)
         sum: int = 0
         for order_product in order_products:
             product_price: int = order_product.product.__dict__.get('price', 0)
             additional_price: int = order_product.selected_configuration.__dict__.get('additional_price', 0)
-            sum += (product_price + additional_price) * order_product.__dict__.get('count', 0)
+            product_count: int = order_product.__dict__.get('count', 0)
+
+            sum += (product_price + additional_price) * product_count
 
         return sum
 

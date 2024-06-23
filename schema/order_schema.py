@@ -1,14 +1,18 @@
-import enum
-from pydantic import BaseModel
 from datetime import datetime
+import enum
+from hashlib import sha256
+from typing import Any, OrderedDict
 
-from typing import Any
+from loguru import logger
+from pydantic import BaseModel, Field
 
+from app.config import Settings
 from schema import SchemaUtils
 from schema.product_schema import ProductConfiguration
 from schema.user_schema import UserResponse
 
 
+settings = Settings()
 utils = SchemaUtils()
 
 
@@ -44,6 +48,55 @@ class PaymentSchema(PaymentBase):
 
 class PaymentCreateSchema(PaymentBase):
     pass
+
+
+class TinkoffPaymentStatus(str, enum.Enum):
+    AUTHORIZED = 'AUTHORIZED'
+    CONFIRMED = 'CONFIRMED'
+    PARTIAL_REVERSED = 'PARTIAL_REVERSED'
+    REVERSED = 'REVERSED'
+    PARTIAL_REFUNDED = 'PARTIAL_REFUNDED'
+    REFUNDED = 'REFUNDED'
+    REJECTED = 'REJECTED'
+
+
+class TinkoffWebhookRequest(BaseModel):
+    terminal_key: str = Field(..., alias='TerminalKey')
+    order_id: str = Field(..., alias='OrderId')
+    success: bool = Field(..., alias='Success')
+    status: TinkoffPaymentStatus = Field(..., alias='Status')
+    payment_id: int = Field(..., alias='PaymentId')
+    error_code: str = Field(..., alias='ErrorCode')
+    amount: int = Field(..., alias='Amount')
+    card_id: int = Field(..., alias='CardId')
+    pan: str = Field(..., alias='Pan')
+    exp_date: str = Field(..., alias='ExpDate')
+    token: str = Field(..., alias='Token')
+
+    def is_valid(self) -> bool:
+        token_creation_data = self.model_dump(exclude={'token'})
+        token_creation_data.update(password=settings.tinkoff_terminal_password)
+        sorted_keys = sorted(list(token_creation_data.keys()))
+        
+        bytes_to_hash = b''
+        for key in sorted_keys:
+            value = token_creation_data[key]
+            if value in (True, False):
+                str_value = str(value).lower()
+            elif key == 'status':
+                str_value = value.value
+            else:
+                str_value = str(value)
+            
+            bytes_to_hash += bytes(str_value, encoding='utf-8')
+
+        hash = sha256(bytes_to_hash).hexdigest()
+
+        return hash == self.token
+
+
+class TinkoffWebhookTokenCreationData(TinkoffWebhookRequest):
+    password: str = Field(..., alias='Password')
 
 
 class OrderProductSchema(BaseModel):

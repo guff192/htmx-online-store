@@ -10,7 +10,9 @@
 
 <div id="order{{ id }}" class="border border-white p-5">
 
-    <h2 class="text-3xl">Сумма: {{ sum }}₽</h2>
+    <h2 class="text-3xl">
+        Сумма: {{ sum }}₽{% if payment and payment.status.value == 'success' %}<span class="text-green-500"> (оплачен)</span>{% endif %}
+    </h2>
     <p class="mb-10">{{ date.strftime('%Y-%B-%d %H:%M') }}</p>
     
 
@@ -64,7 +66,7 @@
             hx-swap="innerHTML"
             hx-replace-url="true">Редактировать заказ</button>
 
-        {% if buyer_name != '' and buyer_phone != '' %} 
+        {% if buyer_name != '' and buyer_phone != '' and (not payment or not payment.status.value == 'success') %} 
             <button class="bg-green-500 rounded p-2 font-bold mt-5"
                 hx-get="/order/payment/{{ id }}" hx-target="#content"
                 hx-replace-url="/order/payment/{{ id }}"

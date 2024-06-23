@@ -3,7 +3,9 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
+from exceptions.payment_exceptions import ErrUnsuccessfulPayment
 from routes.auth_routes import oauth_user_dependency
+from schema.order_schema import TinkoffWebhookRequest
 from schema.user_schema import LoggedUser
 from viewmodels.payment_viewmodel import PaymentViewModel, payment_viewmodel_dependency
 
@@ -36,4 +38,16 @@ def get_payment_page(request: Request, order_id:  int,
         {'request': request,
          **order_with_payment.build_context(), 'user': user}
     )
+
+
+@router.post('/tinkoff')
+async def handle_tinkoff_webhook(
+    request: TinkoffWebhookRequest,
+    vm: PaymentViewModel = Depends(payment_viewmodel_dependency)
+):
+    # Validate and process the request
+    if not request.success:
+        raise ErrUnsuccessfulPayment
+
+    vm.update_payment_status(request)
 

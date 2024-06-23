@@ -37,7 +37,9 @@ class OrderRepository:
         return self._get_order_query(order_id).first()
 
     def list_user_orders(self, user_id: str) -> list[Order]:
-        return self._session.query(Order).filter(Order.user_id == user_id).all()
+        return self._session.query(Order).filter(
+            Order.user_id == user_id
+        ).order_by(Order.date.desc()).all()
 
     def get_order_products(self, order_id) -> list[OrderProduct]:
         return self._session.query(OrderProduct).filter(

@@ -96,6 +96,12 @@ class Settings(BaseSettings):
     bucket_name: str = Field(default='', alias='BUCKET_NAME')
     public_bucket_url: Url = Field(default='', alias='PUBLIC_BUCKET_URL')
 
+    # payment settings
+    # tinkoff settings
+    tinkoff_terminal_id: str = Field(default='', alias='TINKOFF_TERMINAL_ID')
+    tinkoff_terminal_password: str = Field(default='',
+                                           alias='TINKOFF_TERMINAL_PASSWORD')
+
 
 def log_settings():
     settings = Settings().model_dump()

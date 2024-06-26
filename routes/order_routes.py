@@ -13,6 +13,7 @@ from viewmodels.order_viewmodel import OrderViewModel, order_viewmodel_dependenc
 
 router = APIRouter(prefix='/order', tags=['Order'])
 router.include_router(payment_router)
+
 templates = Jinja2Templates(directory='templates')
 
 
@@ -32,19 +33,20 @@ def create_order(
     )
     order = vm.create_order(order_create_schema)
 
-    if request.headers.get('hx-request'):
-        response = templates.TemplateResponse(
-            'partials/order.html',
-            {'request': request, 'user': user, **order.build_context()}
-        )
-    else:
-        response = templates.TemplateResponse(
-            'order.html',
-            {'request': request, 'user': user, **order.build_context()}
-        )
+    # generating context
+    context = {'request': request, 'user': user, **order.build_context(),
+             'editable': True}
 
+    # choosing template
+    if request.headers.get('hx-request'):
+        template_name = 'partials/order.html'
+    else:
+        template_name = 'order.html'
+
+    # creating response object
+    response = templates.TemplateResponse(template_name, context)
     response.headers['Hx-Location'] = '{"path": ' +\
-            f'"/order/{order.id}", ' +\
+            f'"/order/{order.id}/edit", ' +\
             '"target": "#content"}'
 
     return response

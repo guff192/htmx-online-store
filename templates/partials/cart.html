@@ -19,19 +19,18 @@
         hx-target="#content"
         hx-swap="innerHTML"
         hx-replace-url="true"
-        class="bg-lightBlue rounded p-2 font-bold"
+        class="bg-lightBlue rounded p-2 font-bold mx-auto inline-block"
         >Оформить заказ</button>
 
-    <div id="cart" class="md:grid md:grid-cols-4 md:gap-2">
+    <div id="cart" class="flex flex-col">
         {% for product in product_list %}
-            {% include 'partials/product_card.html' %}
+            {% include 'partials/cart_position.html' %}
         {% endfor %}
     </div>
 {% else %}
     <p class="text-center font-bold text-white">
         В твоей корзине пусто 🙃. 
-        Перейдём в <a class="hover:underline text-indigo-400" href="/products/catalog#offset"
-                    >каталог</a>?
+        Перейдём в <a class="hover:underline text-indigo-400" href="/products/catalog#offset">каталог</a>?
     </p>
 {% endif %}
 

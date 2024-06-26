@@ -24,6 +24,8 @@
 
         </p>
 
+    {% elif product.count == 0 %}
+        <span class="bg-darkPink rounded p-2 font-bold">{{ product.count }}</span>
     {% endif %}
 
 {% else %}

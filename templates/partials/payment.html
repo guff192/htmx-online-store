@@ -10,14 +10,17 @@
 
 <div id="payment{{ payment.id }}"
     class="border border-white p-5">
-    <p>Оплата заказа {{ id }}</p>    
-    <p>На сумму: {{ sum }}₽</p>
-    <p>Статус: {{ payment.status.value }}</p>
+    <p class="mb-2 text-xl">Оплата заказа {{ id }}</p>    
+    <p class="text-xl">На сумму: {{ sum }}₽</p>
+    <p class="mb-5">Статус: {{ payment.status.value }}</p>
 
-
-    <p class="text-center font-bold text-white my-5">
-        Тут должна рендериться кнопка от Тинькова
-    </p>
+    <button
+        hx-get="/order/{{ id }}"
+        hx-push-url="true"
+        hx-target="#content"
+        hx-swap="innerHTML"
+        class="bg-lightBlue rounded p-2 font-bold mb-5"
+        >Вернуться к заказу</button>
 
     {% if payment.status.value == 'pending' %}
         <!-- Tinkoff Button -->

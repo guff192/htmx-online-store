@@ -24,7 +24,6 @@ def get_payment_page(request: Request, order_id:  int,
                                 status_code=status.HTTP_303_SEE_OTHER)
 
     order_with_payment = vm.get_by_order_id(order_id, str(user.id))
-    logger.debug(order_with_payment)
 
     if request.headers.get('hx-request'):
         return templates.TemplateResponse(

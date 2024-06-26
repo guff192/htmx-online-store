@@ -57,7 +57,7 @@
                                    newTab.setAttribute('aria-selected', 'true');
                                    newTab.classList.add('bg-lightBlue');">
 
-        <h4 class="text-center">Конфигурации<br>(RAM/SSD):</h4>
+        <h4 class="text-center">Конфигурация<br>(RAM/SSD):</h4>
 
         <div id="product{{ product.id }}priceTabs"
             role="tabpanel"
@@ -71,7 +71,8 @@
 
 
 <!-- Counter -->
+<div class="mt-10">
 {% if request.state.user %}
     {% include 'partials/product_counter.html' %}
 {% endif %}
-
+</div>

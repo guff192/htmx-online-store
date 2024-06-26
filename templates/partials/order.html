@@ -26,7 +26,8 @@
     {% if editable %}
         <script>htmx.config.methodsThatUseUrlParams = ['get', 'put'];</script>
         
-        <form hx-put="/order/{{ id }}" hx-target="#content"
+        <form class="w-1/2 mx-auto p-5 border border-white shadow shadow-darkPink rounded"
+            hx-put="/order/{{ id }}" hx-target="#content"
             hx-swap="innerHTML" hx-params="*" hx-replace-url="/order/{{ id }}">
             <input type="hidden" name="order_id" value="{{ id }}">
             <input type="hidden" name="date" value="{{ date }}">
@@ -82,14 +83,17 @@
     {% endif %}
 
 
-    <h2 class="text-3xl mb-5">Товары</h2>
+    <h2 class="text-3xl my-5">Товары</h2>
     {% for product in products %}
+        {% include 'partials/cart_position.html' %}
+    <!--
         <div class="mb-5">
             <h3 class="text-2xl">{{ product.product_name }}</h3>
             <p>Цена: {{ product.basic_price }}₽</p>
             <p>Конфигурация: {{ product.selected_configuration.name }} (+{{ product.selected_configuration.additional_price }}₽)</p>
             <p>Количество: {{ product.count }} штук{% if product.count % 10 in [2, 3, 4] %}и{% elif product.count % 10 == 1 %}а{% endif %}</p>
         </div>
+    -->
     {% endfor %}
 
 </div>

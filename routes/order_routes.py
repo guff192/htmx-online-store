@@ -105,8 +105,14 @@ def edit_order(request: Request, order_id: int,
 
     order = vm.get_by_id(order_id, str(user.id))
 
+    if request.headers.get('hx-request'):
+        return templates.TemplateResponse(
+            'partials/order.html',
+            {'request': request, **order.build_context(), 'editable': True}
+        )
+
     return templates.TemplateResponse(
-        'partials/order.html',
+        'order.html',
         {'request': request, **order.build_context(), 'editable': True}
     )
 

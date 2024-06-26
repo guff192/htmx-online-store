@@ -1,18 +1,31 @@
-<div class="flex flex-col" id="product{{ product_id }}priceTabs" role="tabpanel"
+<div class="flex flex-col" id="product{{ product_id }}priceTabs" role="tablist"
     hx-on:htmx:before-request="let currentTab = document.querySelector('#product' + '{{ product_id }}' + 'priceTabs [aria-selected=true]');
                                currentTab.setAttribute('aria-selected', 'false');
                                currentTab.classList.remove('bg-lightBlue');
                                let newTab = event.target;
                                newTab.setAttribute('aria-selected', 'true');
                                newTab.classList.add('bg-lightBlue');">
+
+    {% if selected_configuration %}
+    <p class="text-center">{{ selected_configuration.name }}</p>
+    {% endif %}
+
+    <button
+        role="tablist"
+        class="bg-lightBlue rounded p-2 font-bold"
+        onclick="document.querySelectorAll('button[role=tab]').forEach((el) => { el.classList.remove('hidden'); el.classList.remove('h-0'); });
+        document.querySelector('button[role=tablist]').classList.add('hidden');"
+        >Сменить конфигурацию</button>
+
     {% for config in configurations %}
         <button
             role="tab"
+            onclick="document.querySelectorAll('[role=tab]').forEach((el) => { el.classList.add('hidden'); el.classList.add('h-0'); });"
             aria-controls="product{{ product_id }}priceValue"
             aria-selected="{% if config.id == selected_configuration.id %}true{% else %}false{% endif %}"
-            class="border border-white text-xs {% if config.id == selected_configuration.id %}bg-lightBlue{% endif %}"
-            hx-target="#product{{ product_id }}priceValue"
-            hx-select="#product{{ product_id }}priceValue"
+            class="hidden transition-all duration-700 h-0 border border-white text-xs {% if config.id == selected_configuration.id %}bg-lightBlue{% endif %}"
+            hx-target="#product{{ product_id }}priceTabs"
+            hx-select="#product{{ product_id }}priceTabs"
             hx-get="/products/{{ product_id }}/prices/{{ config.id }}">{{ config.name }} (+{{ config.additional_price }}₽)</button>
 
     {% endfor %}
@@ -20,7 +33,7 @@
         
 </div>
 
-<div id="product{{ product_id }}priceValue" role="tab">
+<div id="product{{ product_id }}priceValue" role="tabpanel">
     <strong class="text-2xl">
         {{ basic_price }}₽ + {{ selected_configuration.additional_price }}₽ = {{ basic_price + selected_configuration.additional_price }}₽
     </strong>

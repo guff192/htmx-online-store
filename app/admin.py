@@ -145,9 +145,14 @@ class OrderModelView(ModelView):
     can_delete = True
     can_create = True
 
-    column_list: list[str] = ['id', 'user.name', 'date', 'payment.status']
+    column_list: list[str] = ['id', 'user.email', 'buyer_name',
+                              'date', 'payment.status']
     column_details_list: list[str] = ['id', 'user.name', 'date']
-    column_editable_list: list[str] = ['user_id', 'date']
+    form_columns: list[str] = ['user_id', 'date', 'buyer_name', 'buyer_phone',
+                               'delivery_address']
+    column_editable_list: list[str] = ['user_id', 'date', 'buyer_name']
+
+    column_default_sort: tuple[str, bool] = ('date', True)
 
 
 class PaymentModelView(ModelView):
@@ -161,6 +166,8 @@ class PaymentModelView(ModelView):
     form_columns: list[str] = ['status', 'order_id']
     column_details_list: list[str] = ['id', 'order_id', 'order.user.email',
                                       'date', 'status']
+
+    column_default_sort: tuple[str, bool] = ('date', True)
 
 # ---------------------------------------------------------
 # Middleware

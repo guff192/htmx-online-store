@@ -19,7 +19,7 @@ class Order(Base):
     comment = Column('comment', String(255), nullable=False, default='')
 
     buyer_name = Column('buyer_name', String(255), nullable=False, default='')
-    buyer_phone = Column('buyer_phone', String(255), nullable=False,)
+    buyer_phone = Column('buyer_phone', String(255), nullable=False, default='')
 
     delivery_address = Column('delivery_address', String(255), nullable=False,
                               default='')

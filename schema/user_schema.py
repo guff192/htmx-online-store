@@ -5,9 +5,9 @@ from pydantic import BaseModel
 class UserBase(BaseModel):
     name: str
     email: str
-    profile_img_url: str
-    google_id: str | None
-    yandex_id: int | None
+    profile_img_url: str | None = None
+    google_id: str | None = None
+    yandex_id: int | None = None
     is_admin: bool = False
 
 
@@ -19,7 +19,11 @@ class LoggedUser(UserBase):
     id: UUID
 
 
-class UserCreateGoogle(UserBase):
+class UserCreate(UserBase):
+    pass
+
+
+class UserCreateGoogle(UserCreate):
     google_id: str
     email_verified: bool
     hd: str
@@ -33,7 +37,7 @@ class UserCreateGoogle(UserBase):
         return False
 
 
-class UserCreateYandex(UserBase):
+class UserCreateYandex(UserCreate):
     yandex_id: int
     is_avatar_empty: bool
 

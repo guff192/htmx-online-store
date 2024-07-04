@@ -7,13 +7,22 @@ from loguru import logger
 from exceptions.order_exceptions import ErrOrderNotFound, ErrUserOrdersNotFound
 from models.order import Order, OrderProduct
 from repository.cart_repository import CartRepository, cart_repository_dependency
-from repository.configuration_repository import ConfigurationRepository, configuration_repository_dependency
+from repository.configuration_repository import (
+    ConfigurationRepository, configuration_repository_dependency
+)
 from repository.order_repository import (
     OrderRepository, order_repository_dependency
 )
-from repository.product_repository import ProductRepository, product_repository_dependency
-from schema.order_schema import OrderProductSchema, OrderSchema, OrderUpdateSchema, OrderWithPaymentSchema, PaymentSchema, PaymentStatus, UserOrderListSchema
+from repository.product_repository import (
+    ProductRepository, product_repository_dependency
+)
+from schema.cart_schema import CartInCookie
+from schema.order_schema import (
+    CookieOrderProduct, OrderInCookie, OrderProductSchema, OrderSchema, OrderUpdateSchema, OrderWithPaymentSchema,
+    PaymentSchema, PaymentStatus, UserOrderListSchema
+)
 from schema.product_schema import ProductConfiguration as ProductConfigurationSchema
+from schema.user_schema import UserCreate, UserResponse
 from services.user_service import UserService, user_service_dependency
 
 
@@ -164,11 +173,40 @@ class OrderService:
         return self._repo.get_order_products(order_id)
 
     def create_from_cart(self, user_id: str) -> OrderSchema:
-        # creating order
         user_products = self._cart_repo.get_user_products(user_id)
-        order_model = self._repo.create(user_id, user_products)
+        order_model = self._repo.create_with_user_products(user_id, user_products)
 
         return self._order_model_to_schema(order_model)
+
+    def create_from_cookie_cart(self, cookie_cart: CartInCookie) -> OrderInCookie:
+        order_model = self._repo.create_with_cookie_products(cookie_cart.product_list)
+
+        order_schema = self._order_model_to_schema(order_model)
+        cookie_order = OrderInCookie(
+            id=order_schema.id,
+            date=order_schema.date,
+            products=[ ],
+            sum=order_schema.sum,
+            comment=order_schema.comment,
+            buyer_name=order_schema.buyer_name,
+            buyer_phone=order_schema.buyer_phone,
+            delivery_address=order_schema.delivery_address
+        )
+
+        for product in order_schema.products: 
+            cookie_order_product = CookieOrderProduct(
+                product_id=product.product_id,
+                product_name=product.product_name,
+                configuration_id=product.selected_configuration.id,
+                configuration_name=product.selected_configuration.name,
+                count=product.count
+            )
+            cookie_order.products.append(cookie_order_product)
+
+        return cookie_order
+
+    def create_user_for_order(self, user: UserCreate) -> UserResponse:
+        return self._user_service.create_with_basic_info(user)
 
     def update_order(self, order_update: OrderUpdateSchema) -> OrderSchema:
         if not isinstance(order_update.delivery_address, str):
@@ -179,13 +217,20 @@ class OrderService:
                 + order_update.delivery_address.flat_number
             )
 
+        if order_update.user_id:
+            pass # Create user here
+
+        logger.debug(f'Updating order with schema: {order_update}')
         order_model = self._repo.update(order_update.id, order_update.user_id,
                                         order_update.comment,
                                         order_update.buyer_name,
                                         order_update.delivery_address,
                                         order_update.buyer_phone)
 
-        return self._order_model_to_schema(order_model)
+        order_schema = self._order_model_to_schema(order_model)
+        logger.debug(f'Updated order: {order_schema}')
+
+        return order_schema
 
     def remove_order(self, order_id: int, user_id: str) -> None:
         self._repo.remove(order_id, user_id)

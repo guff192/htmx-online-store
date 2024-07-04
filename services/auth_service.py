@@ -140,23 +140,30 @@ class AuthService:
         if not user_data:
             raise ErrUserNotFound()
 
-        yandex_id = user_data.__dict__.get("yandex_id")
-        if yandex_id is not None:
+        # parsing user data
+        user_data_dict = user_data.__dict__
+        name = user_data_dict.get("name", "")
+        email = user_data_dict.get("email", "")
+        profile_img_url = user_data_dict.get("profile_img_url", "")
+        google_id = user_data_dict.get("google_id", "")
+        yandex_id = user_data_dict.get("yandex_id", 0)
+        if yandex_id:
             yandex_id = int(yandex_id)
+        is_admin = user_data_dict.get("is_admin", False)
 
         return LoggedUser(
             id=user_id,
-            name=str(user_data.name),
-            email=str(user_data.email),
-            profile_img_url=str(user_data.profile_img_url),
-            google_id=str(user_data.google_id),
+            name=name,
+            email=email,
+            profile_img_url=profile_img_url,
+            google_id=google_id,
             yandex_id=yandex_id,
-            is_admin=bool(user_data.is_admin),
+            is_admin=is_admin
         )
 
 
 def auth_service_dependency(
-        user_repo: UserRepository = Depends(user_repository_dependency)
+    user_repo: UserRepository = Depends(user_repository_dependency)
 ):
     service = AuthService(user_repo)
     yield service

@@ -1,5 +1,4 @@
-from collections.abc import Generator
-from typing import Annotated, Any
+from typing import Annotated, Any, Generator 
 
 from fastapi import APIRouter, Body, Cookie, Depends, Form, Request, Response, status
 from fastapi.responses import HTMLResponse, RedirectResponse

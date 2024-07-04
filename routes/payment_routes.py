@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
-from loguru import logger
 
 from exceptions.payment_exceptions import ErrUnsuccessfulPayment
 from routes.auth_routes import oauth_user_dependency
@@ -20,9 +19,9 @@ def get_payment_page(request: Request, order_id:  int,
                      user: LoggedUser | None = Depends(oauth_user_dependency),
                      vm: PaymentViewModel = Depends(payment_viewmodel_dependency)):
     if user is None:
-        return RedirectResponse('/auth/login',
+        return RedirectResponse(f'/order/{order_id}/edit',
                                 status_code=status.HTTP_303_SEE_OTHER)
-
+        
     order_with_payment = vm.get_by_order_id(order_id, str(user.id))
 
     if request.headers.get('hx-request'):

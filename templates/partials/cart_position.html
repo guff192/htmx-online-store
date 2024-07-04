@@ -1,5 +1,6 @@
+{% if product.count %}
 <div
-    id="product{{ product_id }}cartPosition"
+    id="product{{ product.product_id }}cartPosition"
     class="flex flex-row justify-between mb-10"
     >
 
@@ -22,14 +23,17 @@
 
 
     <!-- Product price and configuration -->
-    <div class="flex flex-col grow justify-center text-center">
-        {% if product.price %}
-        <p class="text-xl">{{ product.price + product.selected_configuration.additional_price }}₽</p>
-        {% else %}
-        <p class="text-xl">{{ product.basic_price + product.selected_configuration.additional_price }}₽</p>
-        {% endif %}
-        <p class="text-sm">{{ product.selected_configuration.name }}</p>
-    </div>
+    {% if product.selected_configuration %}
+        <div class="flex flex-col grow justify-center text-center">
+                {% if product.price %}
+                <p class="text-xl">{{ product.price + product.selected_configuration.additional_price }}₽</p>
+                {% else %}
+                <p class="text-xl">{{ product.basic_price + product.selected_configuration.additional_price }}₽</p>
+                {% endif %}
+
+                <p class="text-sm">{{ product.selected_configuration.name }}</p>
+        </div>
+    {% endif %}
 
     <!-- Counter -->
     <div class="flex flex-col grow justify-center text-center">
@@ -57,4 +61,7 @@
 
 
 </div>
+
+{% endif %}
+
 

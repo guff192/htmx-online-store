@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import mapped_column, relationship
+from sqlalchemy_utils import UUIDType
 from db.session import Base
 
 
@@ -10,7 +11,7 @@ class Order(Base):
     id = Column('id', Integer, primary_key=True, index=True, autoincrement=True)
 
     user = relationship('User', back_populates='orders')
-    user_id = mapped_column(ForeignKey('users.id'))
+    user_id = mapped_column(ForeignKey('users.id'), UUIDType())
 
     products = relationship('OrderProduct', cascade='all, delete')
 
@@ -19,7 +20,7 @@ class Order(Base):
     comment = Column('comment', String(255), nullable=False, default='')
 
     buyer_name = Column('buyer_name', String(255), nullable=False, default='')
-    buyer_phone = Column('buyer_phone', String(255), nullable=False,)
+    buyer_phone = Column('buyer_phone', String(255), nullable=False, default='')
 
     delivery_address = Column('delivery_address', String(255), nullable=False,
                               default='')

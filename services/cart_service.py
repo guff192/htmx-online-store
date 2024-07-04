@@ -3,7 +3,9 @@ from typing import Any
 
 from fastapi import Depends
 from loguru import logger
+from sqlalchemy import Index
 from exceptions.auth_exceptions import ErrUserNotFound
+from exceptions.product_exceptions import ErrProductNotFound
 from models.product import ProductConfiguration
 from models.user import User, UserProduct
 from schema.user_schema import UserResponse
@@ -13,9 +15,10 @@ from repository.cart_repository import (
     CartRepository,
     cart_repository_dependency
 )
-from schema.cart_schema import Cart
+from schema.cart_schema import Cart, CartInCookie
 from schema.product_schema import (
-    ProductInCart, ProductConfiguration as ProductConfigurationSchema
+    ProductInCart, ProductConfiguration as ProductConfigurationSchema,
+    Product as ProductSchema
 )
 
 
@@ -110,6 +113,33 @@ class CartService:
 
         return product_in_cart
 
+    def from_cookie_schema(
+        self,
+        cart_in_cookie: CartInCookie
+    ) -> list[ProductInCart]:
+        products: list[ProductInCart] = []
+        for cookie_product in cart_in_cookie.product_list:
+            product = self._products.get_by_id(cookie_product.product_id)
+
+            available_configs = self._products.get_configurations_for_product(product.id)
+            try:
+                selected_config = list(filter(
+                    lambda c: c.id == cookie_product.configuration_id,
+                    available_configs
+                ))[0]
+            except IndexError:
+                raise ErrProductNotFound()
+
+            products.append(ProductInCart(
+                id=product.id, name=product.name, price=product.price,
+                description=product.description, count=cookie_product.count,
+                manufacturer_name=product.manufacturer_name,
+                configurations=product.configurations,
+                selected_configuration=selected_config
+            ))
+            
+        return products
+
     def get_cart(self, user_id: str) -> Cart:
         '''Get products in user's cart'''
         orm_products = self._repo.get_user_products(user_id)
@@ -128,7 +158,15 @@ class CartService:
         if not orm_user:
             raise ErrUserNotFound()
         user_dict = orm_user.__dict__
-        user_schema = UserResponse(**user_dict)
+        user_schema = UserResponse(
+            id=user_dict.get('id', ''),
+            name=user_dict.get('name', ''),
+            email=user_dict.get('email', ''),
+            profile_img_url=user_dict.get('profile_img_url', ''),
+            google_id=user_dict.get('google_id', ''),
+            yandex_id=user_dict.get('yandex_id', 0),
+            is_admin=user_dict.get('is_admin', True),
+        )
 
         return Cart(
             product_list=products,
@@ -145,8 +183,20 @@ class CartService:
 
         return product_schema
 
-    def add_to_cart(self, user_id: str,
+    def add_to_cart(self, user_id: str | None,
                     product_id: int, configuration_id: int) -> ProductInCart:
+        if not user_id:
+            product_schema: ProductSchema = self._products.get_by_id(product_id)
+            product_in_cart = ProductInCart(id=product_schema.id,
+                                    name=product_schema.name, 
+                                    description=product_schema.description,
+                                    price=product_schema.price, count=1,
+                                    manufacturer_name=product_schema.manufacturer_name,
+                                    configurations=product_schema.configurations,
+                                    selected_configuration=product_schema.selected_configuration)
+
+            return product_in_cart
+
         orm_product: UserProduct | None = (
             self._repo.add_to_cart(user_id, product_id, configuration_id)
         )

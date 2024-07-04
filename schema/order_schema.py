@@ -1,9 +1,10 @@
+import urllib.parse
 from datetime import datetime
 import enum
 from hashlib import sha256
-from typing import Any, OrderedDict
+import html
+from typing import Any
 
-from loguru import logger
 from pydantic import BaseModel, Field
 
 from app.config import Settings
@@ -161,4 +162,47 @@ class UserOrderListSchema(BaseModel):
     @utils.add_shop_to_context
     def build_context(self) -> dict[str, Any]:
         return self.__dict__
+
+
+class CookieOrderProduct(BaseModel):
+    product_id: int
+    product_name: str
+    configuration_id: int
+    configuration_name: str
+    count: int
+
+
+class OrderInCookie(BaseModel):
+    id: int
+    date: datetime
+    products: list[CookieOrderProduct]
+    sum: int
+    comment: str = ''
+    buyer_name: str = ''
+    buyer_phone: str = ''
+    delivery_address: DeliveryAddressSchema | str = ''
+
+    @utils.add_shop_to_context
+    def build_context(self) -> dict[str, Any]:
+        return self.__dict__
+
+    def cookie_str(self) -> str:
+        cookie_order_str = '{'
+        cookie_order_str += f'"id": {self.id}, "date": "{self.date}", "sum": {self.sum}, '
+        cookie_order_str += f'"comment": "{self.comment}", "buyer_name": "{self.buyer_name}", '
+        cookie_order_str += f'"buyer_phone": "{self.buyer_phone}", "delivery_address": "{self.delivery_address}", '
+        cookie_order_str += '"products": ['
+
+        products_count = len(self.products)
+        for i, order_product in enumerate(self.products):
+            cookie_order_str += f'{{"product_id": {order_product.product_id}, '
+            cookie_order_str += f'"product_name": "{order_product.product_name}", '
+            cookie_order_str += f'"configuration_id": {order_product.configuration_id}, '
+            cookie_order_str += f'"configuration_name": "{order_product.configuration_name}", '
+            cookie_order_str += f'"count": {order_product.count}}}'
+            cookie_order_str += ',' if i != products_count - 1 else ''
+        cookie_order_str += ']}'
+        
+        cookie_order_str = urllib.parse.quote(cookie_order_str)
+        return cookie_order_str
 

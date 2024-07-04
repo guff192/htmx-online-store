@@ -26,7 +26,7 @@ class UserRepository:
     def create(self,
                name: str,
                email: str,
-               profile_img_url: str | None,
+               profile_img_url: str = '',
                google_id: str | None = None,
                yandex_id: int | None = None) -> User:
         # Create user using given data
@@ -53,7 +53,14 @@ class UserRepository:
             self.db.commit()
             self.db.refresh(user)
         else:
-            raise NotImplementedError
+            user = User(
+                id=uuid4(),
+                email=email,
+                name=name
+            )
+            self.db.add(user)
+            self.db.commit()
+            self.db.refresh(user)
 
         return user
 

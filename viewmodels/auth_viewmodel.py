@@ -11,6 +11,7 @@ from services.auth_service import (
     AuthService,
     GoogleOAuthProvider,
     YandexOAuthProvider,
+    auth_service_dependency,
     get_auth_service
 )
 
@@ -38,7 +39,7 @@ class AuthViewModel:
 
 
 def auth_viewmodel_dependency(
-        auth_service: AuthService = Depends(AuthService)
+        auth_service: AuthService = Depends(auth_service_dependency)
 ) -> Generator[AuthViewModel, None, None]:
     vm = AuthViewModel(auth_service)
     yield vm

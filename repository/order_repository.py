@@ -1,12 +1,14 @@
 from typing import Generator
 
+from db.session import db_dependency
+from exceptions.auth_exceptions import ErrAccessDenied
+from exceptions.order_exceptions import ErrOrderNotFound
 from fastapi import Depends
 from loguru import logger
-from sqlalchemy.orm import Query, Session
-from db.session import db_dependency
-from exceptions.order_exceptions import ErrOrderNotFound
 from models.order import Order, OrderProduct
 from models.user import UserProduct
+from schema.cart_schema import CookieCartProduct
+from sqlalchemy.orm import Query, Session
 
 
 class OrderRepository:
@@ -46,10 +48,9 @@ class OrderRepository:
             OrderProduct.order_id == order_id
         ).all()
 
-    def create(self,
-               user_id: str,
+    def create_with_user_products(self,
+               user_id: str | None,
                user_products: list[UserProduct]) -> Order:
-        logger.info(f'Creating order for user {user_id}')
         order = Order(user_id=user_id, comment='',
                       buyer_name='', buyer_phone='', delivery_address='')
         self._session.add(order)
@@ -69,27 +70,70 @@ class OrderRepository:
 
         return order
 
-    def update(self, order_id: int, user_id: str,
+    def create_with_cookie_products(
+        self,
+        products: list[CookieCartProduct]
+    ) -> Order:
+        order = Order(user_id=None, comment='',
+                      buyer_name='', buyer_phone='', delivery_address='')
+        self._session.add(order)
+        self._session.flush([order])
+
+        order_products: list[OrderProduct] = []
+        for product in products:
+            order_product = OrderProduct(
+                order_id=order.id,
+                product_id=product.product_id,
+                count=product.count,
+                selected_configuration_id=product.configuration_id
+            )
+            self._session.add(order_product)
+            order_products.append(order_product)
+
+        self._session.commit()
+        self._session.flush(order_products)
+
+        order = self.get_by_id(order.id)
+
+        return order
+
+    def update(self, order_id: int, user_id: str | None,
                comment: str, buyer_name: str, delivery_address: str,
                buyer_phone: str) -> Order:
+        logger.debug(
+            f'{order_id = }\n{user_id = }\n{comment = }\n{buyer_name = }\n{delivery_address = }\n{buyer_phone = }'
+        )
         found_order_query = self._get_order_query(order_id)
 
         found_order = found_order_query.first()
-        if not found_order or not str(found_order.user_id) == user_id:
+        if not found_order:
             raise ErrOrderNotFound(order_id)
+        
+        found_order_dict = found_order.__dict__
+        found_order_user_id = str(found_order_dict.get('user_id', ''))
+        if found_order_user_id:
+            if found_order_user_id != user_id:
+                logger.debug(f'User id of found order ({found_order_user_id}) doesn\'t match with user\'s id ({user_id})')
+                raise ErrAccessDenied(f'order {order_id}')
 
-        logger.debug({
-            'comment': comment,
-            'buyer_name': buyer_name,
-            'delivery_address': delivery_address,
-            'buyer_phone': buyer_phone
-        })
-        found_order_query.update({
-            Order.comment: comment,
-            Order.buyer_name: buyer_name,
-            Order.delivery_address: delivery_address,
-            Order.buyer_phone: buyer_phone
-        })
+            update_dict = {
+                Order.comment: comment,
+                Order.buyer_name: buyer_name,
+                Order.delivery_address: delivery_address,
+                Order.buyer_phone: buyer_phone
+            }
+
+        else:
+            logger.info('Setting new user id')
+            update_dict = {
+                Order.comment: comment,
+                Order.user_id: user_id,
+                Order.buyer_name: buyer_name,
+                Order.delivery_address: delivery_address,
+                Order.buyer_phone: buyer_phone
+            }
+
+        found_order_query.update(update_dict)
         self._session.commit()
         self._session.flush([found_order])
 
@@ -130,12 +174,5 @@ def order_repository_dependency(
 def test_order_repository():
     repo = OrderRepository(next(db_dependency()))
 
-    repo.create('066b2931e8b4417b9801e6f89ab19b30', [
-        UserProduct(
-            user_id='066b2931e8b4417b9801e6f89ab19b30',
-            product_id=1,
-            count=1,
-            selected_configuration_id=1
-        ),
-    ])
+    # test here using repo variable
 

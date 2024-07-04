@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from exceptions.auth_exceptions import ErrUnauthorized
+from routes.cookies import add_product_to_cookie_cart, get_cart_from_cookies, remove_product_from_cookie_cart
 from routes.auth_routes import oauth_user_dependency
+from schema import SchemaUtils
+from schema.cart_schema import CartInCookie
 from schema.user_schema import LoggedUser
 
 from viewmodels.cart_viewmodel import CartViewModel, cart_viewmodel_dependency
@@ -18,11 +20,21 @@ def get_cart(
     user: LoggedUser | None = Depends(oauth_user_dependency),
     vm: CartViewModel = Depends(cart_viewmodel_dependency),
 ):
-    if not user:
-        return RedirectResponse('/auth/login', status_code=status.HTTP_303_SEE_OTHER)
+    if user:
+        cart = vm.get_cart(str(user.id))
+        context = {'request': request, 'user': user, **cart.build_context()}
+    else:
+        cart_cookie_str = request.cookies.get("_cart")
+        if cart_cookie_str:
+            cart = CartInCookie.model_validate_json(cart_cookie_str)
+        else:
+            cart = CartInCookie(product_list=[])
 
-    cart = vm.get_cart(str(user.id))
-    context = {'request': request, 'user': user, **cart.build_context()}
+        products = vm.from_cookie(cart)
+        context = {'request': request, 'product_list': products}
+        schema_utils = SchemaUtils()
+        context.update(shop=schema_utils.shop)
+
 
     if request.headers.get('hx-request'):
         return templates.TemplateResponse(
@@ -63,27 +75,42 @@ def add_to_cart(
     vm: CartViewModel = Depends(cart_viewmodel_dependency),
     user: LoggedUser | None = Depends(oauth_user_dependency),
 ):
-    if not user:
-        raise ErrUnauthorized()
+    cookie_cart_str = ''
+    if user:
+        product = vm.add_to_cart(
+            product_id=product_id, user_id=str(user.id),
+            configuration_id=configuration_id
+        )
+    else:
+        cookie_cart = get_cart_from_cookies(request.cookies)
+        cookie_cart = add_product_to_cookie_cart(
+            cookie_cart, product_id, configuration_id
+        )
+        product = cookie_cart.product_list[-1]
 
-    if not configuration_id:
-        configuration_id = 0
+        cookie_cart_str = cookie_cart.cookie_str()
 
-
-    product_dict = (
-        vm
-        .add_to_cart(product_id=product_id, user_id=str(user.id),
-                     configuration_id=configuration_id)
-        .build_context()
-    )
-    context = {'request': request, 'user': user, **product_dict}
-
+    # creating response
     if request.headers.get('hx-request'):
-        return templates.TemplateResponse(
+        context = {'request': request, 'user': user, **product.build_context()}
+        response = templates.TemplateResponse(
             'partials/product_counter.html', context=context
         )
+    else:
+        response = RedirectResponse(
+            '/cart', status_code=status.HTTP_303_SEE_OTHER
+        )
 
-    return RedirectResponse('/cart', status_code=status.HTTP_303_SEE_OTHER)
+    # setting updated cart in cookie
+    if cookie_cart_str:
+        response.set_cookie(
+            key='_cart',
+            value=cookie_cart_str,
+            max_age=2592000,
+            samesite='strict',
+        )
+
+    return response
 
 
 @router.put('/remove')
@@ -94,22 +121,49 @@ def remove_from_cart(
     vm: CartViewModel = Depends(cart_viewmodel_dependency),
     user: LoggedUser | None = Depends(oauth_user_dependency),
 ):
-    if not user:
-        raise ErrUnauthorized()
+    cookie_cart_str = ''
+    if  user:
+        product = vm.remove_from_cart(
+            product_id=product_id, configuration_id=configuration_id,
+            user_id=str(user.id)
+        )
+    else:
+        # getting cart from cookie
+        cookie_cart = get_cart_from_cookies(request.cookies)
 
-    product_dict = (
-        vm
-        .remove_from_cart(product_id=product_id,
-                          configuration_id=configuration_id,
-                          user_id=str(user.id))
-        .build_context()
-    )
-    context = {'request': request, 'user': user, **product_dict}
-
-    if request.headers.get('hx-request'):
-        return templates.TemplateResponse(
-            'partials/product_counter.html', context=context
+        # removing product from cookie cart object
+        cookie_cart = remove_product_from_cookie_cart(
+            cookie_cart, product_id, configuration_id
         )
 
-    return RedirectResponse('/cart', status_code=status.HTTP_303_SEE_OTHER)
+        # always have last product here, as we keep it anyway in product_list
+        product = cookie_cart.product_list[-1] 
+
+        # creating new string to set cart in cookies
+        if product.count != 0 or len(cookie_cart.product_list) > 1:
+            cookie_cart_str = cookie_cart.cookie_str()
+        else:
+            cookie_cart_str = '{"product_list": []}'
+    
+    # creating response
+    context = {'request': request, 'user': user, **product.build_context()}
+    if not request.headers.get('hx-request'):
+        response = RedirectResponse('/cart', status_code=status.HTTP_303_SEE_OTHER)
+    else:
+        response = templates.TemplateResponse(
+            'partials/product_counter.html', context=context
+        )
+    
+    # setting updated cart in cookie
+    if cookie_cart_str:
+        response.set_cookie(
+            key='_cart',
+            value=cookie_cart_str,
+            max_age=2592000,
+            samesite='strict',
+        )
+
+    return response
+        
+
 

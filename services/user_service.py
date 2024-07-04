@@ -3,16 +3,17 @@ from typing import Any
 from fastapi import Depends
 from google.auth.jwt import Mapping
 from loguru import logger
+from sqlalchemy.exc import IntegrityError
 from app.config import Settings
 
-from exceptions.auth_exceptions import ErrWrongCredentials
+from exceptions.auth_exceptions import ErrUserInvalid, ErrWrongCredentials
 from models.user import User
 from repository.user_repository import (
     UserRepository,
     get_user_repository,
     user_repository_dependency,
 )
-from schema.user_schema import UserCreateGoogle, UserCreateYandex, UserResponse
+from schema.user_schema import UserCreate, UserCreateGoogle, UserCreateYandex, UserResponse
 
 
 settings = Settings()
@@ -30,14 +31,14 @@ class UserService:
         name = user_model_dict.get("name", "")
         email = user_model_dict.get("email", "")
         profile_img_url = user_model_dict.get("profile_img_url", "")
-        google_id = user_model_dict.get("google_id", "")
+        google_id = user_model_dict.get("google_id")
         yandex_id = user_model_dict.get("yandex_id")
 
         return UserResponse(
             id=user_id,
             name=name,
             email=email,
-            profile_img_url=profile_img_url,
+            profile_img_url=profile_img_url if profile_img_url else "",
             google_id=google_id,
             yandex_id=yandex_id,
         )
@@ -77,11 +78,14 @@ class UserService:
             is_avatar_empty = bool(
                 yandex_user_id_info.get("is_avatar_empty", False)
             )
-            profile_img_url = (
-                str(settings.yandex_avatars_base_url)
-                + yandex_user_id_info.get("default_avatar_id", "")
-                + settings.yandex_avatars_default_size
-            ) if not is_avatar_empty else ""
+
+            profile_img_url: str = ""
+            if not is_avatar_empty:
+                profile_img_url = (
+                    str(settings.yandex_avatars_base_url)
+                    + yandex_user_id_info.get("default_avatar_id", "")
+                    + settings.yandex_avatars_default_size
+                ) 
 
             user_schema = UserCreateYandex(
                 yandex_id=yandex_user_id_info.get("id", None),
@@ -121,10 +125,7 @@ class UserService:
                 google_id=None
             )
 
-        user_dict = user.__dict__
-        user_schema = UserResponse(**user_dict)
-
-        return user_schema
+        return self.user_model_to_userresponse_schema(user)
 
     def get_or_create_by_google_id(
         self,
@@ -143,10 +144,24 @@ class UserService:
                 google_id=user_schema.google_id
             )
 
-        user_dict = user.__dict__
-        user_schema = UserResponse(**user_dict)
+        return self.user_model_to_userresponse_schema(user)
 
-        return user_schema
+    def create_with_basic_info(
+        self,
+        user_create_schema: UserCreate
+    ) -> UserResponse:
+        try:
+            user_model =  self.repo.create(
+                user_create_schema.name,
+                user_create_schema.email
+            )
+        except IntegrityError as e:
+            logger.error(e)
+            raise ErrUserInvalid
+
+        logger.debug(f'Got user_model: {user_model.__dict__}')
+
+        return self.user_model_to_userresponse_schema(user_model)
 
 
 def user_service_dependency(

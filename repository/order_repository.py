@@ -110,9 +110,9 @@ class OrderRepository:
             raise ErrOrderNotFound(order_id)
         
         found_order_dict = found_order.__dict__
-        found_order_user_id = str(found_order_dict.get('user_id', ''))
+        found_order_user_id = found_order_dict.get('user_id', '')
         if found_order_user_id:
-            if found_order_user_id != user_id:
+            if str(found_order_user_id) != user_id:
                 logger.debug(f'User id of found order ({found_order_user_id}) doesn\'t match with user\'s id ({user_id})')
                 raise ErrAccessDenied(f'order {order_id}')
 

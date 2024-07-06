@@ -159,8 +159,6 @@ class UserService:
             logger.error(e)
             raise ErrUserInvalid
 
-        logger.debug(f'Got user_model: {user_model.__dict__}')
-
         return self.user_model_to_userresponse_schema(user_model)
 
 

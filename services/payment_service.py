@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Generator
 
 from fastapi import Depends
@@ -26,7 +26,7 @@ class PaymentService:
         payment_id = payment_model_dict.get('id', 0)
         order_id = payment_model_dict.get('order_id', 0)
         status = payment_model_dict.get('status', 'pending')
-        date = payment_model_dict.get('date', datetime.now())
+        date = payment_model_dict.get('date', datetime.now(timezone.utc))
 
         order_sum = self._order_service.get_order_sum(order_id)
 

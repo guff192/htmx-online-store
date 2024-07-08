@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import Depends
 from typing import Generator
 
@@ -43,7 +43,7 @@ class OrderService:
         order_model_dict = order_model.__dict__
         order_id = order_model_dict.get('id', 0)
         user_id = str(order_model_dict.get('user_id', ''))
-        order_date = order_model_dict.get('date', datetime.now())
+        order_date = order_model_dict.get('date', datetime.now(timezone.utc))
         order_comment = order_model_dict.get('comment', '')
         order_buyer_name = order_model_dict.get('buyer_name', '')
         order_buyer_phone = order_model_dict.get('buyer_phone', '')
@@ -92,7 +92,7 @@ class OrderService:
                 order_id=order_id,
                 status=PaymentStatus(order_payment_dict.get('status', '')),
                 sum=sum,
-                date=order_payment_dict.get('date', datetime.now()),
+                date=order_payment_dict.get('date', datetime.now(timezone.utc)),
             )
 
             order_schema = OrderWithPaymentSchema(

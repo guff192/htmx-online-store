@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Generator
 
 from db.session import db_dependency
@@ -51,7 +52,7 @@ class OrderRepository:
     def create_with_user_products(self,
                user_id: str | None,
                user_products: list[UserProduct]) -> Order:
-        order = Order(user_id=user_id, comment='',
+        order = Order(user_id=user_id, comment='', date=datetime.now(timezone.utc),
                       buyer_name='', buyer_phone='', delivery_address='')
         self._session.add(order)
         self._session.flush([order])
@@ -74,7 +75,7 @@ class OrderRepository:
         self,
         products: list[CookieCartProduct]
     ) -> Order:
-        order = Order(user_id=None, comment='',
+        order = Order(user_id=None, comment='', date=datetime.now(timezone.utc),
                       buyer_name='', buyer_phone='', delivery_address='')
         self._session.add(order)
         self._session.flush([order])

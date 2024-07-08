@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -37,7 +37,7 @@ def create_order(
     else:
         order_create_schema = OrderCreateSchema(
             user_id=str(user.id),
-            date=datetime.now(),
+            date=datetime.now(timezone.utc),
         )
         order = vm.create_order(order_create_schema)
 
@@ -137,11 +137,11 @@ def edit_order(request: Request, order_id: int,
 
 
 @router.put('/{order_id}')
-def update_order(request: Request, order_id: int = 0,
+def update_order(request: Request,
+                 order_id: int = 0,
                  comment: str = '', buyer_name: str = '',
                  buyer_phone: str = '', delivery_address: str = '',
                  email: str = '',
-                 date: datetime = datetime.now(),
                  user: LoggedUser | None = Depends(oauth_user_dependency),
                  vm: OrderViewModel = Depends(order_viewmodel_dependency),
                  auth_vm: AuthViewModel = Depends(auth_viewmodel_dependency),):
@@ -156,13 +156,15 @@ def update_order(request: Request, order_id: int = 0,
         user_token = auth_vm.create_session({'sub': str(new_user.id)})
 
         order_update = OrderUpdateSchema(
-            id=order_id, user_id=str(new_user.id), date=date, comment=comment,
+            id=order_id, user_id=str(new_user.id),
+            date=datetime.now(timezone.utc), comment=comment,
             buyer_name=buyer_name, buyer_phone=buyer_phone,
             delivery_address=delivery_address
         )
     else:
         order_update = OrderUpdateSchema(
-            id=order_id, user_id=str(user.id), date=date, comment=comment,
+            id=order_id, user_id=str(user.id),
+            date=datetime.now(timezone.utc), comment=comment,
             buyer_name=buyer_name, buyer_phone=buyer_phone,
             delivery_address=delivery_address
         )

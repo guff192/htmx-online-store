@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy_utils import UUIDType
@@ -15,7 +15,7 @@ class Order(Base):
 
     products = relationship('OrderProduct', cascade='all, delete')
 
-    date = Column(DateTime, nullable=False, default=datetime.now())
+    date = Column(DateTime, nullable=False)
 
     comment = Column('comment', String(255), nullable=False, default='')
 

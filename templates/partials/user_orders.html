@@ -20,7 +20,7 @@
         class="bg-lightBlue rounded p-2 font-bold">Редактировать</button>
 
     <h3 class="text-2xl text-right">Сумма: {{ order.sum }}₽</h3>
-    <p class="mb-10 text-right">{{ order.date.strftime('%Y-%B-%d %H:%M') }}</p>
+    <p class="mb-10 text-right" data-timestamp="{{ order.date.isoformat() }}">{{ order.date.strftime('%Y-%B-%d %H:%M') }}</p>
 
     <h3 class="text-3xl mb-5">Товары</h3>
     {% for product in order.products %}

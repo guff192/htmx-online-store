@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import mapped_column, relationship
 from db.session import Base
@@ -14,7 +14,7 @@ class Payment(Base):
 
     status = Column(String(31), index=True, nullable=False)
     
-    date = Column(DateTime, index=True, nullable=False, default=datetime.now())
+    date = Column(DateTime, index=True, nullable=False, default=datetime.now(timezone.utc))
 
     
 

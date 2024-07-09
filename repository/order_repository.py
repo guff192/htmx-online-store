@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Generator
 
 from db.session import db_dependency
@@ -51,7 +52,7 @@ class OrderRepository:
     def create_with_user_products(self,
                user_id: str | None,
                user_products: list[UserProduct]) -> Order:
-        order = Order(user_id=user_id, comment='',
+        order = Order(user_id=user_id, comment='', date=datetime.now(timezone.utc),
                       buyer_name='', buyer_phone='', delivery_address='')
         self._session.add(order)
         self._session.flush([order])
@@ -74,7 +75,7 @@ class OrderRepository:
         self,
         products: list[CookieCartProduct]
     ) -> Order:
-        order = Order(user_id=None, comment='',
+        order = Order(user_id=None, comment='', date=datetime.now(timezone.utc),
                       buyer_name='', buyer_phone='', delivery_address='')
         self._session.add(order)
         self._session.flush([order])
@@ -144,7 +145,8 @@ class OrderRepository:
     def remove(self, order_id: int, user_id: str) -> None:
         found_order_query = self._get_order_query(order_id)
         found_order = found_order_query.first()
-        if not found_order or not str(found_order.user_id) == user_id:
+        if not found_order or found_order.user_id and str(found_order.user_id) != user_id:
+            logger.debug(found_order.__dict__)
             raise ErrOrderNotFound(order_id)
 
         found_order_products = self.get_order_products(order_id)

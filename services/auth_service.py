@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import time
 from typing import Any, Mapping, Protocol
 
@@ -109,9 +109,9 @@ class AuthService:
     ) -> str:
         to_encode = data.copy()
         if expires_delta:
-            expire = datetime.utcnow() + expires_delta
+            expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.utcnow() + timedelta(hours=2)
+            expire = datetime.now(timezone.utc) + timedelta(hours=2)
         to_encode.update({"exp": expire})
 
         encoded_jwt = jwt.encode(

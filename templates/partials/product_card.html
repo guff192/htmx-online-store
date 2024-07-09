@@ -4,9 +4,9 @@
     hx-boost="true">
 
     <!-- Photo -->
-    <div class="h-2/5 mb-3">
+    <div class="h-2/5 mb-3 flex flex-col justify-center">
         <img
-            class="mx-auto h-full"
+            class="mx-auto max-h-full"
             hx-trigger="load"
             hx-get="/photos/main?product_name={{ product.name }}&size=small"
             hx-swap="outerHTML"

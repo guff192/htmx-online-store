@@ -194,8 +194,17 @@ def cancel_order(request: Request, order_id: int,
                  user: LoggedUser | None = Depends(oauth_user_dependency),
                  vm: OrderViewModel = Depends(order_viewmodel_dependency),):
     if not user:
-        return RedirectResponse('/auth/login',
-                                status_code=status.HTTP_303_SEE_OTHER)
+        cookie_order = get_order_from_cookies(request.cookies)
+        if not cookie_order or not order_id == cookie_order.id:
+            return RedirectResponse('/cart',
+                                    status_code=status.HTTP_303_SEE_OTHER)
+
+        vm.remove_order(order_id=order_id, user_id='')
+
+        return templates.TemplateResponse(
+            'empty.html',
+            {'request': request, 'location': '/order/'}
+        )
 
     vm.remove_order(order_id=order_id, user_id=str(user.id))
 

@@ -14,23 +14,13 @@
 <div id="product{{ product.id }}photos"
     class="border-4 border-gray-500 rounded flex flex-col justify-center w-full h-96 md:p-3">
     <div class="relative h-72 border border-gray-800 rounded shadow-2xl shadow-indigo-800">
-        <img
-            src="{{ url_for('static', path='images/loading.webp') }}"
-            class="h-72"
-            hx-trigger="load"
-            hx-get="/photos/main?product_name={{ product.name }}&size="
-            hx-swap="outerHTML"
-        >
+        <img src="{{ url_for('static', path='images/loading.webp') }}" class="h-72" hx-trigger="load"
+            hx-get="/photos/main?product_name={{ product.name }}&size=" hx-swap="outerHTML">
     </div>
 
     <div id="small-photos" class="h-16 mt-2 flex flex-wrap justify-between md:p-2">
-        <img
-            src="{{ url_for('static', path='images/loading.webp') }}"
-            class="h-full"
-            hx-trigger="load"
-            hx-get="/photos/all?product_name={{ product.name }}&size=thumbs"
-            hx-swap="outerHTML"
-        >
+        <img src="{{ url_for('static', path='images/loading.webp') }}" class="h-full" hx-trigger="load"
+            hx-get="/photos/all?product_name={{ product.name }}&size=thumbs" hx-swap="outerHTML">
     </div>
 
 </div>
@@ -45,28 +35,39 @@
     </div>
 </div>
 
-    
+
 <!-- Prices -->
-<div id="product{{ product.id }}price" class="price rounded p-1 mx-auto text-center bg-darkPink text-white border-s-white">
-    <div
-        role="tablist"
-        hx-on:htmx:before-request="let currentTab = document.querySelector('#product' + '{{ product.id }}' + 'price [aria-selected=true]');
+<div id="product{{ product.id }}price"
+    class="price rounded p-1 mx-auto text-center bg-darkPink text-white border-s-white">
+    <div role="tablist" hx-on:htmx:before-request="let currentTab = document.querySelector('#product' + '{{ product.id }}' + 'price [aria-selected=true]');
                                    currentTab.setAttribute('aria-selected', 'false');
                                    currentTab.classList.remove('bg-lightBlue');
                                    let newTab = event.target;
                                    newTab.setAttribute('aria-selected', 'true');
                                    newTab.classList.add('bg-lightBlue');">
+        <!--
+        <div class="group relative inline-block border border-black dotted">Hover over me
+            <span
+                class="hidden group-hover:block bg-black text-white absolute z-10 left-1/2 bottom-full
+                after:w-1 after:bg-black after:content-[' '] after:absolute after:top-full after:left-1/2 after:border-4 -mx-1 after:border-gray-50"
+                >
+                Tooltip text
+            </span>
+        </div>
+        -->
 
-        <h4 class="text-center">Конфигурация<br>(RAM/SSD):</h4>
+        <h4 class="text-center">
+            Конфигурация <img src="{{ url_for('static', path='images/question_mark.png') }}"
+                title="Вы можете добавить оперативную память и SSD диск к ноутбуку"
+                class="w-10 inline cursor-help p-0.5 border border-dashed rounded-lg align-middle">
+            <br>(RAM/SSD):
+        </h4>
 
-        <div id="product{{ product.id }}priceTabs"
-            role="tabpanel"
-            hx-get="/products/{{ product.id }}/prices/0"
-            hx-trigger="load"
-            hx-swap="outerHTML"></div>
+        <div id="product{{ product.id }}priceTabs" role="tabpanel" hx-get="/products/{{ product.id }}/prices/0"
+            hx-trigger="load" hx-swap="outerHTML"></div>
 
     </div>
-    
+
 </div>
 
 

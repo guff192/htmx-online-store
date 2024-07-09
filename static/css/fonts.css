@@ -7,3 +7,9 @@
   font-family: "IBMPlexRegular";
   src: url("/static/fonts/IBM_Plex_Sans_Condensed/IBMPlexSansCondensed-Regular.ttf");
 }
+
+
+body a:hover {
+    text-decoration: underline 1px dotted white;
+}
+

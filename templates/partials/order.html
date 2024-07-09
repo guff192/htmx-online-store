@@ -40,17 +40,18 @@
             {% endif %}
 
             <div> 
-                <label for="buyer_name" class="block font-bold mb-2">Имя покупателя:</label>
-                <input type="text" name="buyer_name" id="buyer_name" class="text-black w-full border border-gray-300 rounded p-2" value="{{ buyer_name }}" required>
+                <label for="buyer_name" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Имя покупателя:</label>
+                <input type="text" name="buyer_name" id="buyer_name" value="{{ buyer_name }}" required
+                    class="text-black w-full border border-gray-300 rounded p-2">
             </div>
 
             <div> 
-                <label for="buyer_phone" class="block font-bold mb-2">Телефон:</label>
+                <label for="buyer_phone" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Телефон:</label>
                 <input type="text" name="buyer_phone" id="buyer_phone" class="text-black w-full border border-gray-300 rounded p-2" value="{{ buyer_phone }}" required>
             </div>
 
             <div>
-                <label for="delivery_address" class="block font-bold mb-2">Адрес доставки:</label>
+                <label for="delivery_address" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Адрес доставки:</label>
                 <input type="text" name="delivery_address" id="delivery_address" class="text-black w-full border border-gray-300 rounded p-2" value="{{ delivery_address }}" required>
             </div>
 
@@ -58,6 +59,7 @@
                 <label for="comment" class="block font-bold mb-2">Комментарий к заказу:</label>
                 <textarea name="comment" id="comment" class="text-black w-full border border-gray-300 rounded p-2">{{ comment }}</textarea>
             </div>
+
 
             <button type="submit" class="bg-lightBlue rounded p-2 font-bold mt-5"
                 hx-target="#content" hx-swap="innerHTML"

@@ -3,7 +3,7 @@
         const sleep = ms => new Promise(r => setTimeout(r, ms));
         async function reload_after(ms) {
             await sleep(ms);
-            window.location = {{ location }};
+            window.location = '{{ location }}';
         }
 
         reload_after(500);

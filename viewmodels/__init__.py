@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Generator
 
 from schema import DefaultSchema
 
@@ -11,6 +11,6 @@ class DefaultViewModel:
         return self.schema.build_context()
 
 
-def default_viewmodel_dependency():
+def default_viewmodel_dependency() -> Generator[DefaultViewModel, None, None]:
     vm = DefaultViewModel()
     yield vm

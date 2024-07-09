@@ -82,6 +82,10 @@
 
 {% block content %}
 
+{% if reload %}
+    {% include 'empty.html' %}
+{% endif %}
+
 <div id="main-content" class="container text-center mx-auto my-8">
     <p class="text-indigo-50">
         Добро пожаловать

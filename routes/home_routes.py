@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
+from app.config import Settings
 from viewmodels import DefaultViewModel, default_viewmodel_dependency
 from viewmodels.banner_viewmodel import BannerViewModel, banner_viewmodel_dependency
 from viewmodels.product_viewmodel import(
@@ -17,9 +18,11 @@ from viewmodels.product_viewmodel import(
 router = APIRouter(prefix='', tags=['Home'])
 templates = Jinja2Templates(directory='templates')
 
+settings = Settings()
+
 
 @router.get('/')
-def root():
+def root(request: Request):
     return RedirectResponse('/home', status_code=status.HTTP_301_MOVED_PERMANENTLY)
 
 
@@ -45,6 +48,9 @@ def home(
         **product_list.build_context(),
         'banners': banner_list,
     }
+    referer = request.headers.get('Referer', '')
+    if str(settings.shop_public_url) not in referer:
+        context_data.update(reload=True, location='/home')
 
     try:
         response = templates.TemplateResponse('home.html', context=context_data)

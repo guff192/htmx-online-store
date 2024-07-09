@@ -34,7 +34,7 @@
 
             {% if not user %}
             <div> 
-                <label for="email" class="block font-bold mb-2">Email:</label>
+                <label for="email" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Email:</label>
                 <input type="email" name="email" id="email" class="text-black w-full border border-gray-300 rounded p-2" value="" required>
             </div>
             {% endif %}

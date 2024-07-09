@@ -3,15 +3,55 @@
 {% block title %}{{ shop.name }} | Контакты{% endblock %}
 
 {% block header %}
-<h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-2 mt-2">Контакты</h1>
+<h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-4 mt-2">Контакты</h1>
 {% endblock %}
 
 {% block content %}
    <div>
-       <p>Москва, Садовая-Кудринская ул., 23, стр. 5</p>
-       <div class="rounded-lg">
-           <iframe style="border-radius: 8px;" src="https://yandex.ru/map-widget/v1/?um=constructor%3A7cad2bdb25cf08e90987de8958d57e9e429f04eead06db4f723301aed557f4f9&amp;source=constructor" width="100%" height="600" frameborder="0"></iframe>       
+       <div class="w-1/2 p-10 border rounded-lg mx-auto text-left">
+
+           <div class="mb-2">
+               <h2 class="inline text-2xl text-indigo-50">Адрес: </h2>
+               <a href="https://yandex.com.ge/maps/-/CDGcQZNN" target="_blank"> Москва, Садовая-Кудринская ул., 23, стр. 5 </a>
+           </div>
+
+           <div class="mb-2">
+               <h2 class="inline text-2xl text-indigo-50">Телефон: </h2>
+               <a href="tel:+79013556515" target="_blank"> +7 (901) 355-65-15 </a>
+           </div>
+
+           <h2 class="text-center text-2xl text-indigo-50 mb-2 mt-4">Часы работы: </h2>
+           <ul class="w-3/4 mx-auto">
+               <li class="flex justify-between">
+                   <strong class="block">Понедельник:</strong> <span class="block">11:00 - 20:00</span>
+               </li>
+               <li class="flex justify-between">
+                   <strong class="block">Вторник:</strong> <span class="block">11:00 - 20:00</span>
+               </li>
+               <li class="flex justify-between">
+                   <strong class="block">Среда:</strong> <span class="block">11:00 - 20:00</span>
+               </li>
+               <li class="flex justify-between">
+                   <strong class="block">Четверг:</strong> <span class="block">11:00 - 20:00</span>
+               </li>
+               <li class="flex justify-between">
+                   <strong class="block">Пятница:</strong> <span class="block">11:00 - 20:00</span>
+               </li>
+               <li class="flex justify-between">
+                   <strong class="block">Суббота:</strong> <span class="block">11:00 - 20:00</span>
+               </li>
+               <li class="flex justify-between">
+                   <strong class="block">Воскресенье:</strong> <span class="block">11:00 - 20:00</span>
+               </li>
+           </ul>
+
+        </div>
+
+       <div class="rounded-lg mt-10">
+           <h2 class="text-2xl text-indigo-50 mb-2">Карта: </h2>
+           <iframe class="rounded-lg" src="https://yandex.ru/map-widget/v1/?um=constructor%3A7cad2bdb25cf08e90987de8958d57e9e429f04eead06db4f723301aed557f4f9&amp;source=constructor" width="100%" height="600" frameborder="0"></iframe>       
        </div>
+
    </div>
 
 {% endblock %}

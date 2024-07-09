@@ -1,26 +1,30 @@
 <div
     id="product{{ product.id }}card{% if product.selected_configuration %}{{ product.selected_configuration.id }}{% endif %}"
-    class="border border-gray-800 bg-black rounded-lg flex flex-col justify-between w-full h-full p-3 mb-2 text-center"
+    class="border border-gray-800 bg-black rounded w-full h-full p-2 mb-2 text-center"
     hx-boost="true">
 
     <!-- Photo -->
-    <img
-        class="mx-auto"
-        hx-trigger="load"
-        hx-get="/photos/main?product_name={{ product.name }}&size=small"
-        hx-swap="outerHTML"
-        src="{{ url_for('static', path='images/loading.webp') }}"
-        alt="{{ product.name }}"
-    >
+    <div class="h-2/5 mb-3">
+        <img
+            class="mx-auto h-full"
+            hx-trigger="load"
+            hx-get="/photos/main?product_name={{ product.name }}&size=small"
+            hx-swap="outerHTML"
+            src="{{ url_for('static', path='images/loading.webp') }}"
+            alt="{{ product.name }}"
+        >
+    </div>
 
     <!-- Product name -->
-    <h3 class="text-l font-bold uppercase mb-3">
+    <h3 class="text-lg font-bold uppercase mb-3 h-24">
         <a hx-target="#content" href="{{ product.absolute_url }}#offset">{{ product.name }}</a>
     </h3>
 
     <!-- Description -->
-    <p class="text-sm">{{ product.description.replace('\n', '<br>') | safe | truncate(50) }}</p>
-    <a class="font-bold hover:underline" hx-target="#content" href="{{ product.absolute_url }}#offset">More info</a>
+    <div class="h-1/6 mb-3 flex flex-col justify-between">
+        <p class="text-sm">{{ product.description.replace('\n', '<br>') | safe | truncate(50) }}</p>
+        <a class="font-bold hover:underline" hx-target="#content" href="{{ product.absolute_url }}#offset">More info</a>
+    </div>
 
     <!-- Price and counter -->
     {% if product.selected_configuration %}
@@ -34,15 +38,19 @@
         {% include 'partials/product_counter.html' %}
 
     {% else %}
-        <div>
-            <strong class="text-3xl">{{ product.price }}₽<span class="text-2xl text-green-600">+</span></strong>
+        <div class="h-1/5 my-2">
+            <strong class="text-3xl block">{{ product.price }}₽<span class="text-2xl text-green-600">+</span></strong>
+
+            <button
+                class="mt-2 cursor-pointer bg-lightBlue rounded p-2 font-bold"
+                hx-get="{{ product.absolute_url }}#product{{ product.id }}photos"
+                hx-trigger="click"
+                hx-target="#content"
+                hx-swap="innerHTML show:#product{{ product.id }}photos:bottom"
+                hx-push-url="true"
+                >Добавить в корзину</button>
         </div>
 
-        <a
-            class="my-2 cursor-pointer bg-lightBlue rounded p-2 font-bold"
-            href="{{ product.absolute_url }}#product{{ product.id }}description"
-            hx-boost="false"
-            >Добавить в корзину</a>
 
     {% endif %}
 

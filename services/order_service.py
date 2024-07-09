@@ -43,7 +43,9 @@ class OrderService:
         order_model_dict = order_model.__dict__
         order_id = order_model_dict.get('id', 0)
         user_id = str(order_model_dict.get('user_id', ''))
-        order_date = order_model_dict.get('date', datetime.now(timezone.utc))
+        order_date: datetime = order_model_dict.get('date', datetime.now(timezone.utc))
+        if not order_date.tzinfo:
+            order_date = order_date.replace(tzinfo=timezone.utc)
         order_comment = order_model_dict.get('comment', '')
         order_buyer_name = order_model_dict.get('buyer_name', '')
         order_buyer_phone = order_model_dict.get('buyer_phone', '')
@@ -87,12 +89,19 @@ class OrderService:
         order_payment = order_model.payment
         if order_payment is not None:
             order_payment_dict = order_payment.__dict__
+            payment_id = order_payment_dict.get('id', 0)
+            order_id = order_id
+            payment_status = PaymentStatus(order_payment_dict.get('status', 'pending'))
+            payment_date: datetime = order_payment_dict.get('date', datetime.now(timezone.utc))
+            if not payment_date.tzinfo:
+                payment_date = payment_date.replace(tzinfo=timezone.utc)
+
             payment_schema = PaymentSchema(
-                id=order_payment_dict.get('id', 0),
+                id=payment_id,
                 order_id=order_id,
-                status=PaymentStatus(order_payment_dict.get('status', '')),
+                status=payment_status,
                 sum=sum,
-                date=order_payment_dict.get('date', datetime.now(timezone.utc)),
+                date=payment_date,
             )
 
             order_schema = OrderWithPaymentSchema(

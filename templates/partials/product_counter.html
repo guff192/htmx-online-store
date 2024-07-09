@@ -75,7 +75,7 @@
 
     
     {% else %}
-        <a
+        <button
             id="product{{ product.id }}counter"
             class="my-2 cursor-pointer bg-lightBlue rounded p-2 font-bold"
             hx-boost="true"
@@ -83,7 +83,7 @@
             hx-put="/cart/add"
             hx-target="#product{{ product.id }}counter"
             hx-swap="outerHTML"
-        >Добавить в корзину</a>
+        >Добавить в корзину</button>
 
     {% endif %}
 

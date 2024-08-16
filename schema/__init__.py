@@ -48,6 +48,12 @@ class SchemaUtils:
             return context
         return wrapper
 
+    def add_user_to_context(
+        self,
+        func: Callable[..., dict[str, Any]]
+    ):
+        pass
+
 
 utils = SchemaUtils()
 

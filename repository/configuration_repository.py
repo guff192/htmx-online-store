@@ -27,7 +27,7 @@ class ConfigurationRepository:
 
     def get_default_configurations(self):
         return self.db.query(ProductConfiguration).filter(
-            ProductConfiguration.is_default == True
+            ProductConfiguration.is_default == True  # noqa: E712
         ).all()
 
     def get_configurations_for_product(

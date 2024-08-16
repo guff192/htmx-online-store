@@ -10,8 +10,11 @@ document.addEventListener('htmx:configRequest', function (event) {
         let configuration_id;
         if (!current_url.includes('/cart')) {
             product_id = parseInt(request_target_str.match(/product(\d+)counter/)[1]);
-            const selected_button = document.querySelector('#product' + product_id + 'priceTabs').querySelector('[aria-selected=true]');
+            const selected_button = document.querySelector('button[aria-selected=true]');
             configuration_id = parseInt(selected_button.getAttribute('hx-get').match(/prices\/(\d+)/)[1]);
+
+            console.log(selected_button);
+            console.log(`product_id: ${product_id} configuration_id: ${configuration_id}`);
         } else {
             product_id = parseInt(request_target_str.match(/product(\d+)counter/)[1]);
             configuration_id = parseInt(request_target_str.match(/product\d+counter(\d+)/)[1]);

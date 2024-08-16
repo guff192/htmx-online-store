@@ -3,11 +3,10 @@ from typing import Any
 
 from fastapi import Depends
 from loguru import logger
-from sqlalchemy import Index
 from exceptions.auth_exceptions import ErrUserNotFound
 from exceptions.product_exceptions import ErrProductNotFound
-from models.product import ProductConfiguration
 from models.user import User, UserProduct
+from schema.manufacturer_schema import Manufacturer
 from schema.user_schema import UserResponse
 from services.user_service import UserService, user_service_dependency
 from services.product_service import ProductService, product_service_dependency
@@ -18,7 +17,6 @@ from repository.cart_repository import (
 from schema.cart_schema import Cart, CartInCookie
 from schema.product_schema import (
     ProductInCart, ProductConfiguration as ProductConfigurationSchema,
-    Product as ProductSchema
 )
 
 
@@ -46,7 +44,7 @@ class CartService:
                 name='',
                 description='',
                 price=0,
-                manufacturer_name='',
+                manufacturer=Manufacturer(name='', logo_url=''),
             )
 
         product = userproduct.product
@@ -58,7 +56,7 @@ class CartService:
                 name='',
                 description='',
                 price=0,
-                manufacturer_name='',
+                manufacturer=Manufacturer(name='', logo_url=''),
             )
 
         manufacturer = product.manufacturer
@@ -70,7 +68,7 @@ class CartService:
                 name='',
                 description='',
                 price=0,
-                manufacturer_name='',
+                manufacturer=Manufacturer(name='', logo_url=''),
             )
 
         userproduct_orm_dict: dict[str, Any] = userproduct.__dict__
@@ -82,6 +80,10 @@ class CartService:
 
         manufacturer_dict: dict[str, Any] = manufacturer.__dict__
         manufacturer_name = manufacturer_dict.get('name', '')
+        manufacturer_logo_url = manufacturer_dict.get('logo_url', '')
+        manufacturer_schema = Manufacturer(
+            name=manufacturer_name, logo_url=manufacturer_logo_url
+        )
 
         orm_configs = [self._products.get_config_by_id(config.__dict__['configuration_id'])
                       for config in product.configurations]
@@ -106,7 +108,7 @@ class CartService:
             name=product_name,
             description=product_description,
             price=product_price,
-            manufacturer_name=manufacturer_name,
+            manufacturer=manufacturer_schema,
             configurations=schema_configs,
             selected_configuration=selected_config_schema,
         )
@@ -133,7 +135,7 @@ class CartService:
             products.append(ProductInCart(
                 id=product.id, name=product.name, price=product.price,
                 description=product.description, count=cookie_product.count,
-                manufacturer_name=product.manufacturer_name,
+                manufacturer=product.manufacturer,
                 configurations=product.configurations,
                 selected_configuration=selected_config
             ))
@@ -183,20 +185,8 @@ class CartService:
 
         return product_schema
 
-    def add_to_cart(self, user_id: str | None,
+    def add_to_cart(self, user_id: str,
                     product_id: int, configuration_id: int) -> ProductInCart:
-        if not user_id:
-            product_schema: ProductSchema = self._products.get_by_id(product_id)
-            product_in_cart = ProductInCart(id=product_schema.id,
-                                    name=product_schema.name, 
-                                    description=product_schema.description,
-                                    price=product_schema.price, count=1,
-                                    manufacturer_name=product_schema.manufacturer_name,
-                                    configurations=product_schema.configurations,
-                                    selected_configuration=product_schema.selected_configuration)
-
-            return product_in_cart
-
         orm_product: UserProduct | None = (
             self._repo.add_to_cart(user_id, product_id, configuration_id)
         )
@@ -210,7 +200,7 @@ class CartService:
     def remove_from_cart(self, user_id,
                          configuration_id: int,
                          product_id: int) -> ProductInCart:
-        orm_product: UserProduct | None = (
+        orm_product: UserProduct = (
             self._repo.remove_from_cart(user_id, configuration_id, product_id)
         )
         product_schema: ProductInCart = (

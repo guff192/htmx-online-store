@@ -175,9 +175,23 @@ def process_yandex_login(
 
 @router.get("/logout")
 def process_logout():
-    response = RedirectResponse(
-        "/auth/login",
-    )
+    response = RedirectResponse("/auth/login")
     response.delete_cookie("_session")
     return response
+
+
+@router.get('/profile')
+def get_profile(
+    request: Request,
+    default_vm: DefaultViewModel = Depends(default_viewmodel_dependency),
+    user: LoggedUser | None = Depends(oauth_user_dependency),
+):
+    if not user:
+        return RedirectResponse("/auth/login")
+
+    context = {'request': request, 'user': user, **default_vm.build_context()}
+    if not request.headers.get('hx-request'):
+        return templates.TemplateResponse('profile.html', context)
+
+    return templates.TemplateResponse('partials/profile.html', context)
 

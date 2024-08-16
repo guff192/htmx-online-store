@@ -4,14 +4,14 @@
     {% block title %}{{ shop.name }} | Каталог{% endblock %}
 
     {% block header %}
-    <h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-5 mt-2">Товары в наличии</h1>
+    <h1 id="page-header" class="text-4xl font-bold text-center mb-5 mt-2">Товары в наличии</h1>
     {% endblock %}
 
 {% else %}
     <script type="text/javascript">
         pageHeader = document.getElementsByTagName('header')[0];
         pageHeader.innerHTML = `
-            <h1 id="page-header" class="text-4xl font-bold text-center text-indigo-50 mb-5 mt-2">Товары в наличии</h1>
+            <h1 id="page-header" class="text-4xl font-bold text-center mb-5 mt-2">Товары в наличии</h1>
         `;
         pageHeader.classList.remove('uppercase');
 
@@ -21,6 +21,19 @@
 
 
 {% block content %}
+<!-- Search bar -->
+<div class="flex justify-center mb-5">
+    <form method="get" action="/products/search" class="w-1/2">
+        <input type="text" name="query" placeholder="Поиск по названию или описанию"
+        class="w-full text-center border border-gray-500 rounded-lg p-2"
+        hx-trigger="keyup changed delay:200ms"
+        hx-get="/products/search"
+        hx-target="#products"
+        hx-swap="innerHTML">
+    </form>
+</div>
+
+<!-- Products grid -->
 <div id="products" class="md:grid md:grid-cols-4 md:gap-2">
     <img
         src="{{ url_for('static', path='images/loading.webp') }}"

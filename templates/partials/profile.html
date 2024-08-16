@@ -1,0 +1,49 @@
+{% if request.headers.get('hx-request') %}
+<script>
+    // Replace page header text
+    var pageHeader = document.getElementsByTagName('header')[0];
+    pageHeader.innerHTML = `
+    <h1 id="page-header" class="text-4xl font-bold text-center mb-5 mt-2">
+        {{ user.name }}
+    </h1>`;
+
+    document.title = '{{ shop.name }} | Профиль'
+</script>
+{% endif %}
+
+<div class="w-3/4 mx-auto h-min relative border p-5" hx-target="#content">
+
+    <div class="flex justify-around items-center w-full mb-5">
+        {% if request.state.user.is_admin %}
+        <a href="/admin" class="block p-2 rounded bg-green-500 w-14 h-14 box-border">
+            <img src="{{ url_for('static', path='images/admin.png') }}" class="w-full h-full" alt="Панель администратора" title="Панель администратора">
+        </a>
+        {% endif %}
+
+        <a href="/order" class="block p-2 rounded bg-lightBlue w-14 h-14 box-border" hx-boost="true">
+            <img src="{{ url_for('static', path='images/orders.png') }}" class="w-full h-full" alt="Мои заказы" title="Мои заказы">
+        </a>
+
+        <a href="/auth/logout" class="block p-2 rounded-lg bg-red-500 w-14 h-14 box-border">
+            <img src="{{ url_for('static', path='images/sign_out.png') }}" class="w-full h-full" alt="Выход" title="Выход">
+        </a>
+    </div>
+
+
+    
+    <img src="{{ user.profile_img_url }}" class="w-60 h-60 mb-5 mx-auto">
+
+
+    <div id="user_info" class="w-1/2 mx-auto border">
+        <div class="flex justify-between">
+            <p class="text-xl">Имя:</p>
+            <p class="text-lg">{{ user.name }}</p>
+        </div>
+
+        <div class="flex justify-between">
+            <p class="text-xl">E-mail:</p>
+            <p class="text-lg">{{ user.email }}</p>
+        </div>
+    </div>
+
+</div>

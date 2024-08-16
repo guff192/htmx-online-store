@@ -1,9 +1,7 @@
 from collections.abc import Generator
-from typing import Any
 
 from fastapi import Depends
 from loguru import logger
-from pydantic import conset
 from sqlalchemy.orm import Query, Session
 
 from db.session import db_dependency
@@ -71,12 +69,12 @@ class CartRepository:
     def add_to_cart(
         self, user_id: str, product_id: int, configuration_id: int
     ) -> UserProduct | None:
-        found_product = self._get_user_product_query(user_id,
+        found_userproduct_query = self._get_user_product_query(user_id,
                                                      product_id,
                                                      configuration_id)
 
         # Check if product is not already in cart
-        if not found_product.first():
+        if not found_userproduct_query.first():
             user_product = UserProduct(
                 user_id=user_id, product_id=product_id,
                 selected_configuration_id=configuration_id, count=1
@@ -84,7 +82,7 @@ class CartRepository:
             self._db.add(user_product)
         else:
             # Increment product count
-            found_product.update({UserProduct.count: UserProduct.count + 1})
+            found_userproduct_query.update({UserProduct.count: UserProduct.count + 1})
 
         self._db.commit()
         updated_product: UserProduct | None = (
@@ -100,26 +98,38 @@ class CartRepository:
             user_id: str,
             configuration_id: int,
             product_id: int
-    ) -> UserProduct | None:
-        found_product: Query[UserProduct] = (
+    ) -> UserProduct:
+        found_userproduct_query: Query[UserProduct] = (
             self._get_user_product_query(user_id, product_id, configuration_id)
         )
-        if not found_product.first():
+        if not found_userproduct_query.first():
             raise ErrProductNotFound()
 
-        # Check if removing last product
-        if found_product.first().__dict__.get('count', 0) == 1:
-            found_product.delete()
-        else:
-            found_product.update({UserProduct.count: UserProduct.count - 1})
+        found_userproduct = found_userproduct_query.first()
+        if not found_userproduct:
+            raise ErrProductNotFound()
 
-        self._db.flush((found_product, ))
+        product = found_userproduct.product
+        selected_configuration = found_userproduct.selected_configuration
+
+        # Check if removing last product
+        if found_userproduct.__dict__.get('count', 0) == 1:
+            found_userproduct_query.delete()
+        else:
+            found_userproduct_query.update({UserProduct.count: UserProduct.count - 1})
+
+        self._db.flush((found_userproduct_query, ))
         self._db.commit()
 
         updated_product: UserProduct | None = (
-            self._get_user_product_query(user_id, product_id,
-                                         configuration_id).first()
+            found_userproduct_query.first()
         )
+        if not updated_product:
+            updated_product = UserProduct(
+                user_id=user_id, product_id=product_id,
+                selected_configuration_id=configuration_id, count=0,
+                product=product, selected_configuration=selected_configuration
+            )
 
         return updated_product
 

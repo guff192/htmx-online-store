@@ -176,5 +176,7 @@ def order_repository_dependency(
 def test_order_repository():
     repo = OrderRepository(next(db_dependency()))
 
+    return repo.get_by_id(1)
+
     # test here using repo variable
 

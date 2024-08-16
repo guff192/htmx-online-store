@@ -67,6 +67,13 @@ class ProductViewModel:
     ) -> ProductPrices:
         return self._service.get_product_prices(product_id, configuration_id)
 
+    def search(
+        self,
+        query: str,
+        offset: int
+    ) -> ProductList:
+        return self._service.search(query, offset)
+
 
 def product_viewmodel_dependency(
     product_service: ProductService = Depends(product_service_dependency),

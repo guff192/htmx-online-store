@@ -75,7 +75,13 @@ def add_to_cart(
     vm: CartViewModel = Depends(cart_viewmodel_dependency),
     user: LoggedUser | None = Depends(oauth_user_dependency),
 ):
+    if not request.headers.get('hx-request'):
+        response = RedirectResponse(
+            '/cart', status_code=status.HTTP_303_SEE_OTHER
+        )
+
     cookie_cart_str = ''
+
     if user:
         product = vm.add_to_cart(
             product_id=product_id, user_id=str(user.id),
@@ -91,15 +97,10 @@ def add_to_cart(
         cookie_cart_str = cookie_cart.cookie_str()
 
     # creating response
-    if request.headers.get('hx-request'):
-        context = {'request': request, 'user': user, **product.build_context()}
-        response = templates.TemplateResponse(
-            'partials/product_counter.html', context=context
-        )
-    else:
-        response = RedirectResponse(
-            '/cart', status_code=status.HTTP_303_SEE_OTHER
-        )
+    context = {'request': request, 'user': user, **product.build_context()}
+    response = templates.TemplateResponse(
+        'partials/product_counter.html', context=context
+    )
 
     # setting updated cart in cookie
     if cookie_cart_str:

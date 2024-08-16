@@ -1,45 +1,71 @@
-<div class="flex flex-col" id="product{{ product_id }}priceTabs" role="tablist"
-    hx-on:htmx:before-request="let currentTab = document.querySelector('#product' + '{{ product_id }}' + 'priceTabs [aria-selected=true]');
-                               currentTab.setAttribute('aria-selected', 'false');
-                               currentTab.classList.remove('bg-lightBlue');
-                               let newTab = event.target;
-                               newTab.setAttribute('aria-selected', 'true');
-                               newTab.classList.add('bg-lightBlue');">
-
-    <button
-        role="tablist"
-        class="bg-lightBlue rounded p-2 font-bold"
-        onclick="document.querySelectorAll('button[role=tab]').forEach((el) => { el.classList.remove('hidden'); el.classList.remove('h-0'); });
-        document.querySelector('button[role=tablist]').classList.add('hidden');"
-        >Сменить конфигурацию</button>
-
+<div class="flex flex-col" id="product{{ product_id }}priceTabs" role="tablist">
     {% for config in configurations %}
         <button
             role="tab"
-            onclick="document.querySelectorAll('[role=tab]').forEach((el) => { el.classList.add('hidden'); el.classList.add('h-0'); });
-            document.querySelector('button[role=tablist]').classList.remove('hidden');"
             aria-controls="product{{ product_id }}priceValue"
             aria-selected="{% if config.id == selected_configuration.id %}true{% else %}false{% endif %}"
-            class="hidden transition-all duration-700 h-0 border border-white text-xs {% if config.id == selected_configuration.id %}bg-lightBlue{% endif %}"
+            config-name="{{ config.name }}"
+            class="rounded transition-all duration-700 {% if config.id == selected_configuration.id %}bg-lightBlue{% endif %}"
+            hx-trigger="loadPrice"
             hx-target="#product{{ product_id }}priceValue"
             hx-select="#product{{ product_id }}priceValue"
-            hx-get="/products/{{ product_id }}/prices/{{ config.id }}">{{ config.name }} (+{{ config.additional_price }}₽)</button>
+            hx-get="/products/{{ product_id }}/prices/{{ config.id }}">{{ config.name }}</button>
 
     {% endfor %}
-
         
 </div>
 
+<script type="text/javascript" async>
+    if (typeof(priceButtons) === 'undefined'){ let priceButtons; }
+    if (typeof(previousSelectedButton) === 'undefined'){ let previousSelectedButton; }
+    if (typeof(configuration) === 'undefined'){ let configuration; }
+    priceButtons = document.querySelectorAll('#product{{ product_id }}priceTabs button[role="tab"]');
+    previousSelectedButton = document.querySelector('#product{{ product_id }}priceTabs button[role="tab"][aria-selected="true"]');
+    configuration = document.querySelector('#product{{ product_id }}configuration');
+
+
+    priceButtons.forEach(button => {
+        button.addEventListener('mouseover', function() {
+            button.dispatchEvent(new Event('loadPrice'));
+            button.setAttribute('aria-selected', true);
+            previousSelectedButton.setAttribute('aria-selected', false);
+
+            setTimeout(() => { configuration.innerText = button.getAttribute('config-name'); }, 100);
+
+            priceButtons.forEach(btn => btn.classList.remove('bg-lightBlue'));
+            button.classList.add('bg-lightBlue');
+        })
+
+        button.addEventListener('mouseout', function() {
+            previousSelectedButton.dispatchEvent(new Event('loadPrice'));
+            button.setAttribute('aria-selected', false);
+            previousSelectedButton.setAttribute('aria-selected', true);
+
+            setTimeout(() => { configuration.innerText = previousSelectedButton.getAttribute('config-name'); }, 100);
+
+            priceButtons.forEach(btn => btn.classList.remove('bg-lightBlue'));
+            previousSelectedButton.classList.add('bg-lightBlue');
+        })
+
+        button.addEventListener('click', function() {
+            button.dispatchEvent(new Event('loadPrice'));
+            button.setAttribute('aria-selected', true);
+            previousSelectedButton.setAttribute('aria-selected', false);
+
+            setTimeout(() => { configuration.innerText = button.getAttribute('config-name'); }, 100);
+
+            priceButtons.forEach(btn => btn.classList.remove('bg-lightBlue'));
+            button.classList.add('bg-lightBlue');
+
+            previousSelectedButton = button;
+        })
+    })
+</script>
+
 <div id="product{{ product_id }}priceValue" role="tabpanel">
-
-    {% if selected_configuration %}
-        <p class="text-center" id="product{{ product_id }}selectedConfiguration">{{ selected_configuration.name }}</p>
-    {% endif %}
-
-    <strong class="text-2xl">
-        {{ basic_price }}₽ + {{ selected_configuration.additional_price }}₽ = {{ basic_price + selected_configuration.additional_price }}₽
+    <strong class="text-4xl mt-2">
+        {{ basic_price + selected_configuration.additional_price }}₽
     </strong>
-
 
 </div>
 

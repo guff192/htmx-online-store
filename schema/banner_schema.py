@@ -16,3 +16,9 @@ class Banner(BaseModel):
             'img_url': self.img_url,
         }
 
+class BannerList(BaseModel):
+    banners: list[Banner]
+
+    def build_context(self) -> dict:
+        return self.model_dump()
+

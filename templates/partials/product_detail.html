@@ -2,76 +2,75 @@
     // Replace page header text
     var pageHeader = document.getElementsByTagName('header')[0];
     pageHeader.innerHTML = `
-        <h1 id="page-header" class="text-indigo-50 text-4xl font-bold text-center mb-5 mt-2">{{ product.name }}</h1>
+        <h1 id="page-header" class="text-4xl font-bold text-center mb-5 mt-2">{{ product.name }}</h1>
     `;
     // Replace page title text
     document.title = '{{ shop.name }} | {{ product.name }}'
 </script>
 
 
+<div id="product{{ product.id }}detail"
+    class="border border-gray-500 rounded flex justify-center w-full md:p-2">
 
-<!-- Photos -->
-<div id="product{{ product.id }}photos"
-    class="border-4 border-gray-500 rounded flex flex-col justify-center w-full h-96 md:p-3">
-    <div class="relative h-72 border border-gray-800 rounded shadow-2xl shadow-indigo-800">
-        <img src="{{ url_for('static', path='images/loading.webp') }}" class="h-72" hx-trigger="load"
-            hx-get="/photos/main?product_name={{ product.name }}&size=" hx-swap="outerHTML">
-    </div>
+    <!-- Photos -->
+    <div id="product{{ product.id }}photos"
+        class="flex flex-col justify-around w-5/12 h-full md:p-1"
+        hx-push-url="false">
 
-    <div id="small-photos" class="h-16 mt-2 flex flex-wrap justify-between md:p-2">
-        <img src="{{ url_for('static', path='images/loading.webp') }}" class="h-full" hx-trigger="load"
-            hx-get="/photos/all?product_name={{ product.name }}&size=thumbs" hx-swap="outerHTML">
-    </div>
-
-</div>
-
-
-<!-- Description -->
-<div class="border rounded flex justify-around w-full h-full p-3">
-    <div id="product{{ product.id }}description" class="grow w-full h-full p-1 text-left text-white">
-        <p>
-            {{ product.description.replace('\n', '<br>') | safe }}
-        </p>
-    </div>
-</div>
-
-
-<!-- Prices -->
-<div id="product{{ product.id }}price"
-    class="price rounded p-1 mx-auto text-center bg-darkPink text-white border-s-white">
-    <div role="tablist" hx-on:htmx:before-request="let currentTab = document.querySelector('#product' + '{{ product.id }}' + 'price [aria-selected=true]');
-                                   currentTab.setAttribute('aria-selected', 'false');
-                                   currentTab.classList.remove('bg-lightBlue');
-                                   let newTab = event.target;
-                                   newTab.setAttribute('aria-selected', 'true');
-                                   newTab.classList.add('bg-lightBlue');">
-        <!--
-        <div class="group relative inline-block border border-black dotted">Hover over me
-            <span
-                class="hidden group-hover:block bg-black text-white absolute z-10 left-1/2 bottom-full
-                after:w-1 after:bg-black after:content-[' '] after:absolute after:top-full after:left-1/2 after:border-4 -mx-1 after:border-gray-50"
-                >
-                Tooltip text
-            </span>
+        <div id="large-photo" class="relative h-4/5 rounded">
+            <img src="{{ url_for('static', path='images/loading.webp') }}" hx-trigger="load"
+                hx-get="/photos/main?product_name={{ product.name }}&size=" hx-swap="outerHTML">
         </div>
-        -->
 
-        <h4 class="text-center">
-            Конфигурация <img src="{{ url_for('static', path='images/question_mark.png') }}"
+        <div id="small-photos" class="h-1/5 mt-2 flex flex-wrap justify-between md:p-2">
+            <img src="{{ url_for('static', path='images/loading.webp') }}" class="h-full" hx-trigger="load"
+                hx-get="/photos/all?product_name={{ product.name }}&size=thumbs" hx-swap="outerHTML">
+        </div>
+
+    </div>
+
+
+    <!-- Prices -->
+    <div id="product{{ product.id }}price"
+        class="price rounded w-1/6 p-1 mx-auto flex flex-col justify-around items-center bg-black text-white">
+        <div class="w-1/2 mx-auto">
+            {% if product.manufacturer.logo_url %}
+                <img src="{{ product.manufacturer.logo_url }}">
+            {% else %}
+                {{ product.manufacturer.name }}
+            {% endif %}
+        </div>
+
+        <h4 class="text-center text-lg">
+            Конфигурация
+            <br />
+            <img src="{{ url_for('static', path='images/question_mark.png') }}"
                 title="Вы можете добавить оперативную память и SSD диск к ноутбуку"
                 class="w-10 inline cursor-help p-0.5 border border-dashed rounded-lg align-middle">
-            <br>(RAM/SSD):
         </h4>
 
         <div id="product{{ product.id }}priceTabs" role="tabpanel" hx-get="/products/{{ product.id }}/prices/0"
             hx-trigger="load" hx-swap="outerHTML"></div>
 
+        <!-- Counter -->
+        <div>
+            {% include 'partials/product_counter.html' %}
+        </div>
+
     </div>
 
-</div>
+
+    <!-- Name & description -->
+    <div class="flex flex-col justify-around w-5/12 p-3">
+        <div>
+            <p class="text-xl">{{ product.name }}</p>
+            <p id="product{{ product.id }}configuration">{{ product.configurations[0].name }}</p>
+        </div>
+
+        <p id="product{{ product.id }}description" class="p-1 text-left">{{ product.description.replace('\n', '<br>') | safe }}</p>
+
+    </div>
 
 
-<!-- Counter -->
-<div class="mt-10">
-    {% include 'partials/product_counter.html' %}
+
 </div>

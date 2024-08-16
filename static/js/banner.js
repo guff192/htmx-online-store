@@ -48,5 +48,7 @@ function showPreviousBanner() {
 //setTimeout(function() { banners = getBanners(); }, 200);
 
 // Set interval to automatically change banners every 5 seconds
-setInterval(showNextBanner, 5000);
+if (window.location.pathname.includes('home')) {
+    setInterval(showNextBanner, 5000);
+}
 

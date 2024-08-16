@@ -7,6 +7,8 @@ from fastapi.templating import Jinja2Templates
 from loguru import logger
 
 from app.config import Settings
+from routes.auth_routes import oauth_user_dependency
+from schema.user_schema import LoggedUser
 from viewmodels import DefaultViewModel, default_viewmodel_dependency
 from viewmodels.banner_viewmodel import BannerViewModel, banner_viewmodel_dependency
 from viewmodels.product_viewmodel import(
@@ -35,18 +37,23 @@ def remove_element():
 def home(
     request: Request,
     offset: int = 0,
-    # user: UserBase = Depends(google_oauth_user_dependency),
+    user: LoggedUser | None = Depends(oauth_user_dependency),
     default_vm: DefaultViewModel = Depends(default_viewmodel_dependency),
     products_vm: ProductViewModel = Depends(product_viewmodel_dependency),
     banner_vm: BannerViewModel = Depends(banner_viewmodel_dependency),
 ):
-    product_list = products_vm.get_newcomers(offset=offset)
-    banner_list = banner_vm.get_all()
+    products_schema = products_vm.get_newcomers(offset=offset)
+    banners_schema = banner_vm.get_all()
+    if not user:
+        default_context = default_vm.build_context()
+    else:
+        default_context = default_vm.build_context_with_user(user)
+
     context_data: dict[str, Any] = {
         'request': request,
-        **default_vm.build_context(),
-        **product_list.build_context(),
-        'banners': banner_list,
+        **default_context,
+        **products_schema.build_context(),
+        **banners_schema.build_context(),
     }
     referer = request.headers.get('Referer', '')
     if str(settings.shop_public_url) not in referer:

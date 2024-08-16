@@ -1,6 +1,5 @@
 from typing import Generator
 from fastapi import Depends
-from loguru import logger
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
@@ -80,7 +79,7 @@ class ProductRepository:
                  isouter=True).
             filter(  # filtering products in cart and products without user
                 or_(UserProduct.user_id == user_id,
-                    UserProduct.user_id == None)).
+                    UserProduct.user_id == None)).  # noqa: E711
             filter(Product.count > 0).
             order_by(Product.name).
             slice(offset, offset + 10)
@@ -120,7 +119,7 @@ class ProductRepository:
     def get_newcomers(self, offset: int) -> list[Product]:
         product_list = (
             self.db.query(Product).
-            filter(Product.newcomer == True).
+            filter(Product.newcomer == True).  # noqa: E712
             slice(offset, offset + 10).all()
         )
 
@@ -132,9 +131,9 @@ class ProductRepository:
     def get_by_name(self, name: str) -> Product | None:
         return self.db.query(Product).filter(Product.name == name).first()
 
-    def search(self, name: str) -> list[Product]:
+    def search(self, query: str, offset: int) -> list[Product]:
         return self.db.query(Product).\
-            filter(Product.name.like(f'%{name}%')).all()
+            filter(Product.name.like(f'%{query.replace(" ", "%")}%')).slice(offset, offset + 10).all()
 
     def create(self,
                name: str,
@@ -204,9 +203,8 @@ class ProductRepository:
                 delete()
             for config in configurations:
                 available_configuration = AvailableProductConfiguration(
-                        product=updated_product_query.first(),
-                        configuration=config
-                        )
+                    product=updated_product_query.first(), configuration=config
+                )
                 self.db.add(available_configuration)
 
 

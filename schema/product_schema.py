@@ -4,6 +4,7 @@ from typing import Any, Sequence
 from pydantic import BaseModel
 
 from schema import SchemaUtils
+from schema.manufacturer_schema import Manufacturer
 
 
 utils = SchemaUtils()
@@ -66,9 +67,7 @@ class ProductCreate(ProductBase):
     manufacturer_name: str
 
     def is_valid(self) -> bool:
-        return super().is_valid() \
-                and self.manufacturer_name != '' \
-                and self.count > 0
+        return super().is_valid() and self.count > 0
 
 
 class ProductUpdate(ProductCreate):
@@ -81,7 +80,7 @@ class ProductUpdateResponse(BaseModel):
 
 class Product(ProductBase):
     id: int
-    manufacturer_name: str
+    manufacturer: Manufacturer
     photos: list[ProductPhotoPath] = []
 
     @property

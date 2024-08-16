@@ -53,7 +53,28 @@
 
 
     {% elif product.count == 0 %}
+    <p
+        {% if product.selected_configuration %}
+            id="product{{ product.id }}counter{{ product.selected_configuration.id }}"
+        {% else %}
+            id="product{{ product.product_id }}counter{{ product.configuration_id }}"
+        {% endif %}
+        class="my-2"
+    >
         <span class="bg-darkPink rounded p-2 font-bold">{{ product.count }}</span>
+        <a
+            class="text-2xl cursor-pointer"
+            hx-boost="true"
+            hx-trigger="click"
+            hx-put="/cart/add"
+            {% if product.selected_configuration %}
+            hx-target="#product{{ product.id }}counter{{ product.selected_configuration.id }}"
+            {% else %}
+            hx-target="#product{{ product.product_id }}counter{{ product.configuration_id }}"
+            {% endif %}
+            hx-swap="outerHTML"
+            >+</a>
+    </p>
     {% endif %}
 
 {% else %}
@@ -75,15 +96,16 @@
 
     
     {% else %}
-        <button
+        <img
+            src="{{ url_for('static', path='images/add_to_cart.png') }}"
+            class="my-2 cursor-pointer rounded w-14 mx-auto box-border"
             id="product{{ product.id }}counter"
-            class="my-2 cursor-pointer bg-lightBlue rounded p-2 font-bold"
             hx-boost="true"
             hx-trigger="click"
             hx-put="/cart/add"
             hx-target="#product{{ product.id }}counter"
             hx-swap="outerHTML"
-        >Добавить в корзину</button>
+        >
 
     {% endif %}
 

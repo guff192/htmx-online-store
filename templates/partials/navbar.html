@@ -5,18 +5,27 @@
 <div  class="navbar-content flex flex-col sm:flex-row justify-between items-center w-full md:w-5/6 mx-auto z-20">
     {% if shop.logo_name %}
     <a href="/home#offset">
-        <img class="h-20 self-center" src="{{ url_for('static', path='images/'+shop.logo_name) }}">
+        <img class="w-40 self-center" src="{{ url_for('static', path='images/'+shop.logo_name) }}">
     </a>
     {% else %}
     <p class="text-2xl font-bold w-5/12 h-min p-2 self-center text-center"><a hx-boost="false" href="/">{{ shop.name }}</a></p>
     {% endif %}
 
     <menu hx-replace-url="true" class="grow flex flex-col sm:flex-row justify-evenly h-full">
-        <a class="flex justify-center items-center md:w-20 sm:w-36 h-14 sm:h-24" href="/home#offset">Главная</a>
 
         <!-- Simple drop-down menu with brands -->
         <div class="dropdown-menu">
-            <a class="flex justify-center items-center w-20 h-14 sm:h-24" href="/products/catalog#offset">Каталог</a>
+            <a class="flex justify-center items-center w-20 h-14 sm:h-24" href="/products/catalog#offset">
+                <div class="flex justify-center items-center w-20 h-14 sm:h-24">
+                    <img
+                        src="{{ url_for('static', path='images/store.png') }}"
+                        class="m-auto h-14 w-14 cursor-pointer rounded"
+                        alt="Каталог"
+                    >
+                </div>
+            </a>
+
+            <!--
             <div class="dropdown-content top-0 translate-y-full bg-sky-700 w-20">
                 <a href="/products/catalog/search?manufacturer=Lenovo">
                     <div class="p-1 text-center">Lenovo</div>
@@ -28,33 +37,35 @@
                     <div class="p-1 text-center">Dell</div>
                 </a>
             </div>
+            -->
         </div>
 
-        <a href="/home#banners" hx-target="#content">
-            <div class="flex justify-center items-center w-20 h-14 sm:h-24">Акции</div>
-        </a>
-        <a href="/about#offset" hx-target="#content">
-            <div class="flex justify-center items-center w-20 h-14 sm:h-24">О нас</div>
-        </a>
-        <a href="#" hx-target="#content">
-            <div class="flex justify-center items-center w-20 h-14 sm:h-24">Доставка</div>
-        </a>
         <a href="/contacts" hx-boost="false">
-            <div class="flex justify-center items-center w-20 h-14 sm:h-24">Контакты</div>
+            <div class="flex justify-center items-center w-20 h-14 sm:h-24">
+                <img
+                src="{{ url_for('static', path='images/contacts.png') }}"
+                class="m-auto h-14 w-14 cursor-pointer rounded"
+                alt="Контакты"
+                >
+            </div>
         </a>
 
         <a href="/cart#offset">
-            <div class="flex justify-center items-center w-20 h-14 sm:h-24">Корзина</div>
+            <div class="flex justify-center items-center w-20 h-14 sm:h-24">
+                <img
+                    src="{{ url_for('static', path='images/cart.png') }}"
+                    class="m-auto h-14 w-14 cursor-pointer rounded"
+                    alt="Корзина"
+                    >
+            </div>
         </a>
     </menu>
 
-    <div class="border-2 border-white rounded flex justify-evenly">
+    <div class="w-40"
+        hx-swap="innerHTML show:#offset:bottom">
         {% if request.state.user %}
-            <a href="/order/" hx-boost="true">
-                <div class="p-4">Мои заказы</div>
-            </a>
-            <a href="/auth/logout" hx-boost="false">
-                <div class="p-4">Выход</div>
+            <a href="/auth/profile" hx-boost="true" title="Профиль">
+                <img src="{{ request.state.user.profile_img_url }}" class="w-20 h-20 rounded-lg mx-auto">
             </a>
         {% else %}
             <a href="/auth/login" hx-boost="false">

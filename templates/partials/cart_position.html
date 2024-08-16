@@ -46,20 +46,6 @@
     </div>
 
 
-    {# Checking if we are in cart, and not in order #}
-    {% if product.name %}
-        <!-- Photo -->
-        <img
-            class="mx-auto"
-            hx-trigger="load"
-            hx-get="/photos/main?product_name={{ product.name }}&size=small"
-            hx-swap="outerHTML"
-            src="{{ url_for('static', path='images/loading.webp') }}"
-            alt="{{ product.name }}"
-        >
-    {% endif %}
-
-
 </div>
 
 {% endif %}

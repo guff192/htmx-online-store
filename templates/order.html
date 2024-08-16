@@ -31,24 +31,24 @@
             <div> 
                 <label for="buyer_name" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Имя покупателя:</label>
                 <input type="text" name="buyer_name" id="buyer_name" value="{{ buyer_name }}" required
-                    class="text-black w-full border border-gray-300 rounded p-2">
+                    class="text-black text-center w-full border border-gray-300 rounded p-2">
             </div>
 
             {% if not user %}
             <div> 
                 <label for="email" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Email:</label>
-                <input type="email" name="email" id="email" class="text-black w-full border border-gray-300 rounded p-2" value="" required>
+                <input type="email" name="email" id="email" class="text-black text-center w-full border border-gray-300 rounded p-2" value="" required>
             </div>
             {% endif %}
 
             <div> 
                 <label for="buyer_phone" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Телефон:</label>
-                <input type="text" name="buyer_phone" id="buyer_phone" class="text-black w-full border border-gray-300 rounded p-2" value="{{ buyer_phone }}" required>
+                <input type="text" name="buyer_phone" id="buyer_phone" class="text-black text-center w-full border border-gray-300 rounded p-2" value="{{ buyer_phone }}" required>
             </div>
 
             <div>
                 <label for="delivery_address" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Адрес доставки:</label>
-                <input type="text" name="delivery_address" id="delivery_address" class="text-black w-full border border-gray-300 rounded p-2" value="{{ delivery_address }}" required>
+                <input type="text" name="delivery_address" id="delivery_address" class="text-black text-center w-full border border-gray-300 rounded p-2" value="{{ delivery_address }}" required>
             </div>
 
             <div> 

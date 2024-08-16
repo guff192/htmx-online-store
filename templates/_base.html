@@ -7,6 +7,7 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', path='css/fonts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/buttons.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/indicator.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/dropdown.css') }}">
@@ -25,7 +26,7 @@
 
 </head>
 
-<body class="bg-darkBlue text-white p-0 m-0">
+<body class="bg-white text-black p-0 m-0">
     <div id="promocode"
         class="fixed top-0 w-full h-16 bg-white text-lightBlue text-center leading-loose z-20">
         Введи промокод <i><b>ничего</b></i> и получи <b>скидку 100% на всю техникуу!</b>
@@ -44,7 +45,7 @@
         {% block header %}<h1 id="page-header">Default Header</h1>{% endblock %}
     </header>
 
-    <main id="content" class="w-full md:w-9/12 mx-auto mt-2 text-center">
+    <main id="content" class="w-full md:w-5/6 mx-auto mt-2 text-center">
         {% block content %}{% endblock %}
     </main>
 

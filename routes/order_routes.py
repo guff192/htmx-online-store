@@ -9,7 +9,7 @@ from routes.cookies import get_cart_from_cookies, get_order_from_cookies
 from routes.auth_routes import oauth_user_dependency
 from routes.payment_routes import router as payment_router
 from schema.order_schema import (
-    OrderCreateSchema, OrderInCookie, OrderUpdateSchema
+    OrderCreateSchema, OrderUpdateSchema
 )
 from schema.user_schema import LoggedUser, UserCreate
 from viewmodels.auth_viewmodel import AuthViewModel, auth_viewmodel_dependency
@@ -123,6 +123,9 @@ def edit_order(request: Request, order_id: int,
 
     context = {'request': request, 'user': user,
                **order.build_context(), 'editable': True}
+    if user and not context.get('buyer_name'):
+        context['buyer_name'] = user.name
+
     if request.headers.get('hx-request'):
         template_name = 'partials/order.html'
     else:

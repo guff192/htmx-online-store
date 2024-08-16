@@ -2,7 +2,6 @@ import urllib.parse
 from datetime import datetime
 import enum
 from hashlib import sha256
-import html
 from typing import Any
 
 from pydantic import BaseModel, Field

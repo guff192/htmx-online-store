@@ -1,14 +1,11 @@
-from typing import Any, Literal
+from typing import Any
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from loguru import logger
 from routes.auth_routes import oauth_user_dependency
 
 from schema.product_schema import (
-    Product,
-    ProductConfiguration,
     ProductList,
     ProductUpdate,
     ProductUpdateResponse,
@@ -69,6 +66,26 @@ def update_product_by_name(
     updated_product_count = \
         product_service.update_or_create_by_name(product_update)
     return updated_product_count
+
+
+@router.get('/search', response_class=HTMLResponse)
+def search(
+    request: Request,
+    query: str, offset: int = 0,
+    product_vm: ProductViewModel = Depends(product_viewmodel_dependency),
+):
+    if not request.headers.get('hx-request'):
+        return RedirectResponse('/products/catalog')
+
+    products_data: ProductList = product_vm.search(query, offset)
+
+    context_data: dict[str, Any] = {'request': request}
+    context_data.update(products_data.build_context())
+
+    return templates.TemplateResponse(
+        'partials/product_list.html',
+        context=context_data
+    )
 
 
 @router.get('/{product_id}', response_class=HTMLResponse)

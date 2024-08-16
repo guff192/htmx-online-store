@@ -20,23 +20,19 @@ def add_product_to_cookie_cart(
     # adding product to cart
     products = cookie_cart.product_list
     try:
-        product = list(filter(
+        found_product = list(filter(
             lambda p: p.product_id == product_id and p.configuration_id == configuration_id,
             products
         ))[0]
-        product.count += 1
+        found_product.count += 1
+        
+        return cookie_cart
     except IndexError:
-        product = CookieCartProduct(
+        new_product = CookieCartProduct(
             product_id=product_id, configuration_id=configuration_id,
             count=1,
         )
-
-    new_products = list(
-        filter(lambda p: p.product_id != product_id, products)
-    )
-    new_products.append(product)
-
-    cookie_cart.product_list = new_products
+        products.append(new_product)
 
     return cookie_cart
 
@@ -57,14 +53,6 @@ def remove_product_from_cookie_cart(
                 count=0
             )
         )
-        return cookie_cart
-
-    new_products = list(
-        filter(lambda p: p.product_id != product_id, products)
-    )
-    new_products.append(product) 
-
-    cookie_cart.product_list = new_products
 
     return cookie_cart
 

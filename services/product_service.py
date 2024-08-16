@@ -1,22 +1,23 @@
+from boto3.exceptions import Boto3Error
+from botocore.exceptions import EndpointConnectionError
 from fastapi import Depends
 from loguru import logger
 from pydantic_core import Url
 
 from exceptions.product_exceptions import (
     ErrInvalidProduct,
-    ErrProductAlreadyExists,
     ErrProductNotFound,
 )
 from exceptions.product_prices_exceptions import ErrPriceNotFound
 from models.product import Product, ProductConfiguration
 from models.manufacturer import Manufacturer
-from models.user import UserProduct
 from repository.configuration_repository import ConfigurationRepository, configuration_repository_dependency
 from repository.manufacturer_repository import ManufacturerRepository, manufacturer_repository_dependency
 from repository.product_repository import (
     ProductRepository,
     product_repository_dependency,
 )
+from schema.manufacturer_schema import Manufacturer as ManufacturerSchema
 from schema.product_schema import (
     Product as ProductSchema,
     ProductCreate,
@@ -48,6 +49,22 @@ class ProductService:
         self._manufacturer_repo = manufacturer_repo
         self.config_repo = configuration_repo
         self.photo_storage = photo_storage
+
+    def _orm_product_to_product_schema(self, orm_product: Product) -> ProductSchema:
+        product_dict = orm_product.__dict__
+        manufacturer_dict = orm_product.manufacturer.__dict__
+        manufacturer_schema = ManufacturerSchema(
+            name=manufacturer_dict.get('name', ''),
+            logo_url=manufacturer_dict.get('logo_url', '')
+        )
+
+        return ProductSchema(
+            id=product_dict.get('_id', 0),
+            name=product_dict.get('name', ''),
+            description=product_dict.get('description', ''),
+            price=product_dict.get('price', 0),
+            manufacturer=manufacturer_schema,
+        )
 
     def get_config_by_id(self, config_id: int) -> ProductConfiguration:
         return self.config_repo.get_by_id(config_id)
@@ -147,15 +164,21 @@ class ProductService:
 
             manufacturer = self._manufacturer_repo.get_by_id(manufacturer_id)
             if not manufacturer:
-                manufacturer_name = ''
-            else:
-                manufacturer_name = manufacturer.__dict__.get('name', '')
+                continue
+
+            manufacturer_dict = manufacturer.__dict__
+            manufacturer_name = manufacturer_dict.get('name', '')
+            manufacturer_logo_url = manufacturer_dict.get('logo_url', '')
+            manufacturer_schema = ManufacturerSchema(
+                name=manufacturer_name, logo_url=manufacturer_logo_url
+            )
+                
 
             product = ProductInCart(
                 id=product_dto.id, name=product_dto.name,
                 description=product_dto.description,
                 price=product_dto.price, count=product_dto.count,
-                manufacturer_name=manufacturer_name,
+                manufacturer=manufacturer_schema
             )
             products.append(product)
 
@@ -171,12 +194,17 @@ class ProductService:
 
         schema_products: list[ProductSchema] = []
         for orm_product in orm_products:
-            # getting manufacturer name
-            manufacturer_name = ''
-            if hasattr(orm_product, 'manufacturer'):
-                manufacturer = orm_product.manufacturer
-                if manufacturer and manufacturer.__dict__:
-                    manufacturer_name = manufacturer.__dict__.get('name', '')
+            # getting manufacturer
+            if not hasattr(orm_product, 'manufacturer'):
+                continue
+
+            manufacturer = orm_product.manufacturer
+            manufacturer_dict = manufacturer.__dict__
+            manufacturer_name = manufacturer_dict.get('name', '')
+            manufacturer_logo_url = manufacturer_dict.get('logo_url', '')
+            manufacturer_schema = ManufacturerSchema(
+                name=manufacturer_name, logo_url=manufacturer_logo_url
+            )
 
             orm_product_dict = orm_product.__dict__
             product_id = orm_product_dict.get('_id', 0)
@@ -189,7 +217,7 @@ class ProductService:
                 name=product_name,
                 description=orm_product_dict.get('description', ''),
                 price=orm_product_dict.get('price', 0),
-                manufacturer_name=manufacturer_name,
+                manufacturer=manufacturer_schema
             )
             schema_products.append(product)
 
@@ -204,14 +232,19 @@ class ProductService:
         product_name = orm_product_dict.get('name', '')
         try:
             product_photos = self.get_all_photos_by_name(product_name)
-        except:
+        except (Boto3Error, EndpointConnectionError):
             product_photos = []
 
         manufacturer_name = ''
-        if hasattr(orm_product, 'manufacturer') and orm_product.manufacturer:
-            manufacturer: Manufacturer = orm_product.manufacturer
-            if manufacturer:
-                manufacturer_name = manufacturer.__dict__.get('name', '')
+        if not hasattr(orm_product, 'manufacturer'):
+            raise ErrProductNotFound()
+        manufacturer: Manufacturer = orm_product.manufacturer
+        manufacturer_dict = manufacturer.__dict__
+        manufacturer_name = manufacturer_dict.get('name', '')
+        manufacturer_logo_url = manufacturer_dict.get('logo_url', '')
+        manufacturer_schema = ManufacturerSchema(
+            name=manufacturer_name, logo_url=manufacturer_logo_url
+        )
         
         available_configurations = self.get_configurations_for_product(
             product_id
@@ -223,7 +256,7 @@ class ProductService:
             name=product_name,
             description=orm_product_dict.get('description', ''),
             price=orm_product_dict.get('price', 0),
-            manufacturer_name=manufacturer_name,
+            manufacturer=manufacturer_schema,
             configurations=available_configurations,
             selected_configuration=None
         )
@@ -303,8 +336,15 @@ class ProductService:
         )
         return ProductUpdateResponse(count=updated_products_count)
 
-    def search(self, name: str) -> list[Product]:
-        return self.repo.search(name)
+    def search(self, name: str, offset: int = 0) -> ProductList:
+        orm_products = self.repo.search(name, offset)
+        schema_products: list[ProductSchema] = []
+        for orm_product in orm_products:
+            product_schema = self._orm_product_to_product_schema(orm_product)
+            schema_products.append(product_schema)
+
+        product_list = ProductList(products=schema_products, offset=offset)
+        return product_list
 
     def create(self, product_create_schema: ProductCreate) -> ProductSchema:
         if not product_create_schema.is_valid():
@@ -325,12 +365,22 @@ class ProductService:
             )
             self.update_or_create_by_name(created_product)
 
+            orm_manufacturer = self._manufacturer_repo.get_by_name(
+                product_create_schema.manufacturer_name
+            )
+            manufacturer_dict = orm_manufacturer.__dict__
+            manufacturer_name = manufacturer_dict.get('name', '')
+            manufacturer_logo_url = manufacturer_dict.get('logo_url', '')
+            manufacturer_schema = ManufacturerSchema(
+                name=manufacturer_name, logo_url=manufacturer_logo_url
+            )
+
             product_schema = ProductSchema(
                 id=product_id,
                 name=created_product.name,
                 description=created_product.description,
                 price=created_product.price,
-                manufacturer_name=product_create_schema.manufacturer_name,
+                manufacturer=manufacturer_schema,
                 configurations=product_create_schema.configurations,
             )
 
@@ -344,14 +394,28 @@ class ProductService:
                     product_create_schema.manufacturer_name
                 )
             )
-            product_id: int = created_product.__dict__.get('_id', -1)
+            created_product_dict = created_product.__dict__
+            product_id: int = created_product_dict.get('_id', -1)
+            product_name = created_product_dict.get('name', '')
+            product_description = created_product_dict.get('description', '')
+            product_price = created_product_dict.get('price', '')
+
+            if not hasattr(created_product, 'manufacturer'):
+                raise ErrInvalidProduct()
+
+            product_manufacturer = created_product.manufacturer
+            manufacturer_name = product_manufacturer.get('name', '')
+            manufacturer_logo_url = product_manufacturer.get('logo_url', '')
+            manufacturer_schema = ManufacturerSchema(
+                name=manufacturer_name, logo_url=manufacturer_logo_url
+            )
 
             product_schema = ProductSchema(
                 id=product_id,
-                name=created_product.__dict__.get('name', ''),
-                description=created_product.__dict__.get('description', ''),
-                price=created_product.__dict__.get('price', ''),
-                manufacturer_name=product_create_schema.manufacturer_name,
+                name=product_name,
+                description=product_description,
+                price=product_price,
+                manufacturer=manufacturer_schema
             )
 
         return product_schema

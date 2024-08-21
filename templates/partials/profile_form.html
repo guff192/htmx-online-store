@@ -1,0 +1,20 @@
+
+<form id="user_info" class="w-3/4 h-80 mx-auto border rounded-xl p-2 flex flex-col justify-around items-center bg-black"
+    hx-put="/auth/profile/edit" hx-params="*">
+    <div class="w-3/4 flex flex-col justify-between">
+        <label for="user_name" class="text-xl text-white text-left">Имя:</label>
+        <input id="user_name" type="text" name="name" value="{{ user.name }}" class="text-lg text-center border rounded-lg h-10">
+    </div>
+
+    <div class="w-3/4 flex flex-col justify-between">
+        <label for="user_email" class="text-xl text-white text-left">E-mail:</label>
+        <input id="user_email" type="text" name="email" value="{{ user.email }}" class="text-lg text-center border rounded-lg h-10">
+    </div>
+
+
+    <button type="submit" class="w-14 h-14" hx-target="#profile-info">
+        <img src="{{ url_for('static', path='images/save.png') }}" class="w-full h-full" alt="Сохранить" title="Сохранить">
+    </button>
+
+</form>
+

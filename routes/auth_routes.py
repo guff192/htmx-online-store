@@ -1,5 +1,5 @@
-from typing import Annotated, Any, Generator 
-
+from typing import Annotated, Any, Generator
+ 
 from fastapi import APIRouter, Body, Cookie, Depends, Form, Request, Response, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -10,7 +10,7 @@ from schema.auth_schema import (
     GoogleOAuthCredentials,
     YandexOauthCredentials
 )
-from schema.user_schema import LoggedUser, UserResponse
+from schema.user_schema import LoggedUser, UserResponse, UserUpdate
 from services.auth_service import (
     AuthService,
     auth_service_dependency,
@@ -21,11 +21,13 @@ from viewmodels import (
 )
 from viewmodels.auth_viewmodel import (
     AuthViewModel,
+    auth_viewmodel_dependency,
     get_auth_viewmodel,
 )
 from viewmodels.user_viewmodel import (
     UserViewModel,
     get_user_viewmodel,
+    user_viewmodel_dependency,
 )
 from exceptions.auth_exceptions import ErrWrongCredentials
 
@@ -93,7 +95,7 @@ def login_with_google_account(
     token = auth_vm.create_session({'sub': str(user.id)})
 
     response = RedirectResponse(
-        "/home",
+        "/auth/profile",
         status_code=status.HTTP_302_FOUND,
     )
     response.set_cookie(
@@ -193,5 +195,40 @@ def get_profile(
     if not request.headers.get('hx-request'):
         return templates.TemplateResponse('profile.html', context)
 
+    return templates.TemplateResponse('partials/profile.html', context)
+
+
+@router.get('/profile/edit')
+def edit_profile(
+    request: Request,
+    user: LoggedUser | None = Depends(oauth_user_dependency),
+):
+    if not user:
+        return RedirectResponse("/auth/login")
+
+    if not request.headers.get('hx-request'):
+        return RedirectResponse("/auth/profile")
+    
+    context = {'request': request, 'user': user}
+    return templates.TemplateResponse('partials/profile_form.html', context)
+
+
+@router.put('/profile/edit')
+def update_user(
+    request: Request,
+    name: Annotated[str, Form()],
+    email: Annotated[str, Form()],
+    user: LoggedUser | None = Depends(oauth_user_dependency),
+    auth_vm: UserViewModel = Depends(user_viewmodel_dependency),
+    default_vm: DefaultViewModel = Depends(default_viewmodel_dependency),
+):
+    if not user:
+        return RedirectResponse("/auth/login")
+
+    user_update_schema = UserUpdate(id=user.id, name=name, email=email)
+    updated_user_response_schema = auth_vm.update(user_update_schema)
+
+    context = {'request': request, 'user': updated_user_response_schema,
+               **default_vm.build_context()}
     return templates.TemplateResponse('partials/profile.html', context)
 

@@ -3,17 +3,17 @@ from typing import Any
 from fastapi import Depends
 from google.auth.jwt import Mapping
 from loguru import logger
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from app.config import Settings
 
-from exceptions.auth_exceptions import ErrUserInvalid, ErrWrongCredentials
+from exceptions.auth_exceptions import ErrUserInvalid, ErrUserNotFound, ErrWrongCredentials
 from models.user import User
 from repository.user_repository import (
     UserRepository,
     get_user_repository,
     user_repository_dependency,
 )
-from schema.user_schema import UserCreate, UserCreateGoogle, UserCreateYandex, UserResponse
+from schema.user_schema import UserCreate, UserCreateGoogle, UserCreateYandex, UserResponse, UserUpdate
 
 
 settings = Settings()
@@ -158,6 +158,18 @@ class UserService:
         except IntegrityError as e:
             logger.error(e)
             raise ErrUserInvalid
+
+        return self.user_model_to_userresponse_schema(user_model)
+
+    def update(
+        self,
+        user_update_schema: UserUpdate
+    ) -> UserResponse:
+        user_model = self.repo.update(
+            user_update_schema.id,
+            user_update_schema.name,
+            user_update_schema.email,
+        )
 
         return self.user_model_to_userresponse_schema(user_model)
 

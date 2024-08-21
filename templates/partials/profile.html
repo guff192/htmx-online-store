@@ -3,7 +3,7 @@
     // Replace page header text
     var pageHeader = document.getElementsByTagName('header')[0];
     pageHeader.innerHTML = `
-    <h1 id="page-header" class="text-4xl font-bold text-center mb-5 mt-2">
+    <h1 id="page-header" class="text-4xl font-bold text-center my-5">
         {{ user.name }}
     </h1>`;
 
@@ -11,39 +11,39 @@
 </script>
 {% endif %}
 
-<div class="w-3/4 mx-auto h-min relative border p-5" hx-target="#content">
+<div id="profile-info" class="w-3/4 mx-auto h-min relative" hx-target="#content">
 
-    <div class="flex justify-around items-center w-full mb-5">
+    <img src="{{ user.profile_img_url }}" class="w-60 h-60 mb-2 mx-auto rounded-xl">
+
+    <div class="flex justify-around items-center w-1/2 mx-auto rounded-3xl mb-4 p-1 bg-black">
         {% if request.state.user.is_admin %}
-        <a href="/admin" class="block p-2 rounded bg-green-500 w-14 h-14 box-border">
+        <a href="/admin" class="block rounded w-14 h-14 box-border">
             <img src="{{ url_for('static', path='images/admin.png') }}" class="w-full h-full" alt="Панель администратора" title="Панель администратора">
         </a>
         {% endif %}
 
-        <a href="/order" class="block p-2 rounded bg-lightBlue w-14 h-14 box-border" hx-boost="true">
+        <a id="edit-profile-btn" href="/auth/profile/edit" class="block rounded w-14 h-14 box-border"
+            hx-boost="true"
+            hx-target="#profile-info"
+            hx-swap="beforeend">
+            <img src="{{ url_for('static', path='images/edit.png') }}" class="w-full h-full" alt="Редактировать профиль" title="Редактировать профиль">
+        </a>
+
+        <script>
+            if(typeof(editProfileBtn) == "undefined") { let editProfileBtn; }
+            editProfileBtn = document.querySelector("#edit-profile-btn");
+            editProfileBtn.addEventListener("click", () => {
+                editProfileBtn.classList.add("hidden");
+            });
+        </script>
+
+        <a href="/order" class="block rounded w-14 h-14 box-border" hx-boost="true">
             <img src="{{ url_for('static', path='images/orders.png') }}" class="w-full h-full" alt="Мои заказы" title="Мои заказы">
         </a>
 
-        <a href="/auth/logout" class="block p-2 rounded-lg bg-red-500 w-14 h-14 box-border">
+        <a href="/auth/logout" class="block rounded-lg w-14 h-14 box-border">
             <img src="{{ url_for('static', path='images/sign_out.png') }}" class="w-full h-full" alt="Выход" title="Выход">
         </a>
-    </div>
-
-
-    
-    <img src="{{ user.profile_img_url }}" class="w-60 h-60 mb-5 mx-auto">
-
-
-    <div id="user_info" class="w-1/2 mx-auto border">
-        <div class="flex justify-between">
-            <p class="text-xl">Имя:</p>
-            <p class="text-lg">{{ user.name }}</p>
-        </div>
-
-        <div class="flex justify-between">
-            <p class="text-xl">E-mail:</p>
-            <p class="text-lg">{{ user.email }}</p>
-        </div>
     </div>
 
 </div>

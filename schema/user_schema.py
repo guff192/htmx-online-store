@@ -22,6 +22,9 @@ class LoggedUser(UserBase):
 class UserCreate(UserBase):
     pass
 
+class UserUpdate(UserBase):
+    id: UUID
+
 
 class UserCreateGoogle(UserCreate):
     google_id: str

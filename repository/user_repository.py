@@ -1,8 +1,11 @@
 from uuid import UUID, uuid4
 from fastapi import Depends
+from loguru import logger
+from sqlalchemy import ReleaseSavepointClause
 from sqlalchemy.orm import Session
 
 from db.session import db_dependency, get_db
+from exceptions.auth_exceptions import ErrUserNotFound
 from models.user import User
 
 
@@ -63,6 +66,28 @@ class UserRepository:
             self.db.refresh(user)
 
         return user
+
+    def update(self, user_uuid: UUID, name: str, email: str) -> User:
+        user_query = self.db.query(User).filter(User.id == user_uuid)
+        found_user = user_query.first()
+        if not found_user:
+            raise ErrUserNotFound()
+        logger.debug(f'{name = }\n{email = }\n')
+        logger.debug(found_user.__dict__)
+
+        user_update_dict = {
+            User.name: name,
+            User.email: email,
+        }
+        user_query.update(user_update_dict)
+
+        self.db.commit()
+        self.db.flush([found_user])
+
+        updated_user = self.get_by_id(str(user_uuid))
+        logger.debug(updated_user.__dict__)
+
+        return updated_user
 
 
 def user_repository_dependency(db: Session = Depends(db_dependency)):

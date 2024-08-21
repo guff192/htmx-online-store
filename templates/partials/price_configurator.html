@@ -30,7 +30,7 @@
             button.setAttribute('aria-selected', true);
             previousSelectedButton.setAttribute('aria-selected', false);
 
-            setTimeout(() => { configuration.innerText = button.getAttribute('config-name'); }, 100);
+            setTimeout(() => { configuration.innerText = button.getAttribute('config-name'); }, 200);
 
             priceButtons.forEach(btn => btn.classList.remove('bg-lightBlue'));
             button.classList.add('bg-lightBlue');
@@ -41,7 +41,7 @@
             button.setAttribute('aria-selected', false);
             previousSelectedButton.setAttribute('aria-selected', true);
 
-            setTimeout(() => { configuration.innerText = previousSelectedButton.getAttribute('config-name'); }, 100);
+            setTimeout(() => { configuration.innerText = previousSelectedButton.getAttribute('config-name'); }, 200);
 
             priceButtons.forEach(btn => btn.classList.remove('bg-lightBlue'));
             previousSelectedButton.classList.add('bg-lightBlue');
@@ -52,7 +52,7 @@
             button.setAttribute('aria-selected', true);
             previousSelectedButton.setAttribute('aria-selected', false);
 
-            setTimeout(() => { configuration.innerText = button.getAttribute('config-name'); }, 100);
+            setTimeout(() => { configuration.innerText = button.getAttribute('config-name'); }, 200);
 
             priceButtons.forEach(btn => btn.classList.remove('bg-lightBlue'));
             button.classList.add('bg-lightBlue');

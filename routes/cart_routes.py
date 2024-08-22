@@ -96,7 +96,11 @@ def add_to_cart(
         cookie_cart = add_product_to_cookie_cart(
             cookie_cart, product_id, configuration_id
         )
-        product = cookie_cart.product_list[-1]
+
+        product = next(filter(
+            lambda p: p.product_id == product_id and p.configuration_id == configuration_id,
+            cookie_cart.product_list
+        ))
 
         cookie_cart_str = cookie_cart.cookie_str()
 
@@ -126,6 +130,9 @@ def remove_from_cart(
     vm: CartViewModel = Depends(cart_viewmodel_dependency),
     user: LoggedUser | None = Depends(oauth_user_dependency),
 ):
+    if not request.headers.get('hx-request'):
+        return RedirectResponse('/cart', status_code=status.HTTP_303_SEE_OTHER)
+
     cookie_cart_str = ''
     if  user:
         product = vm.remove_from_cart(
@@ -141,23 +148,20 @@ def remove_from_cart(
             cookie_cart, product_id, configuration_id
         )
 
-        # always have last product here, as we keep it anyway in product_list
-        product = cookie_cart.product_list[-1] 
+        # removed product always stays in cart (even when count = 0)
+        product = next(filter(
+            lambda p: p.product_id == product_id and p.configuration_id == configuration_id,
+            cookie_cart.product_list
+        ))
 
         # creating new string to set cart in cookies
-        if product.count != 0 or len(cookie_cart.product_list) > 1:
-            cookie_cart_str = cookie_cart.cookie_str()
-        else:
-            cookie_cart_str = '{"product_list": []}'
+        cookie_cart_str = cookie_cart.cookie_str()
     
     # creating response
     context = {'request': request, 'user': user, **product.build_context()}
-    if not request.headers.get('hx-request'):
-        response = RedirectResponse('/cart', status_code=status.HTTP_303_SEE_OTHER)
-    else:
-        response = templates.TemplateResponse(
-            'partials/product_counter.html', context=context
-        )
+    response = templates.TemplateResponse(
+        'partials/product_counter.html', context=context
+    )
     
     # setting updated cart in cookie
     if cookie_cart_str:

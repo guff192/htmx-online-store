@@ -14,9 +14,9 @@ from repository.cart_repository import (
     CartRepository,
     cart_repository_dependency
 )
-from schema.cart_schema import Cart, CartInCookie
+from schema.cart_schema import Cart, ProductInCart, CartInCookie
 from schema.product_schema import (
-    ProductInCart, ProductConfiguration as ProductConfigurationSchema,
+    ProductConfiguration as ProductConfigurationSchema,
 )
 
 
@@ -139,7 +139,7 @@ class CartService:
                 configurations=product.configurations,
                 selected_configuration=selected_config
             ))
-            
+
         return products
 
     def get_cart(self, user_id: str) -> Cart:

@@ -92,10 +92,6 @@ class Product(ProductBase):
         return {'product': self}
 
 
-class ProductInCart(Product):
-    count: int 
-
-
 class ProductList(BaseModel):
     products: Sequence[Product]
     offset: int = 0

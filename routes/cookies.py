@@ -17,7 +17,9 @@ def get_cart_from_cookies(cookies: dict[str, str]) -> CartInCookie:
 def add_product_to_cookie_cart(
     cookie_cart: CartInCookie, product_id: int, configuration_id: int
 ) -> CartInCookie:
-    # adding product to cart
+    '''
+        Adds product to cart. If product already in cart, increases count.
+    '''
     products = cookie_cart.product_list
     try:
         found_product = list(filter(
@@ -40,7 +42,9 @@ def add_product_to_cookie_cart(
 def remove_product_from_cookie_cart(
     cookie_cart: CartInCookie, product_id: int, configuration_id: int
 ) -> CartInCookie:
-    # adding product to cart
+    '''
+        Removes product from cart. Removed product always stays in cart
+    '''
     products = cookie_cart.product_list
     try:
         product = list(filter(lambda p: p.product_id == product_id and p.configuration_id == configuration_id,

@@ -21,7 +21,6 @@ from schema.manufacturer_schema import Manufacturer as ManufacturerSchema
 from schema.product_schema import (
     Product as ProductSchema,
     ProductCreate,
-    ProductInCart,
     ProductList,
     ProductPhotoPath,
     ProductPhotoSize,
@@ -30,6 +29,7 @@ from schema.product_schema import (
     ProductUpdateResponse,
     ProductConfiguration as ProductConfigurationSchema,
 )
+from schema.cart_schema import ProductInCart
 from schema.user_schema import LoggedUser
 from storage.photo_storage import (
     ProductPhotoStorage,

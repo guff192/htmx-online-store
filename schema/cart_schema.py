@@ -2,17 +2,22 @@ from typing import Any
 from pydantic import BaseModel
 from schema import SchemaUtils
 
-from schema.product_schema import ProductInCart
+from schema.product_schema import Product
 from schema.user_schema import UserResponse
 
 
 utils = SchemaUtils()
 
 
+class ProductInCart(Product):
+    count: int 
+
+
 class Cart(BaseModel):
     user: UserResponse
     product_list: list[ProductInCart]
 
+    @utils.add_debug_info_to_context
     @utils.add_shop_to_context
     def build_context(self) -> dict:
         return {
@@ -32,7 +37,6 @@ class CookieCartProduct(BaseModel):
 
 class CartInCookie(BaseModel):
     product_list: list[CookieCartProduct]
-
     @utils.add_shop_to_context
     def build_context(self) -> dict[str, Any]:
         return self.__dict__

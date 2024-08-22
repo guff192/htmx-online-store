@@ -1,8 +1,7 @@
 from typing import Generator
 
 from fastapi import Depends
-from schema.cart_schema import Cart, CartInCookie
-from schema.product_schema import ProductInCart
+from schema.cart_schema import Cart, CartInCookie, ProductInCart
 from services.cart_service import CartService, cart_service_dependency
 
 

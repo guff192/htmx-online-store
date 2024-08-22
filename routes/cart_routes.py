@@ -22,7 +22,7 @@ def get_cart(
 ):
     if user:
         cart = vm.get_cart(str(user.id))
-        context = {'request': request, 'user': user, **cart.build_context()}
+        context_data = {'request': request, 'user': user, **cart.build_context()}
     else:
         cart_cookie_str = request.cookies.get("_cart")
         if cart_cookie_str:
@@ -30,19 +30,23 @@ def get_cart(
         else:
             cart = CartInCookie(product_list=[])
 
-        products = vm.from_cookie(cart)
-        context = {'request': request, 'product_list': products}
         schema_utils = SchemaUtils()
-        context.update(shop=schema_utils.shop)
+        products = vm.from_cookie(cart)
 
+        @schema_utils.add_shop_to_context
+        @schema_utils.add_debug_info_to_context
+        def context_func():
+            return {'request': request, 'product_list': products}  
+
+        context_data = context_func()
 
     if request.headers.get('hx-request'):
         return templates.TemplateResponse(
-            'partials/cart.html', context=context
+            'partials/cart.html', context=context_data
         )
 
     return templates.TemplateResponse(
-        'cart.html', context=context
+        'cart.html', context=context_data
     )
 
 
@@ -92,7 +96,11 @@ def add_to_cart(
         cookie_cart = add_product_to_cookie_cart(
             cookie_cart, product_id, configuration_id
         )
-        product = cookie_cart.product_list[-1]
+
+        product = next(filter(
+            lambda p: p.product_id == product_id and p.configuration_id == configuration_id,
+            cookie_cart.product_list
+        ))
 
         cookie_cart_str = cookie_cart.cookie_str()
 
@@ -122,6 +130,9 @@ def remove_from_cart(
     vm: CartViewModel = Depends(cart_viewmodel_dependency),
     user: LoggedUser | None = Depends(oauth_user_dependency),
 ):
+    if not request.headers.get('hx-request'):
+        return RedirectResponse('/cart', status_code=status.HTTP_303_SEE_OTHER)
+
     cookie_cart_str = ''
     if  user:
         product = vm.remove_from_cart(
@@ -137,23 +148,20 @@ def remove_from_cart(
             cookie_cart, product_id, configuration_id
         )
 
-        # always have last product here, as we keep it anyway in product_list
-        product = cookie_cart.product_list[-1] 
+        # removed product always stays in cart (even when count = 0)
+        product = next(filter(
+            lambda p: p.product_id == product_id and p.configuration_id == configuration_id,
+            cookie_cart.product_list
+        ))
 
         # creating new string to set cart in cookies
-        if product.count != 0 or len(cookie_cart.product_list) > 1:
-            cookie_cart_str = cookie_cart.cookie_str()
-        else:
-            cookie_cart_str = '{"product_list": []}'
+        cookie_cart_str = cookie_cart.cookie_str()
     
     # creating response
     context = {'request': request, 'user': user, **product.build_context()}
-    if not request.headers.get('hx-request'):
-        response = RedirectResponse('/cart', status_code=status.HTTP_303_SEE_OTHER)
-    else:
-        response = templates.TemplateResponse(
-            'partials/product_counter.html', context=context
-        )
+    response = templates.TemplateResponse(
+        'partials/product_counter.html', context=context
+    )
     
     # setting updated cart in cookie
     if cookie_cart_str:

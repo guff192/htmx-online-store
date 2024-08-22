@@ -22,7 +22,7 @@ def get_cart(
 ):
     if user:
         cart = vm.get_cart(str(user.id))
-        context = {'request': request, 'user': user, **cart.build_context()}
+        context_data = {'request': request, 'user': user, **cart.build_context()}
     else:
         cart_cookie_str = request.cookies.get("_cart")
         if cart_cookie_str:
@@ -30,19 +30,23 @@ def get_cart(
         else:
             cart = CartInCookie(product_list=[])
 
-        products = vm.from_cookie(cart)
-        context = {'request': request, 'product_list': products}
         schema_utils = SchemaUtils()
-        context.update(shop=schema_utils.shop)
+        products = vm.from_cookie(cart)
 
+        @schema_utils.add_shop_to_context
+        @schema_utils.add_debug_info_to_context
+        def context_func():
+            return {'request': request, 'product_list': products}  
+
+        context_data = context_func()
 
     if request.headers.get('hx-request'):
         return templates.TemplateResponse(
-            'partials/cart.html', context=context
+            'partials/cart.html', context=context_data
         )
 
     return templates.TemplateResponse(
-        'cart.html', context=context
+        'cart.html', context=context_data
     )
 
 

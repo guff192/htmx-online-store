@@ -16,8 +16,13 @@
 <div id="order{{ order.id }}" class="border border-white p-5">
 
     <h2 class="text-3xl font-bold uppercase text-center mb-5 mt-1">Заказ {{ order.id }}</h2>
-    <button hx-get="/order/{{ order.id }}" hx-target="#content" hx-swap="innerHTML" hx-replace-url="true"
-        class="bg-lightBlue rounded p-2 font-bold">Редактировать</button>
+    <button class="bg-black rounded p-1"
+        hx-get="/order/{{ order.id }}"
+        hx-target="#content"
+        hx-swap="innerHTML"
+        hx-replace-url="true">
+        <img src="{{ url_for('static', path='images/view.png') }}" class="w-14 h-14" alt="Просмотр заказа" title="Просмотр заказа">
+    </button>
 
     <h3 class="text-2xl text-right">Сумма: {{ order.sum }}₽</h3>
     <p class="mb-10 text-right" data-timestamp="{{ order.date.isoformat() }}">{{ order.date.strftime('%Y-%B-%d %H:%M') }}</p>

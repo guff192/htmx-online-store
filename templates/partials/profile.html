@@ -11,11 +11,11 @@
 </script>
 {% endif %}
 
-<div id="profile-info" class="w-3/4 mx-auto h-min relative" hx-target="#content">
+<div id="profile-info" class="w-full md:w-3/4 mx-auto h-min relative" hx-target="#content">
 
     <img src="{{ user.profile_img_url }}" class="w-60 h-60 mb-2 mx-auto rounded-xl">
 
-    <div class="flex justify-around items-center w-1/2 mx-auto rounded-3xl mb-4 p-1 bg-black">
+    <div class="flex justify-around items-center w-4/5 md:w-1/2 mx-auto rounded-3xl mb-4 p-1 bg-black">
         {% if request.state.user.is_admin %}
         <a href="/admin" class="block rounded w-14 h-14 box-border">
             <img src="{{ url_for('static', path='images/admin.png') }}" class="w-full h-full" alt="Панель администратора" title="Панель администратора">

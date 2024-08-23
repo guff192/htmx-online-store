@@ -1,7 +1,3 @@
-{% if not user %}
-    {% include 'partials/oauth_buttons.html' %}
-{% endif %}
-
 {% if not request.headers.get('hx-request') %}
     
     {% extends '_base.html' %}
@@ -88,6 +84,10 @@
 
 {% if reload %}
     {% include 'empty.html' %}
+{% endif %}
+
+{% if not user %}
+    {% include 'partials/oauth_buttons.html' %}
 {% endif %}
 
 <div id="main-content" class="container text-center mx-auto my-8">

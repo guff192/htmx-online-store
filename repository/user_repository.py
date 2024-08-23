@@ -1,7 +1,6 @@
 from uuid import UUID, uuid4
 from fastapi import Depends
 from loguru import logger
-from sqlalchemy import ReleaseSavepointClause
 from sqlalchemy.orm import Session
 
 from db.session import db_dependency, get_db

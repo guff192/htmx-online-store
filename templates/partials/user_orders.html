@@ -30,7 +30,7 @@
     <h3 class="text-3xl mb-5">Товары</h3>
     {% for product in order.products %}
 
-        <div class="mb-5 border-b">
+        <div class="mb-5 p-2 border rounded">
             <h4 class="text-xl">{{ product.product_name }}</h4>
             <p>Цена: {{ product.basic_price + product.selected_configuration.additional_price }}₽</p>
             <p>Конфигурация: {{ product.selected_configuration.name }} (+{{ product.selected_configuration.additional_price }}₽)</p>

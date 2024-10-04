@@ -5,8 +5,8 @@ from loguru import logger
 
 class MemoryCacheStorage:
     def __new__(cls):
-        logger.debug('Creating response cache storage')
         if not hasattr(cls, 'instance'):
+            logger.info('Creating memory cache storage')
             cls.instance = super(MemoryCacheStorage, cls).__new__(cls)
         return cls.instance
 
@@ -26,7 +26,6 @@ class MemoryCacheStorage:
                 response = request_func(*args, **kwargs)
                 self._cache[full_func_name, key_args] = response
 
-            logger.debug(f'self._cache[{full_func_name}, {key_args}]')
             return response
 
         return wrapper

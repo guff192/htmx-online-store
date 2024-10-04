@@ -10,15 +10,18 @@
 <div id="order{{ id }}" class="border border-white p-5">
 
     <h2 class="text-3xl">
-        Сумма: {{ sum }}₽{% if payment and payment.status.value == 'success' %}<span class="text-green-500"> (оплачен)</span>{% endif %}
+        Сумма: <span id="order_sum">{{ sum }}</span>₽{% if payment and payment.status.value == 'success' %}<span class="text-green-500"> (оплачен)</span>{% endif %}
     </h2>
     <p class="mb-10" data-timestamp="{{ date.isoformat() }}">{{ date.strftime('%Y-%B-%d %H:%M') }}</p>
 
 
-    <button class="bg-red-500 rounded p-2 font-bold mb-5"
-        hx-delete="/order/{{ id }}/cancel" hx-target="#order{{ id }}"
-        hx-confirm="Вы действительно хотите отменить заказ {{ id }}?"
-        hx-swap="outerHTML">Отменить заказ</button>
+    {% if not payment or payment.status.value != 'success' %}
+    {{ payment }}
+        <button class="bg-red-500 rounded p-2 font-bold mb-5"
+            hx-delete="/order/{{ id }}/cancel" hx-target="#order{{ id }}"
+            hx-confirm="Вы действительно хотите отменить заказ {{ id }}?"
+            hx-swap="outerHTML">Отменить заказ</button>
+    {% endif %}
 
     {% if editable %}
         <script>htmx.config.methodsThatUseUrlParams = ['get', 'put'];</script>
@@ -28,6 +31,7 @@
             hx-swap="innerHTML" hx-params="*" hx-replace-url="/order/{{ id }}">
             <input type="hidden" name="order_id" value="{{ id }}">
 
+            {% if not payment or payment.status.value != 'success' %}
             <div> 
                 <label for="buyer_name" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Имя покупателя:</label>
                 <input type="text" name="buyer_name" id="buyer_name" value="{{ buyer_name }}" required
@@ -46,16 +50,54 @@
                 <input type="text" name="buyer_phone" id="buyer_phone" class="text-black text-center w-full border border-gray-300 rounded p-2" value="{{ buyer_phone }}" required>
             </div>
 
-            <div>
-                <label for="delivery_address" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Адрес доставки:</label>
-                <input type="text" name="delivery_address" id="delivery_address" class="text-black text-center w-full border border-gray-300 rounded p-2" value="{{ delivery_address }}" required>
-            </div>
-
             <div> 
                 <label for="comment" class="block font-bold mb-2">Комментарий к заказу:</label>
                 <textarea name="comment" id="comment" class="text-black w-full border border-gray-300 rounded p-2">{{ comment }}</textarea>
             </div>
 
+            {% if not delivery_address.city.name %}
+            <div>
+                <div class="h-20 flex justify-around items-center">
+                    <div>
+                        <label class="w-1/3" for="delivery">Доставка</label>
+                        <input type="radio" name="delivery" id="delivery" value="true"
+                        hx-trigger="change"
+                        hx-get="/delivery/form"
+                        hx-target="#delivery_form"
+                        hx-swap="outerHTML"
+                        hx-push-url="false"
+                        hx-replace-url="false"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="w-1/3" for="pickup">Самовывоз</label>
+                        <input type="radio" name="delivery" id="pickup" value="false" checked
+                        hx-trigger="change"
+                        hx-delete="/remove_element"
+                        hx-target="#delivery_form"
+                        hx-swap="innerHTML"
+                        hx-push-url="false"
+                        hx-replace-url="false"
+                        >
+                    </div>
+                </div>
+            </div>
+            <div id="delivery_form"></div>
+            {% else %}
+            {% include 'partials/delivery_form.html' %}
+            {% endif %}
+
+            {% else %}
+                <input type="hidden" name="region" value="{{ delivery_address.region.code }}">
+                <input type="hidden" name="city" value="{{ delivery_address.city.code }}">
+                <input type="hidden" name="region_name" value="{{ delivery_address.region.name }}">
+                <input type="hidden" name="city_name" value="{{ delivery_address.city.name }}">
+                <input type="hidden" name="buyer_name" value="{{ buyer_name }}">
+                <input type="hidden" name="buyer_phone" value="{{ buyer_phone }}">
+                <input type="hidden" name="email" value="{{ email }}">
+
+            {% endif %}
 
             <button type="submit" class="bg-lightBlue rounded p-2 font-bold mt-5"
                 hx-target="#content" hx-swap="innerHTML"
@@ -66,27 +108,38 @@
     {% else %}
         <script>htmx.config.methodsThatUseUrlParams = ['get'];</script>
 
+        {% if delivery_address.address %}
         <button class="bg-lightBlue rounded p-2 font-bold"
             hx-get="/order/{{ id }}/edit" hx-target="#content" hx-swap="innerHTML"
             hx-replace-url="true">Редактировать заказ</button>
+        {% endif %}
 
         {% if buyer_name != '' and buyer_phone != '' and (not payment or not payment.status.value == 'success') %} 
             <button class="bg-green-500 rounded p-2 font-bold mt-5"
                 hx-get="/order/payment/{{ id }}" hx-target="#content"
                 hx-replace-url="/order/payment/{{ id }}"
                 hx-swap="innerHTML">Перейти к оплате</button>
-
         {% endif %}
 
-        <p>Комментарий: {{ comment }}</p>
+        <br>
         <p>Имя покупателя: {{ buyer_name }}</p>
         <p>Телефон: {{ buyer_phone }}</p>
-        <p>Адрес доставки: {{ delivery_address }}</p>
+        <p>Комментарий: {{ comment }}</p>
+        {% if delivery_address.region.name %}
+        <p>Регион: {{ delivery_address.region.name }}</p>
+        <p>Город: {{ delivery_address.city.name }}</p>
+        <p>Адрес доставки: {{ delivery_address.address }}</p>
+        {% endif %}
+        {% if delivery_track_number %}
+        <br>
+        <p>Номер для отслеживания доставки: {{ delivery_track_number }}</p>
+        {% endif %}
+
 
     {% endif %}
 
 
-    <h2 class="text-3xl my-5">Товары</h2>
+    <h2 class="text-3xl my-5">Товары в заказе (<span id="products_count">{{ products|length }}</span>)</h2>
     {% for product in products %}
         {% include 'partials/cart_position.html' %}
     {% endfor %}

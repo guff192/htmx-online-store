@@ -1,3 +1,4 @@
+import re
 import urllib.parse
 from datetime import datetime
 import enum
@@ -23,12 +24,20 @@ class PaymentStatus(str, enum.Enum):
 
 
 # TODO: Finish this schema and add to OrderSchema
+class RegionSchema(BaseModel):
+    code: int
+    name: str
+
+
+class CitySchema(BaseModel):
+    code: int
+    name: str
+
+
 class DeliveryAddressSchema(BaseModel):
-    id: int | None
-    city: str
-    street: str
-    house_number: str
-    flat_number: str
+    region: RegionSchema
+    city: CitySchema
+    address: str
 
 
 class PaymentBase(BaseModel):
@@ -114,6 +123,21 @@ class OrderProductSchema(BaseModel):
     def get_full_price(self) -> int:
         return self.basic_price + self.selected_configuration.additional_price
 
+    def to_package_item(self) -> dict[str, Any]:
+        product_name_parts = list(map(str.strip, self.product_name.split(',')))
+        ware_key = ''
+        for part in product_name_parts:
+            ware_key += ''.join(list(re.findall('[A-Z0-9]+', part)))
+
+        return {
+            'ware_key': ware_key,
+            'payment': {'value': 0},
+            'name': self.product_name,
+            'cost': self.basic_price + self.selected_configuration.additional_price,
+            'amount': 1,
+            'weight': 3000,
+        }
+
 
 class OrderBase(BaseModel):
     user_id: str
@@ -127,7 +151,8 @@ class OrderSchema(OrderBase):
     comment: str = ''
     buyer_name: str = ''
     buyer_phone: str = ''
-    delivery_address: DeliveryAddressSchema | str = ''
+    delivery_address: DeliveryAddressSchema
+    delivery_track_number: str = ''
 
     @utils.add_shop_to_context
     def build_context(self) -> dict[str, Any]:
@@ -151,7 +176,8 @@ class OrderUpdateSchema(OrderCreateSchema):
     comment: str
     buyer_name: str
     buyer_phone: str
-    delivery_address: DeliveryAddressSchema | str
+    delivery_address: DeliveryAddressSchema
+    delivery_track_number: str = ''
 
 
 class UserOrderListSchema(BaseModel):
@@ -179,7 +205,7 @@ class OrderInCookie(BaseModel):
     comment: str = ''
     buyer_name: str = ''
     buyer_phone: str = ''
-    delivery_address: DeliveryAddressSchema | str = ''
+    delivery_address: DeliveryAddressSchema
 
     @utils.add_shop_to_context
     def build_context(self) -> dict[str, Any]:

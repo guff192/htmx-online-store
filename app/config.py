@@ -99,8 +99,29 @@ class Settings(BaseSettings):
     # payment settings
     # tinkoff settings
     tinkoff_terminal_id: str = Field(default='', alias='TINKOFF_TERMINAL_ID')
-    tinkoff_terminal_password: str = Field(default='',
-                                           alias='TINKOFF_TERMINAL_PASSWORD')
+    tinkoff_terminal_password: str = Field(
+        default='',
+        alias='TINKOFF_TERMINAL_PASSWORD'
+    )
+
+    # delivery settings
+    # cdek settings
+    cdek_base_api_url: Url = Field(
+        default='https://api.edu.cdek.ru/v2',
+        alias='CDEK_BASE_API_URL'
+    ) 
+    cdek_account: str = Field(
+        default='wqGwiQx0gg8mLtiEKsUinjVSICCjtTEP',
+        alias='CDEK_ACCOUNT'
+    )
+    cdek_secure_password: str = Field(
+        default='RmAmgvSgSl1yirlz9QupbzOJVqhCxcP5',
+        alias='CDEK_SECURE_PASSWORD'
+    )
+    cdek_shop_city_id: int = Field(
+        default=44,
+        alias='CDEK_SHOP_CITY_ID'
+    )
 
 
 def log_settings():

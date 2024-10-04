@@ -3,10 +3,10 @@ from typing import Any
 from fastapi import Depends
 from google.auth.jwt import Mapping
 from loguru import logger
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError
 from app.config import Settings
 
-from exceptions.auth_exceptions import ErrUserInvalid, ErrUserNotFound, ErrWrongCredentials
+from exceptions.auth_exceptions import ErrUserInvalid, ErrWrongCredentials
 from models.user import User
 from repository.user_repository import (
     UserRepository,

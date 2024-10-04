@@ -21,7 +21,6 @@ from viewmodels import (
 )
 from viewmodels.auth_viewmodel import (
     AuthViewModel,
-    auth_viewmodel_dependency,
     get_auth_viewmodel,
 )
 from viewmodels.user_viewmodel import (

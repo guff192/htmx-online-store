@@ -1,0 +1,37 @@
+<select name="city" id="city" class="text-black text-center w-full border border-gray-300 rounded p-2" value="{{ city }}" required
+    >
+    <!-- TODO: Remove this
+    hx-trigger="change"
+    hx-get="/delivery/cost"
+    hx-target="#order_sum"
+    hx-swap="innerHTML"
+    hx-push-url="false"
+    hx-replace-url="false"
+    -->
+    <option>--Пожалуйста, выберите город--</option>
+    {% for city in cities %}
+    <option value="{{ city.code }}">{{ city.name }}</option>
+    {% endfor %}
+</select>
+
+<script type="text/javascript">
+    if (typeof(citySelect) === 'undefined') { let citySelect; }
+    citySelect = document.querySelector('#city');
+
+    citySelect.addEventListener('change', (e) => {
+        document.querySelector('#city_name').value = citySelect.querySelector('option:checked').textContent;
+    });
+    citySelect.addEventListener('htmx:configRequest', (e) => {
+        if (typeof(orderId) !== 'undefined') { let orderId; }
+        if (typeof(productsCount) !== 'undefined') { let productsCount; }
+
+        orderId = document.querySelector("h1").innerText.match(/\d+/)[0];
+        productsCount = parseInt(document.querySelector('#products_count').textContent);
+
+        e.detail.parameters['order_id'] = orderId;
+        e.detail.parameters['products_count'] = productsCount;
+
+        console.log(e.detail);
+    });
+</script>
+

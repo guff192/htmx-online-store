@@ -21,11 +21,16 @@ class Order(Base):
     buyer_name = Column('buyer_name', String(255), nullable=False, default='')
     buyer_phone = Column('buyer_phone', String(255), nullable=False, default='')
 
-    delivery_address = Column('delivery_address', String(255), nullable=False,
-                              default='')
+    region_id = Column('region_id', Integer)
+    region_name = Column('region_name', String(255), default='')
+
+    city_id = Column('city_id', Integer)
+    city_name = Column('city_name', String(255), default='')
+    delivery_address = Column('delivery_address', String(255), nullable=False, default='')
+
+    delivery_track_number = Column('delivery_track_number', String(255), default='')
 
     payment = relationship('Payment', back_populates='order', uselist=False)
-
 
 
 class OrderProduct(Base):

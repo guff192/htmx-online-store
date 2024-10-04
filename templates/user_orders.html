@@ -15,14 +15,14 @@
 {% endif %}
 
 {% for order in orders %}
-<div id="order{{ order.id }}" class="border border-white p-5">
+<div id="order{{ order.id }}" class="md:w-1/2 mx-auto border rounded-lg p-5 mb-10">
 
     <h2 class="text-3xl font-bold uppercase text-center mb-5 mt-1">Заказ {{ order.id }}</h2>
     <button class="bg-black rounded p-1"
         hx-get="/order/{{ order.id }}"
         hx-target="#content"
         hx-swap="innerHTML"
-        hx-replace-url="true">
+        hx-push-url="true">
         <img src="{{ url_for('static', path='images/view.png') }}" class="w-14 h-14" alt="Просмотр заказа" title="Просмотр заказа">
     </button>
 
@@ -32,7 +32,7 @@
     <h3 class="text-3xl mb-5">Товары</h3>
     {% for product in order.products %}
 
-        <div class="mb-5">
+        <div class="mb-5 p-2 border rounded">
             <h4 class="text-xl">{{ product.product_name }}</h4>
             <p>Цена: {{ product.basic_price + product.selected_configuration.additional_price }}₽</p>
             <p>Конфигурация: {{ product.selected_configuration.name }} (+{{ product.selected_configuration.additional_price }}₽)</p>

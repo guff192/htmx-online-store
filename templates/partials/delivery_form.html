@@ -1,0 +1,73 @@
+<div id="delivery_form">
+    <div>
+        <label for="region" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Регион:</label>
+        <select name="region" id="region" class="text-black text-center w-full border border-gray-300 rounded p-2" required
+            {% if delivery_address %}
+            {% if delivery_address.region %}value="{{ delivery_address.region.code }}"{% else %}value=""{% endif %}
+            {% endif %}
+            hx-trigger="change"
+            hx-get="/delivery/cities"
+            hx-target="#city"
+            hx-swap="outerHTML"
+            hx-push-url="false"
+            hx-replace-url="false"
+            hx-on:htmx:before-request="document.querySelector('#region_name').value = this.querySelector('option:checked').textContent;">
+            {% if delivery_address %}
+                {% if delivery_address.region %}<option value="{{ delivery_address.region.code }}">{{ delivery_address.region.name }}</option>{% endif %}
+            {% endif %}
+            <option value="">--Пожалуйста, выберите регион--</option>
+            {% for region in regions %}
+                <option value="{{ region.code }}">{{ region.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="hidden" name="region_name" id="region_name"
+            {% if delivery_address %}
+            {% if delivery_address.region %}value="{{ delivery_address.region.name }}"{% else %}value=""{% endif %}
+            {% endif %}
+            >
+    </div>
+
+    <div>
+        <label for="city" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Город:</label>
+        <select name="city" id="city" class="text-black text-center w-full border border-gray-300 rounded p-2" required
+            {% if delivery_address %}
+            {% if delivery_address.city %}value="{{ delivery_address.city.code }}"{% else %}value=""{% endif %}
+            {% endif %}
+            >
+            <!-- TODO: Remove this
+            hx-trigger="change"
+            hx-get="/delivery/cost"
+            hx-target="#order{{ id }}sum"
+            hx-swap="innerHTML"
+            hx-push-url="false"
+            hx-replace-url="false"
+            hx-on:htmx:before-request="document.querySelector('#city_name').value = this.querySelector('option:checked').textContent;"
+            -->
+
+            {% if delivery_address %}
+            {% if delivery_address.city %}<option value="{{ delivery_address.city.code }}">{{ delivery_address.city.name }}</option>{% endif %}
+            {% endif %}
+            <option value="">--Пожалуйста, выберите город--</option>
+            {% for city in cities %}
+                <option value="{{ city.code }}">{{ city.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="hidden" name="city_name" id="city_name"
+            {% if delivery_address %}
+            {% if delivery_address.city %}value="{{ delivery_address.city.name }}"{% else %}value=""{% endif %}>
+            {% endif %}
+    </div>
+
+
+    <div>
+        <label for="delivery_address" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Адрес доставки:</label>
+        <input type="text" name="delivery_address" id="delivery_address" class="text-black text-center w-full border border-gray-300 rounded p-2" 
+        {% if delivery_address %}
+        value="{{ delivery_address.address }}"
+        {% else %}
+        value=""
+        {% endif %}
+        required>
+    </div>
+
+</div>

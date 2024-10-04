@@ -15,6 +15,7 @@ from db.session import get_db
 from middleware.auth_middleware import AdminMiddleware, LoginMiddleware
 from routes.auth_routes import router as auth_router
 from routes.cart_routes import router as cart_router
+from routes.delivery_routes import router as delivery_router
 from routes.home_routes import router as home_router
 from routes.product_routes import router as product_router
 from routes.product_photos_routes import router as product_photos_router
@@ -98,6 +99,7 @@ def get_app() -> FastAPI:
     app.include_router(home_router)
     app.include_router(cart_router)
     app.include_router(order_router)
+    app.include_router(delivery_router)
 
     return app
 

@@ -7,9 +7,11 @@ from pydantic_core import Url
 
 from app.config import Settings
 from schema.product_schema import ProductPhotoPath, ProductPhotoSize
+from storage.cache_storage import MemoryCacheStorage
 
 
 settings = Settings()
+cache = MemoryCacheStorage()
 
 
 class ProductPhotoStorage(ABC):
@@ -72,6 +74,7 @@ class S3ProductPhotoStorage(ProductPhotoStorage):
             return None
         return paths[0]
 
+    @cache.cache_response
     def get_all_by_name(
         self,
         name: str,

@@ -11,7 +11,7 @@
 </script>
 {% endif %}
 
-<div id="profile-info" class="w-full md:w-3/4 mx-auto h-min relative" hx-target="#content">
+<div id="profile-info" class="w-full md:w-3/4 mx-auto h-min relative" hx-target="#content" hx-push-url="true">
 
     <img src="{{ user.profile_img_url }}" class="w-60 h-60 mb-2 mx-auto rounded-xl">
 
@@ -37,7 +37,7 @@
             });
         </script>
 
-        <a href="/order" class="block rounded w-14 h-14 box-border" hx-boost="true">
+        <a href="/order" class="block rounded w-14 h-14 box-border" hx-boost="true" hx-push-url="/order">
             <img src="{{ url_for('static', path='images/orders.png') }}" class="w-full h-full" alt="Мои заказы" title="Мои заказы">
         </a>
 

@@ -4,6 +4,7 @@ from fastapi.responses import RedirectResponse
 from flask.app import Flask
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+from loguru import logger
 from sqlalchemy.orm import Session
 from starlette.middleware.base import (
     BaseHTTPMiddleware, RequestResponseEndpoint
@@ -147,12 +148,18 @@ class OrderModelView(ModelView):
 
     column_list: list[str] = ['id', 'user.email', 'buyer_name',
                               'date', 'payment.status']
-    column_details_list: list[str] = ['id', 'user.name', 'date']
+    column_details_list: list[str] = ['id', 'user.name', 'date', 'buyer_name',
+                                      'buyer_phone', 'region_name',
+                                      'city_name', 'delivery_address']
     form_columns: list[str] = ['user_id', 'date', 'buyer_name', 'buyer_phone',
                                'delivery_address']
     column_editable_list: list[str] = ['user_id', 'date', 'buyer_name']
 
     column_default_sort: tuple[str, bool] = ('date', True)
+
+    def delete_view(self):
+        logger.debug('Deleting order from admin panel')
+        return super().delete_view()
 
 
 class PaymentModelView(ModelView):
@@ -168,6 +175,7 @@ class PaymentModelView(ModelView):
                                       'date', 'status']
 
     column_default_sort: tuple[str, bool] = ('date', True)
+
 
 # ---------------------------------------------------------
 # Middleware

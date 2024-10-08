@@ -5,6 +5,7 @@ from fastapi import Depends
 from schema.auth_schema import (
     GoogleOAuthCredentials,
     OAuthCredentials,
+    PhoneLoginForm,
     YandexOauthCredentials
 )
 from services.auth_service import (
@@ -18,7 +19,7 @@ from services.auth_service import (
 
 class AuthViewModel:
     def __init__(self, auth_service: AuthService) -> None:
-        self.auth_service = auth_service
+        self._service = auth_service
 
     def verify_oauth(
             self, credentials: OAuthCredentials
@@ -26,16 +27,22 @@ class AuthViewModel:
 
         # Setup provider
         if isinstance(credentials, GoogleOAuthCredentials):
-            self.auth_service.oauth_provider = GoogleOAuthProvider()
+            self._service.oauth_provider = GoogleOAuthProvider()
         elif isinstance(credentials, YandexOauthCredentials):
-            self.auth_service.oauth_provider = YandexOAuthProvider()
+            self._service.oauth_provider = YandexOAuthProvider()
         else:
             return None
 
-        return self.auth_service.verify_oauth(credentials)
+        return self._service.verify_oauth(credentials)
+
+    def get_phone_code_input(self, phone_form: PhoneLoginForm) -> PhoneLoginForm:
+        return self._service.init_verification_call(phone_form)
+
+    def verify_phone_code(self, phone_form: PhoneLoginForm) -> PhoneLoginForm | None:
+        return self._service.verify_phone_code(phone_form)
 
     def create_session(self, data: dict) -> str:
-        return self.auth_service.create_access_token(data)
+        return self._service.create_access_token(data)
 
 
 def auth_viewmodel_dependency(

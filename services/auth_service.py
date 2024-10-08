@@ -20,12 +20,15 @@ from repository.user_repository import (
 from schema.auth_schema import (
     GoogleOAuthCredentials,
     OAuthCredentials,
+    PhoneLoginForm,
     YandexOauthCredentials
 )
 from schema.user_schema import LoggedUser
+from storage.cache_storage import MemoryCacheStorage
 
 
 settings = Settings()
+cache = MemoryCacheStorage()
 
 
 # Using strategy pattern to handle different oauth providers
@@ -91,6 +94,41 @@ class AuthService:
     ):
         self.repo = user_repo
 
+    def init_verification_call(self, phone_form: PhoneLoginForm) -> PhoneLoginForm:
+        # triggering method on caller API to initiate the call
+        # curl https://api.ucaller.ru/v1.0/initCall/ \
+        # -X "POST" \
+        # -H "Content-Type: application/json" \
+        # -H "Authorization: Bearer TV8P57aNs3Hi8UyT0FpZ2FzeMzPLedSh.593433" \
+        # -d '{"phone":79000000001, "client":"broTester"}'
+        url = f"https://api.ucaller.ru/v1.0/initCall/"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {settings.ucaller_service_secret_key}.{settings.ucaller_service_id}"
+        }
+        params = {
+            "phone": phone_form.phone,
+        }
+        response = requests.post(url, headers=headers, params=params)
+        if (response_data := response.json())["status"] is False:
+            logger.debug(response_data)
+            return PhoneLoginForm(phone=phone_form.phone,
+                                  error="Не получилось дозвониться на указанный номер.")
+        
+
+        # {"status":true,"ucaller_id":47799851,"phone":"7900***0001","code":"2476","client":"broTester"}%
+        # saving code value from response to memory cache
+        cache.cache_value(key=phone_form.phone, value=response_data["code"])
+
+        return PhoneLoginForm(phone=phone_form.phone)
+
+    def verify_phone_code(self, phone_form: PhoneLoginForm) -> PhoneLoginForm | None:
+        code = cache.get_cached_value(phone_form.phone)
+        if code != phone_form.code:
+            return PhoneLoginForm(phone=phone_form.phone, error="Неверный код.")
+
+        return None
+
     @property
     def oauth_provider(self) -> OauthProvider:
         return self._provider
@@ -111,7 +149,7 @@ class AuthService:
         if expires_delta:
             expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.now(timezone.utc) + timedelta(hours=2)
+            expire = datetime.now(timezone.utc) + timedelta(days=2)
         to_encode.update({"exp": expire})
 
         encoded_jwt = jwt.encode(

@@ -13,7 +13,8 @@ from repository.user_repository import (
     get_user_repository,
     user_repository_dependency,
 )
-from schema.user_schema import UserCreate, UserCreateGoogle, UserCreateYandex, UserResponse, UserUpdate
+from schema.auth_schema import PhoneLoginForm
+from schema.user_schema import UserCreate, UserCreateGoogle, UserCreatePhone, UserCreateYandex, UserResponse, UserUpdate
 
 
 settings = Settings()
@@ -49,6 +50,20 @@ class UserService:
 
     def _get_by_yandex_id(self, yandex_id: int) -> User | None:
         return self.repo.get_by_yandex_id(yandex_id)
+
+    def _parse_user_create_phone_schema(
+        self, phone_login_form: PhoneLoginForm
+    ) -> UserCreatePhone | None:
+        try:
+            user_schema = UserCreatePhone(
+                name='Пользователь без имени',
+                email='noemail@noemail.com',
+                phone=str(phone_login_form.phone),
+            )
+            return user_schema
+        except Exception as e:
+            logger.debug(f"Error parsing user schema: {e}")
+            return None
 
     def _parse_user_create_google_schema(
         self, google_user_id_info: Mapping[str, Any]
@@ -106,6 +121,21 @@ class UserService:
 
     def get_by_id(self, user_id: str) -> User | None:
         return self.repo.get_by_id(user_id)
+
+    def get_or_create_by_phone(
+        self,
+        phone: str
+    ) -> UserResponse:
+        user_model = self.repo.get_by_phone(phone)
+        if not user_model:
+            user_model = self.repo.create(
+                name="Пользователь без имени",
+                email="noemail@noemail.com",
+                phone=phone
+            )
+
+        user_schema = self.user_model_to_userresponse_schema(user_model)
+        return user_schema
 
     def get_or_create_by_yandex_id(
         self,

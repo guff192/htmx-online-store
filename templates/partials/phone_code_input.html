@@ -1,0 +1,37 @@
+{% if error %}
+<div id="phone_login_submit"
+    <p class="text-red-500 text-center text-xl">{{ error }}</p>
+
+    <input id="phone_login_submit" type="submit" value="Войти по телефону"
+        class="block bg-lightBlue md:w-3/4 w-full rounded p-2 font-bold">
+
+</div>
+{% else %}
+
+<input type="text" name="code" placeholder="1234"
+    class="text-black text-center md:w-3/4 w-full border border-gray-300 rounded p-2">
+
+<input id="phone_login_submit" type="submit" value="Войти по телефону"
+    class="block bg-lightBlue md:w-3/4 w-full rounded p-2 font-bold" hx-post="/auth/login/phone">
+
+<script>
+    document.body.addEventListener('htmx:beforeOnLoad', function (evt) {
+        console.log(evt);
+        if (evt.detail.xhr.status === 403) {
+            evt.detail.shouldSwap = true;
+            evt.detail.isError = false;
+        }
+    });
+    document.body.addEventListener('redirect', function (evt) {
+        console.log(evt);
+        window.location.href = evt.detail.value;
+    });
+    htmx.config.methodsThatUseUrlParams = ['get', 'post'];
+    if (typeof (phone_login_form) === 'undefined') {let phone_login_form;}
+    phone_login_form = document.querySelector('#phone_login_form');
+    phone_login_form.removeAttribute('hx-get');
+    phone_login_form.setAttribute('hx-post', '/auth/login/phone');
+    phone_login_form.setAttribute('hx-boost', 'false');
+</script>
+
+{% endif %}

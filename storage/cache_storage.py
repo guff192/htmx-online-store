@@ -11,7 +11,8 @@ class MemoryCacheStorage:
         return cls.instance
 
     def __init__(self) -> None:
-        self._cache: dict[tuple[str, tuple], Any] = {}
+        self._response_cache: dict[tuple[str, tuple], Any] = {}
+        self._values_cache: dict[str, Any] = {}
 
     def cache_response(self, request_func: Callable[..., Any]):
         full_func_name = request_func.__qualname__
@@ -22,11 +23,18 @@ class MemoryCacheStorage:
             else:
                 key_args = args[:] + tuple(kwargs.items())
 
-            if not (response := self._cache.get((full_func_name, key_args))):
+            if not (response := self._response_cache.get((full_func_name, key_args))):
                 response = request_func(*args, **kwargs)
-                self._cache[full_func_name, key_args] = response
+                self._response_cache[full_func_name, key_args] = response
 
             return response
 
         return wrapper
+
+    def cache_value(self, key: str, value: Any):
+        self._values_cache[key] = value
+
+    def get_cached_value(self, key: str) -> Any:
+        return self._values_cache.get(key)
+
 

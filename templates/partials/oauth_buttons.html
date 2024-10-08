@@ -1,99 +1,135 @@
-<div class="w-1/3 mx-auto my-5 flex flex-col justify-center">
-    {% if debug %}
-    <!-- Google sign-in -->
-    <script src="https://accounts.google.com/gsi/client" async></script>
-    <div id="g_id_onload"
-         data-client_id="935226770770-a46ho936db2qegqer0nufds50cajul0h.apps.googleusercontent.com"
-         data-context="signin"
-         data-ux_mode="popup"
-         data-login_uri="/auth/login/google"
-         data-auto_select="false"
-         data-itp_support="true">
-    </div>
-
-    <div class="g_id_signin w-1/2 mx-auto my-5 flex justify-center"
-         data-type="standard"
-         data-shape="pill"
-         data-theme="filled_blue"
-         data-text="signin_with"
-         data-size="large"
-         data-logo_alignment="left">
-    </div>
+<div class="mx-auto flex flex-col justify-center">
+    {% if 'login' not in request.url.path %}
+    <button
+        class="absolute right-0 top-0 block w-6 h-6 rounded-full bg-red-500 text-white mr-1 mt-1"
+        hx-delete="/remove_element"
+        hx-target="#login_choice"
+        hx-swap="outerHTML">X</button>
     {% endif %}
 
-    <!-- Tinkoff sign-in -->
-    <script src="https://sso-forms-prod.cdn-tinkoff.ru/tinkoff-id/widget.js"></script>
-    <div id="container-for-tid-button" class="w-1/2 mx-auto my-5 flex justify-center"></div>
-    <script type="text/javascript" async>
-        if(typeof(TidSDK) === "undefined") { let TidSDK; }
-        if(typeof(authParams) === "undefined") { let authParams; }
-        if(typeof(uiParams) === "undefined") { let uiParams; }
+    <form id="phone_login_form" method="post"
+        class="flex flex-col justify-around items-center my-1 h-36"
+        hx-boost="true"
+        hx-get="/auth/login/phone"
+        hx-target="#phone_login_submit"
+        hx-swap="outerHTML"
+        hx-push-url="false"
+        hx-replace-url="false"
+        >
 
-        authParams = {
-          redirectUri: '{{ shop.public_url }}home',
-          responseType: 'code',
-          clientId: 'sadfsfasfaszfsa',
-          state: 'some-state',
-        }
+        <input type="tel" data-tel-input placeholder="Телефон" name="phone"
+        class="text-black text-center md:w-3/4 w-full border border-gray-300 rounded p-2"
+        >
 
-        uiParams = {
-          container: '#container-for-tid-button',
-          size: 'm',
-          color: 'primary',
-          text: 'Tinkoff',
-          target: '_self'
-        }
+        <input id="phone_login_submit" type="submit" value="Войти по телефону"
+        class="block bg-lightBlue md:w-3/4 w-full rounded p-2 font-bold">
 
-        tidSdk = new TidSDK(authParams);
+        <script src="{{ url_for('static', path='js/phoneinput.js') }}"></script>
+    </form>
 
-        tidSdk.addButton(uiParams);
-    </script>
+    <hr class="my-1">
+    
+    {% if debug %}
+    <div class="my-1">
+        <!-- Google sign-in -->
+        <script src="https://accounts.google.com/gsi/client" async></script>
+        <div id="g_id_onload"
+             data-client_id="935226770770-a46ho936db2qegqer0nufds50cajul0h.apps.googleusercontent.com"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-login_uri="/auth/login/google"
+             data-auto_select="false"
+             data-itp_support="true">
+        </div>
 
-    <!-- Yandex sign-in -->
-    <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
-    <div id="yaButtonContainer" class="my-5 flex justify-center"></div>
-    <script type="text/javascript" async>
+        <div class="g_id_signin w-1/2 mx-auto my-1 flex justify-center"
+             data-type="standard"
+             data-shape="pill"
+             data-theme="filled_blue"
+             data-text="signin_with"
+             data-size="medium"
+             data-logo_alignment="left">
+        </div>
+        {% endif %}
+    </div>
 
-      window.YaAuthSuggest.init(
-        {
-          client_id: 'a84759ce6fca43beab9f850640f933ca',
-          response_type: 'token',
-          redirect_uri: '{{ shop.public_url }}auth/login/yandex',
-        },
-        '{{ shop.public_url }}auth/login/yandex',
-        {
-          view: "button",
-          parentId: "yaButtonContainer",
-          buttonSize: 'm',
-          buttonView: 'main',
-          buttonTheme: 'dark',
-          buttonBorderRadius: "22",
-          buttonIcon: 'ya',
-        }
-      )
-      .then(({handler}) => handler())
-      .then((data) => {
-        
-        if(data.access_token && data.token_type && data.expires_in) {
-          fetch("{{ shop.public_url }}auth/login/yandex", {
-            method: "POST",
-            body: JSON.stringify({
-              access_token: data.access_token,
-              token_type: data.token_type,
-              expires_in: data.expires_in,
-            }),
-            headers: {
-              "Content-type": "application/json; charset=UTF-8"
+    <div class="my-1">
+        <!-- Tinkoff sign-in -->
+        <script src="https://sso-forms-prod.cdn-tinkoff.ru/tinkoff-id/widget.js"></script>
+        <div id="container-for-tid-button" class="w-1/2 mx-auto my-1 flex justify-center"></div>
+        <script type="text/javascript" async>
+            if(typeof(TidSDK) === "undefined") { let TidSDK; }
+            if(typeof(authParams) === "undefined") { let authParams; }
+            if(typeof(uiParams) === "undefined") { let uiParams; }
+
+            authParams = {
+              redirectUri: '{{ shop.public_url }}home',
+              responseType: 'code',
+              clientId: 'sadfsfasfaszfsa',
+              state: 'some-state',
+            }
+
+            uiParams = {
+              container: '#container-for-tid-button',
+              size: 'm',
+              color: 'primary',
+              text: 'Tinkoff',
+              target: '_self'
+            }
+
+            tidSdk = new TidSDK(authParams);
+
+            tidSdk.addButton(uiParams);
+        </script>
+    </div>
+
+    <div class="my-1">
+        <!-- Yandex sign-in -->
+        <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
+        <div id="yaButtonContainer" class="my-1 flex justify-center w-1/2 mx-auto"></div>
+        <script type="text/javascript" async>
+
+          window.YaAuthSuggest.init(
+            {
+              client_id: 'a84759ce6fca43beab9f850640f933ca',
+              response_type: 'token',
+              redirect_uri: '{{ shop.public_url }}auth/login/yandex',
+            },
+            '{{ shop.public_url }}auth/login/yandex',
+            {
+              view: "button",
+              parentId: "yaButtonContainer",
+              buttonSize: 's',
+              buttonView: 'main',
+              buttonTheme: 'dark',
+              buttonBorderRadius: "22",
+              buttonIcon: 'ya',
+            }
+          )
+          .then(({handler}) => handler())
+          .then((data) => {
+            
+            if(data.access_token && data.token_type && data.expires_in) {
+              fetch("{{ shop.public_url }}auth/login/yandex", {
+                method: "POST",
+                body: JSON.stringify({
+                  access_token: data.access_token,
+                  token_type: data.token_type,
+                  expires_in: data.expires_in,
+                }),
+                headers: {
+                  "Content-type": "application/json; charset=UTF-8"
+                }
+              })
+              .then((response) => {
+                const cookie = response.headers.get("set-cookie");
+                window.location.href = '{{ shop.public_url }}'
+              });
             }
           })
-          .then((response) => {
-            const cookie = response.headers.get("set-cookie");
-            window.location.href = '{{ shop.public_url }}'
-          });
-        }
-      })
-      .catch(error => console.log('Обработка ошибки', error));
+          .catch(error => console.log('Обработка ошибки', error));
 
-    </script>
+        </script>
+    </div>
 
 </div>

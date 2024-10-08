@@ -1,13 +1,23 @@
+from typing import Any
 from pydantic import BaseModel
 
 
-class OAuthCredentials(BaseModel):
-    pass
+class PhoneLoginForm(BaseModel):
+    phone: str
+    error: str | None = None
+    code: str | None = None
+
+    def build_context(self) -> dict[str, Any]:
+        return self.__dict__
 
 
 class GoogleLoginForm(BaseModel):
     credential: str
     g_csrf_token: str
+
+
+class OAuthCredentials(BaseModel):
+    pass
 
 
 class GoogleOAuthCredentials(OAuthCredentials):

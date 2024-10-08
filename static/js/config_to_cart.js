@@ -3,8 +3,6 @@ document.addEventListener('htmx:configRequest', function (event) {
     const request_target_str = event.detail.headers['HX-Target'].toString();
     const current_url = event.detail.headers['HX-Current-URL'];
 
-    console.log(request_target_str);
-
     if (request_path.includes('/cart/add') || request_path.includes('/cart/remove')) {
         let product_id;
         let configuration_id;

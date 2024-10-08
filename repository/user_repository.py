@@ -16,6 +16,9 @@ class UserRepository:
         user_uuid = UUID(user_id)
         return self.db.query(User).get(user_uuid)
 
+    def get_by_phone(self, phone: str) -> User | None:
+        return self.db.query(User).filter_by(phone=phone).first()
+
     def get_by_email(self, email: str) -> User | None:
         return self.db.query(User).filter_by(email=email).first()
 
@@ -30,7 +33,8 @@ class UserRepository:
                email: str,
                profile_img_url: str = '',
                google_id: str | None = None,
-               yandex_id: int | None = None) -> User:
+               yandex_id: int | None = None,
+               phone: str | None = None) -> User:
         # Create user using given data
         if google_id:
             user = User(
@@ -38,7 +42,7 @@ class UserRepository:
                 email=email,
                 name=name,
                 profile_img_url=profile_img_url,
-                google_id=google_id
+                google_id=google_id,
             )
             self.db.add(user)
             self.db.commit()
@@ -50,6 +54,16 @@ class UserRepository:
                 name=name,
                 profile_img_url=profile_img_url,
                 yandex_id=yandex_id
+            )
+            self.db.add(user)
+            self.db.commit()
+            self.db.refresh(user)
+        elif phone:
+            user = User(
+                id=uuid4(),
+                email=email,
+                name=name,
+                phone=phone
             )
             self.db.add(user)
             self.db.commit()

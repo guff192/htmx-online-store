@@ -1,3 +1,4 @@
+import re
 from typing import Annotated, Any, Generator
  
 from fastapi import APIRouter, Body, Cookie, Depends, Form, Request, Response, status
@@ -8,6 +9,7 @@ from loguru import logger
 from schema.auth_schema import (
     GoogleLoginForm,
     GoogleOAuthCredentials,
+    PhoneLoginForm,
     YandexOauthCredentials
 )
 from schema.user_schema import LoggedUser, UserResponse, UserUpdate
@@ -21,6 +23,7 @@ from viewmodels import (
 )
 from viewmodels.auth_viewmodel import (
     AuthViewModel,
+    auth_viewmodel_dependency,
     get_auth_viewmodel,
 )
 from viewmodels.user_viewmodel import (
@@ -71,6 +74,66 @@ def get_login_page(
     return templates.TemplateResponse("login.html", context=context_data)
 
 
+@router.get("/login/phone", response_class=HTMLResponse)
+def get_phone_code_input(
+    request: Request,
+    phone: str,
+    auth_vm: AuthViewModel = Depends(auth_viewmodel_dependency)
+):
+    phone = phone.strip()
+    phone = ''.join(re.compile('([0-9]+)').findall(phone))
+    form_data = PhoneLoginForm(phone=phone)
+    form_data = auth_vm.get_phone_code_input(form_data)
+    context_data: dict[str, Any] = {"request": request}
+    context_data.update(form_data.build_context())
+
+    return templates.TemplateResponse("partials/phone_code_input.html", context=context_data)
+
+
+@router.post("/login/phone")
+def process_phone_login(
+    request: Request,
+    phone: str,
+    code: str,
+    auth_vm: AuthViewModel = Depends(auth_viewmodel_dependency),
+    user_vm: UserViewModel = Depends(user_viewmodel_dependency),
+):
+    form = PhoneLoginForm(phone=phone, code=code)
+
+    form.phone = form.phone.strip()
+    form.phone = ''.join(re.compile('([0-9]+)').findall(form.phone))
+    if (form_verification_data := auth_vm.verify_phone_code(form)):
+        logger.debug(form_verification_data)
+        context_data: dict[str, Any] = {"request": request}
+        context_data.update(form_verification_data.build_context())
+
+        return templates.TemplateResponse(
+            "partials/phone_code_input.html",
+            context=context_data,
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    user = user_vm.get_by_phone(form.phone)
+    token = auth_vm.create_session({'phone': form.phone, 'sub': str(user.id)})
+    response = Response(
+        status_code=status.HTTP_200_OK,
+        headers={
+            "Hx-Trigger": '{"redirect": "/auth/profile"}',
+        },
+    )
+    response.set_cookie(
+        key="_session",
+        value=token,
+        httponly=True,
+        samesite="strict",
+        secure=True,
+        max_age=86400000,
+    )
+    return response
+
+    return templates.TemplateResponse("partials/phone_code_input.html", context=context_data)
+
+
 @router.post("/login/google")
 def login_with_google_account(
     credential: Annotated[str, Form()],
@@ -103,7 +166,7 @@ def login_with_google_account(
         httponly=True,
         samesite="strict",
         secure=True,
-        max_age=2592000,
+        max_age=86400000,
     )
     return response
     # TODO: Create profile template and redirect to it here
@@ -169,7 +232,7 @@ def process_yandex_login(
         httponly=True,
         samesite="strict",
         secure=True,
-        max_age=2592000,
+        max_age=86400000,
     )
     return response
 

@@ -6,6 +6,7 @@ class UserBase(BaseModel):
     name: str
     email: str
     profile_img_url: str | None = None
+    phone: str | None = None
     google_id: str | None = None
     yandex_id: int | None = None
     is_admin: bool = False
@@ -24,6 +25,10 @@ class UserCreate(UserBase):
 
 class UserUpdate(UserBase):
     id: UUID
+
+
+class UserCreatePhone(UserCreate):
+    phone: str
 
 
 class UserCreateGoogle(UserCreate):

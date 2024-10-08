@@ -53,7 +53,7 @@
                     if (!email.value && !phone.value)
                         return alert("Поле E-mail или Phone не должно быть пустым");
 
-                    TPF.receipt.value = JSON.stringify({
+                    const receipt = {
                         "EmailCompany": "{{ shop.email }}",
                         "Taxation": "osn",
                         "FfdVersion": "1.2",
@@ -81,7 +81,20 @@
                                 "MeasurementUnit": "шт"
                             }
                         ]
-                    });
+                    };
+                    // const totalPriceWithoutDelivery = receipt.Items.reduce((acc, item) => acc + item.Price * item.Quantity, 0);
+                    // receipt.Items.push({
+                    //     "Name": "Доставка",
+                    //     "Price": {{ sum }} * 100 - totalPriceWithoutDelivery,
+                    //     "Quantity": 1.00,
+                    //     "Amount": {{ sum }} * 100 - totalPriceWithoutDelivery,
+                    //     "PaymentMethod": "full_prepayment",
+                    //     "PaymentObject": "commodity",
+                    //     "Tax": "none",
+                    //     "MeasurementUnit": "шт"
+                    // });
+
+                    TPF.receipt.value = JSON.stringify(receipt);
                 }
                 
                 pay(TPF);

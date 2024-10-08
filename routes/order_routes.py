@@ -9,10 +9,11 @@ from routes.cookies import get_cart_from_cookies, get_order_from_cookies
 from routes.auth_routes import oauth_user_dependency
 from routes.payment_routes import router as payment_router
 from schema.order_schema import (
-    OrderCreateSchema, OrderUpdateSchema
+    CitySchema, DeliveryAddressSchema, OrderCreateSchema, OrderUpdateSchema, RegionSchema
 )
 from schema.user_schema import LoggedUser, UserCreate
 from viewmodels.auth_viewmodel import AuthViewModel, auth_viewmodel_dependency
+from viewmodels.delivery_viewmodel import DeliveryViewModel, delivery_viewmodel_dependency
 from viewmodels.order_viewmodel import OrderViewModel, order_viewmodel_dependency
 
 
@@ -27,6 +28,7 @@ def create_order(
     request: Request,
     user: LoggedUser | None = Depends(oauth_user_dependency),
     vm: OrderViewModel = Depends(order_viewmodel_dependency),
+    delivery_vm: DeliveryViewModel = Depends(delivery_viewmodel_dependency),
 ):
     cookie_order_str: str = ''
     if not user:
@@ -41,10 +43,16 @@ def create_order(
         )
         order = vm.create_order(order_create_schema)
 
-    # generating context
-    context = {'request': request, 'user': user, **order.build_context(),
-             'editable': True}
+    regions = delivery_vm.get_regions()
 
+    # generating context
+    context = {
+        'request': request,
+        'user': user,
+        **order.build_context(),
+        'regions': regions,
+        'editable': True
+    }
     # choosing template
     if request.headers.get('hx-request'):
         template_name = 'partials/order.html'
@@ -74,15 +82,16 @@ def get_order(request: Request, order_id: int,
     order = vm.get_by_id(order_id, str(user.id))
 
     if request.headers.get('hx-request'):
-        return templates.TemplateResponse(
-            'partials/order.html',
-            {'request': request, **order.build_context()}
-        )
-
-    return templates.TemplateResponse(
-        'order.html',
+        template_name = 'partials/order.html'
+    else:
+        template_name = 'order.html'
+    response = templates.TemplateResponse(
+        template_name,
         {'request': request, **order.build_context()}
     )
+    if request.cookies.get('_payment_for_order'):
+        response.delete_cookie('_payment_for_order')
+    return response
 
 
 @router.get('/')
@@ -107,9 +116,12 @@ def get_user_orders(request: Request,
 
 
 @router.get('/{order_id}/edit')
-def edit_order(request: Request, order_id: int,
-                user: LoggedUser | None = Depends(oauth_user_dependency),
-                vm: OrderViewModel = Depends(order_viewmodel_dependency)):
+def edit_order(
+    request: Request, order_id: int,
+    user: LoggedUser | None = Depends(oauth_user_dependency),
+    vm: OrderViewModel = Depends(order_viewmodel_dependency),
+    delivery_vm: DeliveryViewModel = Depends(delivery_viewmodel_dependency),
+):
     cookie_order_str = ''
     if not user:
         order = get_order_from_cookies(request.cookies)
@@ -121,8 +133,15 @@ def edit_order(request: Request, order_id: int,
     else:
         order = vm.get_by_id(order_id, str(user.id))
 
-    context = {'request': request, 'user': user,
-               **order.build_context(), 'editable': True}
+    regions = delivery_vm.get_regions()
+
+    context = {
+        'request': request,
+        'user': user,
+        **order.build_context(),
+        'regions': regions,
+        'editable': True
+    }
     if user and not context.get('buyer_name'):
         context['buyer_name'] = user.name
 
@@ -140,15 +159,24 @@ def edit_order(request: Request, order_id: int,
 
 
 @router.put('/{order_id}')
-def update_order(request: Request,
-                 order_id: int = 0,
-                 comment: str = '', buyer_name: str = '',
-                 buyer_phone: str = '', delivery_address: str = '',
-                 email: str = '',
-                 user: LoggedUser | None = Depends(oauth_user_dependency),
-                 vm: OrderViewModel = Depends(order_viewmodel_dependency),
-                 auth_vm: AuthViewModel = Depends(auth_viewmodel_dependency),):
+def update_order(
+    request: Request,
+    order_id: int = 0,
+    comment: str = '',
+    buyer_name: str = '', buyer_phone: str = '', email: str = '',
+    region: int = 0, region_name: str = '', city: int = 0, city_name: str = '',
+    delivery_address: str = '',
+    user: LoggedUser | None = Depends(oauth_user_dependency),
+    vm: OrderViewModel = Depends(order_viewmodel_dependency),
+    auth_vm: AuthViewModel = Depends(auth_viewmodel_dependency),
+):
     user_token = ''
+    address = DeliveryAddressSchema(
+        region=RegionSchema(code=region, name=region_name),
+        city=CitySchema(code=city, name=city_name),
+        address=delivery_address
+    )
+
     if not user:
         if not all((email, buyer_name)):
             raise ErrOrderInvalid
@@ -162,14 +190,14 @@ def update_order(request: Request,
             id=order_id, user_id=str(new_user.id),
             date=datetime.now(timezone.utc), comment=comment,
             buyer_name=buyer_name, buyer_phone=buyer_phone,
-            delivery_address=delivery_address
+            delivery_address=address
         )
     else:
         order_update = OrderUpdateSchema(
             id=order_id, user_id=str(user.id),
             date=datetime.now(timezone.utc), comment=comment,
             buyer_name=buyer_name, buyer_phone=buyer_phone,
-            delivery_address=delivery_address
+            delivery_address=address
         )
 
     updated_order = vm.update_order(order_update)

@@ -98,12 +98,14 @@ class OrderRepository:
 
         return order
 
-    def update(self, order_id: int, user_id: str | None,
-               comment: str, buyer_name: str, delivery_address: str,
-               buyer_phone: str) -> Order:
-        logger.debug(
-            f'{order_id = }\n{user_id = }\n{comment = }\n{buyer_name = }\n{delivery_address = }\n{buyer_phone = }'
-        )
+    def update(
+        self, order_id: int, user_id: str | None,
+        comment: str, buyer_name: str,
+        region_id: int, region_name: str, city_id: int, city_name: str,
+        delivery_address: str,
+        buyer_phone: str,
+        delivery_track_number: str
+    ) -> Order:
         found_order_query = self._get_order_query(order_id)
 
         found_order = found_order_query.first()
@@ -112,29 +114,27 @@ class OrderRepository:
         
         found_order_dict = found_order.__dict__
         found_order_user_id = found_order_dict.get('user_id', '')
+        update_dict = {
+            Order.comment: comment,
+            Order.buyer_name: buyer_name,
+            Order.region_id: region_id,
+            Order.region_name: region_name,
+            Order.city_id: city_id,
+            Order.city_name: city_name,
+            Order.delivery_address: delivery_address,
+            Order.buyer_phone: buyer_phone,
+        }
+
         if found_order_user_id:
             if str(found_order_user_id) != user_id:
                 logger.debug(f'User id of found order ({found_order_user_id}) doesn\'t match with user\'s id ({user_id})')
                 raise ErrAccessDenied(f'order {order_id}')
-
-            update_dict = {
-                Order.comment: comment,
-                Order.buyer_name: buyer_name,
-                Order.delivery_address: delivery_address,
-                Order.buyer_phone: buyer_phone
-            }
-
-        else:
             logger.info('Setting new user id')
-            update_dict = {
-                Order.comment: comment,
-                Order.user_id: user_id,
-                Order.buyer_name: buyer_name,
-                Order.delivery_address: delivery_address,
-                Order.buyer_phone: buyer_phone
-            }
+            update_dict[Order.user_id] = found_order_user_id
+        if delivery_track_number:
+            update_dict[Order.delivery_track_number] = delivery_track_number
 
-        found_order_query.update(update_dict)
+        found_order_query.update(update_dict) # type: ignore
         self._session.commit()
         self._session.flush([found_order])
 

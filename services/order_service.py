@@ -18,11 +18,12 @@ from repository.product_repository import (
 )
 from schema.cart_schema import CartInCookie
 from schema.order_schema import (
-    CookieOrderProduct, OrderInCookie, OrderProductSchema, OrderSchema, OrderUpdateSchema, OrderWithPaymentSchema,
-    PaymentSchema, PaymentStatus, UserOrderListSchema
+    CitySchema, CookieOrderProduct, DeliveryAddressSchema, OrderInCookie, OrderProductSchema, OrderSchema, OrderUpdateSchema, OrderWithPaymentSchema,
+    PaymentSchema, PaymentStatus, RegionSchema, UserOrderListSchema
 )
 from schema.product_schema import ProductConfiguration as ProductConfigurationSchema
 from schema.user_schema import UserCreate, UserResponse
+from services.delivery_service import DeliveryService, delivery_service_dependency
 from services.user_service import UserService, user_service_dependency
 
 
@@ -31,16 +32,19 @@ class OrderService:
                  cart_repo: CartRepository,
                  config_repo: ConfigurationRepository,
                  product_repo: ProductRepository,
-                 user_service: UserService) -> None:
+                 user_service: UserService,
+                 delivery_service: DeliveryService) -> None:
         self._repo = repo
         self._cart_repo = cart_repo
         self._config_repo = config_repo
         self._product_repo = product_repo
         self._user_service = user_service
+        self._delivery_service = delivery_service
 
     def _order_model_to_schema(self, order_model: Order) -> OrderSchema | OrderWithPaymentSchema:
         # getting data from model
         order_model_dict = order_model.__dict__
+        logger.debug(f'{order_model_dict=}')
         order_id = order_model_dict.get('id', 0)
         user_id = str(order_model_dict.get('user_id', ''))
         order_date: datetime = order_model_dict.get('date', datetime.now(timezone.utc))
@@ -49,7 +53,22 @@ class OrderService:
         order_comment = order_model_dict.get('comment', '')
         order_buyer_name = order_model_dict.get('buyer_name', '')
         order_buyer_phone = order_model_dict.get('buyer_phone', '')
-        order_address = order_model_dict.get('delivery_address', '')
+        delivery_track_number = order_model_dict.get('delivery_track_number', '')
+        delivery_track_number = '' if not delivery_track_number else delivery_track_number
+
+        # parsing address
+        region_code = order_model_dict.get('region_id', 0)
+        region_name = order_model_dict.get('region_name', '')
+        city_code = order_model_dict.get('city_id', 0)
+        city_name = order_model_dict.get('city_name', '')
+        region_code = 0 if not region_code else region_code
+        city_code = 0 if not city_code else city_code
+        delivery_address = order_model_dict.get('delivery_address', '')
+        address_schema = DeliveryAddressSchema(
+            region=RegionSchema(code=region_code, name=region_name),
+            city=CitySchema(code=city_code, name=city_name),
+            address=delivery_address
+        )
 
         # creating order products schema
         order_products_model: list[OrderProduct] = self.get_order_products(order_model.id)
@@ -113,8 +132,9 @@ class OrderService:
                 comment=order_comment,
                 buyer_name=order_buyer_name,
                 buyer_phone=order_buyer_phone,
-                delivery_address=order_address,
-                payment=payment_schema
+                delivery_address=address_schema,
+                payment=payment_schema,
+                delivery_track_number=delivery_track_number
             )
         else:
             order_schema = OrderSchema(
@@ -126,7 +146,8 @@ class OrderService:
                 comment=order_comment,
                 buyer_name=order_buyer_name,
                 buyer_phone=order_buyer_phone,
-                delivery_address=order_address
+                delivery_address=address_schema,
+                delivery_track_number=delivery_track_number
             )
 
         return order_schema
@@ -148,16 +169,34 @@ class OrderService:
 
         return sum
 
-    def get_by_id(self, order_id: int, user_id: str) -> OrderSchema:
+    def get_order_sum_with_delivery(self, order_id: int) -> int:
+        order_model = self._repo.get_by_id(order_id)
+        if not order_model:
+            raise ErrOrderNotFound(order_id)
+        order_dict = order_model.__dict__
+        order_city_id = order_dict.get('city_id', 0)
+
+        sum = self.get_order_sum(order_id)
+        return sum + self._delivery_service.get_shipping_cost(
+            order_city_id,
+            len(self.get_order_products(order_id))
+        )
+
+    def get_by_id(self, order_id: int, user_id: str | None = None) -> OrderSchema:
         order_model = self._repo.get_by_id(order_id)
         if not order_model:
             logger.debug(f'{order_id = }')
             raise ErrOrderNotFound(order_id)
 
         order_schema = self._order_model_to_schema(order_model)
-        if not order_schema.user_id == user_id:
+        if user_id and not order_schema.user_id == user_id:
             raise ErrOrderNotFound(order_id)
 
+        # recalculating order sum with shipping cost
+        # if order_schema.delivery_address.city.code:
+        #     order_schema.sum += self._delivery_service.get_shipping_cost(
+        #         order_schema.delivery_address.city.code, len(order_schema.products)
+        #     )
 
         return order_schema
 
@@ -218,25 +257,29 @@ class OrderService:
         return self._user_service.create_with_basic_info(user)
 
     def update_order(self, order_update: OrderUpdateSchema) -> OrderSchema:
-        if not isinstance(order_update.delivery_address, str):
-            order_update.delivery_address = (
-                order_update.delivery_address.city
-                + order_update.delivery_address.street
-                + order_update.delivery_address.house_number
-                + order_update.delivery_address.flat_number
-            )
-
         if order_update.user_id:
             pass # Create user here
 
         logger.debug(f'Updating order with schema: {order_update}')
-        order_model = self._repo.update(order_update.id, order_update.user_id,
-                                        order_update.comment,
-                                        order_update.buyer_name,
-                                        order_update.delivery_address,
-                                        order_update.buyer_phone)
+        order_model = self._repo.update(
+            order_update.id, order_update.user_id,
+            order_update.comment,
+            order_update.buyer_name,
+            order_update.delivery_address.region.code,
+            order_update.delivery_address.region.name,
+            order_update.delivery_address.city.code,
+            order_update.delivery_address.city.name,
+            order_update.delivery_address.address,
+            order_update.buyer_phone,
+            order_update.delivery_track_number,
+        )
 
         order_schema = self._order_model_to_schema(order_model)
+        # recalculating order sum with shipping cost
+        # order_schema.sum += self._delivery_service.get_shipping_cost(
+        #     order_schema.delivery_address.city.code, len(order_schema.products)
+        # )
+
         logger.debug(f'Updated order: {order_schema}')
 
         return order_schema
@@ -253,9 +296,10 @@ def order_service_dependency(
         configuration_repository_dependency
     ),
     product_repo: ProductRepository = Depends(product_repository_dependency),
-    user_service: UserService = Depends(user_service_dependency)
+    user_service: UserService = Depends(user_service_dependency),
+    delivery_service: DeliveryService = Depends(delivery_service_dependency),
 ) -> Generator[OrderService, None, None]:
 
-    service = OrderService(repo, cart_repo, config_repo, product_repo, user_service)
+    service = OrderService(repo, cart_repo, config_repo, product_repo, user_service, delivery_service)
     yield service
 

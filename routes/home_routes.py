@@ -42,6 +42,11 @@ def home(
     products_vm: ProductViewModel = Depends(product_viewmodel_dependency),
     banner_vm: BannerViewModel = Depends(banner_viewmodel_dependency),
 ):
+    if (paid_order_id := request.cookies.get('_payment_for_order', '')):
+        response = RedirectResponse(f'/order/{paid_order_id}', status_code=status.HTTP_303_SEE_OTHER)
+        response.delete_cookie('_payment_for_order')
+        return response
+
     products_schema = products_vm.get_newcomers(offset=offset)
     banners_schema = banner_vm.get_all()
     if not user:

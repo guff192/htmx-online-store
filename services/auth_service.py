@@ -95,23 +95,27 @@ class AuthService:
         self.repo = user_repo
 
     def init_verification_call(self, phone_form: PhoneLoginForm) -> PhoneLoginForm:
-        url = f"https://api.ucaller.ru/v1.0/initCall/"
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {settings.ucaller_service_secret_key}.{settings.ucaller_service_id}"
-        }
-        params = {
-            "phone": phone_form.phone,
-        }
-        response = requests.post(url, headers=headers, params=params)
-        if (response_data := response.json())["status"] is False:
-            logger.debug(response_data)
-            return PhoneLoginForm(phone=phone_form.phone,
-                                  error="Не получилось дозвониться на указанный номер.")
-        
+        if not settings.debug:
+            logger.debug('Ucaller service is not available in production mode.')
+            url = f"https://api.ucaller.ru/v1.0/initCall/"
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {settings.ucaller_service_secret_key}.{settings.ucaller_service_id}"
+            }
+            params = {
+                "phone": phone_form.phone,
+            }
+            response = requests.post(url, headers=headers, params=params)
+            if (response_data := response.json())["status"] is False:
+                logger.debug(response_data)
+                return PhoneLoginForm(phone=phone_form.phone,
+                                      error="Не получилось дозвониться на указанный номер.")
+        else:
+            response_data = {
+                "status": True,
+                "code": "1234"
+            }
 
-        # {"status":true,"ucaller_id":47799851,"phone":"7900***0001","code":"2476","client":"broTester"}%
-        # saving code value from response to memory cache
         cache.cache_value(key=phone_form.phone, value=response_data["code"])
 
         return PhoneLoginForm(phone=phone_form.phone)

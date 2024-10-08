@@ -123,6 +123,17 @@ class Settings(BaseSettings):
         alias='CDEK_SHOP_CITY_ID'
     )
 
+    # phone verification settings
+    # ucaller settings
+    ucaller_service_id: str = Field(
+        default='',
+        alias='UCALLER_SERVICE_ID'
+    )
+    ucaller_service_secret_key: str = Field(
+        default='',
+        alias='UCALLER_SERVICE_SECRET_KEY'
+    )
+
 
 def log_settings():
     settings = Settings().model_dump()

@@ -1,4 +1,5 @@
 from typing import Any
+from uuid import uuid4
 
 from fastapi import Depends
 from google.auth.jwt import Mapping
@@ -23,6 +24,7 @@ settings = Settings()
 class UserService:
     def __init__(self, user_repo: UserRepository) -> None:
         self.repo = user_repo
+        self._shop_url = settings.shop_public_url.host
 
     def user_model_to_userresponse_schema(
         self, user_model: User
@@ -128,9 +130,11 @@ class UserService:
     ) -> UserResponse:
         user_model = self.repo.get_by_phone(phone)
         if not user_model:
+            user_name = f"Пользователь с номером {phone}"
+            user_email = f"{str(uuid4()).split('-')[0]}@{settings.shop_public_url.host}"
             user_model = self.repo.create(
-                name="Пользователь без имени",
-                email="noemail@noemail.com",
+                name=user_name,
+                email=user_email,
                 phone=phone
             )
 

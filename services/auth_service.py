@@ -95,12 +95,6 @@ class AuthService:
         self.repo = user_repo
 
     def init_verification_call(self, phone_form: PhoneLoginForm) -> PhoneLoginForm:
-        # triggering method on caller API to initiate the call
-        # curl https://api.ucaller.ru/v1.0/initCall/ \
-        # -X "POST" \
-        # -H "Content-Type: application/json" \
-        # -H "Authorization: Bearer TV8P57aNs3Hi8UyT0FpZ2FzeMzPLedSh.593433" \
-        # -d '{"phone":79000000001, "client":"broTester"}'
         url = f"https://api.ucaller.ru/v1.0/initCall/"
         headers = {
             "Content-Type": "application/json",

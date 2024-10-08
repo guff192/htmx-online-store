@@ -13,6 +13,12 @@ from services.user_service import (
 class UserViewModel:
     def __init__(self, user_service: UserService) -> None:
         self.user_service = user_service
+    
+    def get_by_id(self, user_id: str) -> UserResponse:
+        return self.user_service.get_by_id(user_id)
+
+    def get_by_phone(self, phone: str) -> UserResponse:
+        return self.user_service.get_or_create_by_phone(phone)
 
     def get_by_google_id_or_create(
         self, id_info: Mapping[str, Any]

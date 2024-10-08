@@ -13,7 +13,8 @@ class User(Base):
     yandex_id = Column(Integer, unique=True)
 
     name = Column(String(255), nullable=False)
-    email = Column(EmailType, nullable=False, unique=True)
+    email = Column(EmailType, unique=True)
+    phone = Column(String(255), unique=True)
 
     profile_img_url = Column(String(255))
 

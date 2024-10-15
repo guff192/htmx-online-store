@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from datetime import datetime, timedelta, timezone
-import time
+from time import time
 from typing import Any, Mapping, Protocol
 
 from fastapi import Depends
@@ -58,7 +58,7 @@ class GoogleOAuthProvider(OauthProvider):
                 credentials.form_data.credential,
                 google_auth_requests.Request(),
                 settings.google_oauth2_client_id,
-                int(time.time())
+                int(time())
             )
 
             return id_info
@@ -116,7 +116,10 @@ class AuthService:
                 "code": "1234"
             }
 
-        cache.cache_value(key=phone_form.phone, value=response_data["code"])
+        cache.add_value_to_cache(
+            key=phone_form.phone,
+            value=response_data["code"],
+            expires_at=int(time()) + 180)
 
         return PhoneLoginForm(phone=phone_form.phone)
 

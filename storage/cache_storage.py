@@ -1,6 +1,9 @@
+from time import time
 from typing import Any, Callable
 
 from loguru import logger
+
+from schema.cache_schema import CacheValueSchema
 
 
 class MemoryCacheStorage:
@@ -12,7 +15,10 @@ class MemoryCacheStorage:
 
     def __init__(self) -> None:
         self._response_cache: dict[tuple[str, tuple], Any] = {}
-        self._values_cache: dict[str, Any] = {}
+        self._values_cache: dict[str, CacheValueSchema] = {}
+
+    def remove_expired_values(self) -> None:
+        self._values_cache = {k: v for k, v in self._values_cache.items() if time() < v.expires_at}
 
     def cache_response(self, request_func: Callable[..., Any]):
         full_func_name = request_func.__qualname__
@@ -31,10 +37,18 @@ class MemoryCacheStorage:
 
         return wrapper
 
-    def cache_value(self, key: str, value: Any):
-        self._values_cache[key] = value
+    def add_value_to_cache(self, key: str, value: Any, expires_at: int = 0) -> None:
+        self._values_cache[key] = CacheValueSchema(value=value, expires_at=expires_at)
 
     def get_cached_value(self, key: str) -> Any:
-        return self._values_cache.get(key)
+        cached_value = self._values_cache.get(key)
+        if not cached_value:
+            return None
+
+        if cached_value.expires_at and time() >= cached_value.expires_at:
+            del self._values_cache[key]
+            return None
+        return cached_value.value
+
 
 

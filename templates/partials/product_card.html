@@ -1,7 +1,7 @@
 <div
     id="product{{ product.id }}card{% if product.selected_configuration %}{{ product.selected_configuration.id }}{% endif %}"
-    class="border border-gray-800 bg-black rounded-lg w-full p-2 mb-2 text-center text-white cursor-pointer brightness-95 hover:brightness-100 group"
-    style="height: 40vh;"
+    class="bg-white w-full px-10 py-5 mb-2 text-center text-black cursor-pointer brightness-100 hover:brightness-105 shadow-lg group"
+    style="height: 50vh;"
     hx-boost="true"
     hx-get="{{ product.absolute_url }}#offset"
     hx-swap="innerHTML show:#offset:bottom"
@@ -24,12 +24,12 @@
 
     <!-- Product name -->
     <h3 class="text-lg font-bold uppercase h-1/5 box-border group-hover:underline">
-        <a href="{{ product.absolute_url }}#offset">{{ product.name }}</a>
+        <a href="{{ product.absolute_url }}#offset">{{ product.name | replace(',', '') | truncate(40) }}</a>
     </h3>
 
-    <!-- Description -->
-    <div class="h-1/5 box-border flex flex-col justify-between group-hover:underline">
-        <p class="text-sm">{{ product.description.replace('\n', '<br>') | safe | truncate(50) }}</p>
+    <!-- Reviews -->
+    <div class="h-1/5 box-border my-2 flex flex-col justify-between group-hover:underline">
+        <p class="text-sm flex justify-evenly"><span class="text-red-600 font-bold">★ 4.9</span><span class="text-gray-500">25 отзывов</span></p>
     </div>
 
     <!-- Price -->

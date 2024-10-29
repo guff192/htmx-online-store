@@ -75,7 +75,7 @@
         <div class="flex flex-row-reverse gap-2 text-xl">
             <label for="touchscreen_false">Нет</label>   
             <input name="touchscreen" id="touchscreen_false" type="radio" class="w-6 h-6"
-            hx-get="/products" hx-trigger="change" value="false">
+            hx-get="/products" hx-trigger="change" value="false" checked>
         </div>
     </div>
 
@@ -84,7 +84,7 @@
     <div class="flex flex-col items-start">
         <div class="flex flex-row-reverse gap-2 text-xl">
             <label for="graphics">Да</label>
-            <input type="checkbox" name="graphics" id="graphics_true" class="w-6 h-6" 
+            <input type="checkbox" name="graphics" id="graphics_true" class="w-6 h-6" checked
             hx-get="/products" hx-trigger="change" value="true">
         </div>
 

@@ -21,26 +21,41 @@
 
 
 {% block content %}
-<!-- Search bar -->
-<div class="flex justify-center mb-5">
-    <form method="get" action="/products/search" class="w-1/2">
-        <input type="text" name="query" placeholder="Поиск по названию или описанию"
-        class="w-full text-center border border-gray-500 rounded-lg p-2"
-        hx-trigger="keyup changed delay:200ms"
-        hx-get="/products/search"
-        hx-target="#products"
-        hx-swap="innerHTML">
-    </form>
-</div>
+<!-- Filters and products grid -->
+<div class="flex justify-center md:gap-4 mb-5">
 
-<!-- Products grid -->
-<div id="products" class="md:grid md:grid-cols-4 md:gap-2">
-    <img
-        src="{{ url_for('static', path='images/loading.webp') }}"
-        id="products-loader"
-        hx-trigger="intersect once"
-        hx-get="/products?offset=0"
-        hx-swap="outerHTML"
-        >
+    <!-- Filters -->
+    <div id="filters" class="w-1/4 bg-white shadow-lg">
+        {% include 'partials/filters.html' %}
+    </div>
+
+
+    <!-- Products -->
+    <div class="flex flex-col items-center w-3/4">
+
+        <!-- Search bar -->
+        <div class="flex justify-center mb-5 w-full">
+            <form method="get" action="/products/search" class="w-3/4">
+                <input type="text" name="query" placeholder="Поиск по названию или описанию"
+                class="w-full text-center border border-gray-500 rounded-lg p-2"
+                hx-trigger="keyup changed delay:200ms"
+                hx-get="/products/search"
+                hx-target="#products"
+                hx-swap="innerHTML">
+            </form>
+        </div>
+
+        <!-- Products grid -->
+        <div id="products" class="md:grid md:grid-cols-3 md:gap-2">
+            <img
+            src="{{ url_for('static', path='images/loading.webp') }}"
+            id="products-loader"
+            hx-trigger="intersect once"
+            hx-get="/products?offset=0"
+            hx-swap="outerHTML"
+            >
+        </div>
+
+    </div>
 </div>
 {% endblock %}

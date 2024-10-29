@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-import subprocess
 import sys
 
 from fastapi import FastAPI
@@ -9,7 +8,7 @@ from loguru import logger
 
 from app.admin import get_admin_app
 from app.config import Settings, log_settings
-from app.initial_setup import fetch_products
+from app.initial_setup import fetch_products, reload_tailwindcss, run_migrations
 from db import init_db
 from db.session import get_db
 from middleware.auth_middleware import AdminMiddleware, LoginMiddleware
@@ -34,23 +33,15 @@ async def lifecycle(app: FastAPI):
     '''
     # initialize database (create all tables if they don't exist)
     init_db()
+    run_migrations()
+
     if settings.debug:
         token = get_auth_service().create_access_token({'sub': '3b15eef2e9f24623afeda25d49b95960'})
         logger.debug(f'{token = }')
     else:
         fetch_products(get_db())
 
-    # reload tailwindcss
-    try:
-        subprocess.run([
-            'tailwindcss',
-            '-i',
-            str(settings.static_dir / 'src' / 'tw.css'),
-            '-o',
-            str(settings.static_dir / 'css' / 'main.css'),
-        ])
-    except Exception as e:
-        print(f'Error running tailwindcss: {e}')
+    reload_tailwindcss()
 
     # add loggers
     logger.remove()  # remove default logger

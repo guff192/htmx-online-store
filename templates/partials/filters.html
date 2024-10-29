@@ -1,0 +1,98 @@
+<div class="w-4/5 mx-auto flex flex-col items-start">
+    <!-- RAM -->
+    <h3 class="text-lg font-bold">Оперативная память</h3>
+    <div class="flex flex-col items-start">
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="all_ram">8 GB</label>
+            <input name="ram" id="ram_8" type="checkbox" class="w-6 h-6"
+            hx-get="/products" hx-trigger="change" value="8GB" checked>
+        </div>
+
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="all_ram">16 GB</label>
+            <input name="ram" id="ram_16" type="checkbox" class="w-6 h-6"
+            hx-get="/products" hx-trigger="change" value="16GB" checked>
+        </div>
+    </div>
+
+    <!-- SSD -->
+    <h3 class="text-lg font-bold">Жесткий диск (SSD)</h3>
+    <div class="flex flex-col items-start">
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="all_ssd">256 GB</label>
+            <input name="ssd" id="ssd_256" type="checkbox" class="w-6 h-6"
+            hx-get="/products" hx-trigger="change" value="256GB" checked>
+        </div>
+
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="all_ssd">512 GB</label>
+            <input name="ssd" id="ssd_512" type="checkbox" class="w-6 h-6"
+            hx-get="/products" hx-trigger="change" value="512GB" checked>
+        </div>
+    </div>
+
+    <!-- CPU -->
+    <h3 class="text-lg font-bold">Процессор</h3>
+    <div class="flex flex-col items-start">
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="all_cpu">i7</label>
+            <input name="cpu" id="cpu_i7" type="checkbox" class="w-6 h-6"
+            hx-get="/products" hx-trigger="change" value="i7" checked>
+        </div>
+
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="all_cpu">i5</label>
+            <input name="cpu" id="cpu_i5" type="checkbox" class="w-6 h-6"
+            hx-get="/products" hx-trigger="change" value="i5" checked>
+        </div>
+    </div>
+
+    <!-- Resolution -->
+    <h3 class="text-lg font-bold">Разрешение экрана</h3>
+    <div class="flex flex-col items-start">
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="resolution_1920x1080">Full HD</label>   
+            <input name="resolution" id="resolution_1920x1080"  type="checkbox" class="w-6 h-6"
+            hx-get="/products" hx-trigger="change" value="1920x1080" checked>
+        </div>
+        
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="resolution_1920x1080">HD</label>   
+            <input name="resolution" id="resolution_1280x720"  type="checkbox" class="w-6 h-6"
+            hx-get="/products" hx-trigger="change" value="1280x720" checked>
+        </div>
+    </div>
+
+    <!-- Touchscreen -->
+    <h3 class="text-lg font-bold">Сенсорный экран</h3>
+    <div class="flex flex-col items-start">
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="touchscreen_true">Есть</label>   
+            <input name="touchscreen" id="touchscreen_true" type="radio" class="w-6 h-6"
+            hx-get="/products" hx-trigger="change" value="true">
+        </div>
+        
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="touchscreen_false">Нет</label>   
+            <input name="touchscreen" id="touchscreen_false" type="radio" class="w-6 h-6"
+            hx-get="/products" hx-trigger="change" value="false">
+        </div>
+    </div>
+
+    <!-- Graphics -->
+    <h3 class="text-lg font-bold">Для работы с графикой</h3>
+    <div class="flex flex-col items-start">
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="graphics">Да</label>
+            <input type="checkbox" name="graphics" id="graphics_true" class="w-6 h-6" 
+            hx-get="/products" hx-trigger="change" value="true">
+        </div>
+
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="graphics">Нет</label>
+            <input type="checkbox" name="graphics" id="graphics_false" class="w-6 h-6" checked
+            hx-get="/products" hx-trigger="change" value="false">
+        </div>
+    </div>
+</div>
+

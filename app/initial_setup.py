@@ -1,3 +1,4 @@
+import subprocess
 from fastapi import HTTPException
 from loguru import logger
 import requests
@@ -40,6 +41,12 @@ def fetch_products(db: Session):
         count = product_data.get("count", 0)
         manufacturer_name = product_data.get("manufacturer_name", "")
         use_basic_configs = product_data.get("basic_configs", False)
+        soldered_ram = product_data.get("soldered_ram", 0)
+        can_add_ram = product_data.get("can_add_ram", False)
+        resolution = product_data.get("resolution", "")
+        cpu = product_data.get("cpu", "")
+        gpu = product_data.get("gpu", "")
+        touch_screen = product_data.get("touch_screen", False)
         if not name or not price or price == '#N/A' or not use_basic_configs:
             logger.info(f"Skipping product: {product_data}")
             continue
@@ -60,6 +67,29 @@ def fetch_products(db: Session):
             logger.info(f"Created product: {product}")
         except HTTPException as e:
             logger.info(f"Error creating product: {e.detail}")
+
+
+def reload_tailwindcss():
+    """Reload the TailwindCSS CSS file."""
+    try:
+        subprocess.run([
+            'tailwindcss',
+            '-i',
+            str(settings.static_dir / 'src' / 'tw.css'),
+            '-o',
+            str(settings.static_dir / 'css' / 'main.css'),
+        ])
+    except Exception as e:
+        print(f'Error running tailwindcss: {e}')
+
+
+def run_migrations():
+    """Run Alembic migrations to ensure database is up to date."""
+    try:
+        subprocess.run(["alembic", "upgrade", "head"], check=True)
+        logger.info("Database migrations applied successfully.")
+    except Exception as e:
+        logger.error(f"Error applying migrations: {e}")
 
 
 if __name__ == "__main__":

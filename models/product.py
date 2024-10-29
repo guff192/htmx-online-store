@@ -23,10 +23,14 @@ class ProductConfiguration(Base):
 
     id = Column("id", Integer, primary_key=True,
                 index=True, autoincrement=True)
-    name = Column(String(255), nullable=False, unique=True)
+    ram_amount = Column(Integer, nullable=False, default=0)
+    ssd_amount = Column(Integer, nullable=False, default=0)
+
     additional_price = Column(Integer, nullable=False, default=0)
 
     is_default = Column(Boolean, default=False, nullable=False)
+    additional_ram = Column(Boolean, default=False, nullable=False)
+    soldered_ram = Column(Integer, default=0, nullable=False)
 
     products = relationship(
         "AvailableProductConfiguration", back_populates="configuration"
@@ -48,6 +52,13 @@ class Product(Base):
 
     manufacturer_id = Column(Integer, ForeignKey("manufacturers.id"))
     manufacturer = relationship("Manufacturer", back_populates="products")
+
+    soldered_ram = Column(Integer, default=0, nullable=False)
+    can_add_ram = Column(Boolean, default=True, nullable=False)
+    resolution = Column(String(10), nullable=False)
+    cpu = Column(String(12), nullable=False)
+    gpu = Column(String(12), nullable=False)
+    touch_screen = Column(Boolean, default=False, nullable=False)
 
     users = relationship("UserProduct", back_populates="product")
 

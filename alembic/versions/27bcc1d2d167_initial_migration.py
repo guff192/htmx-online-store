@@ -90,7 +90,7 @@ def upgrade() -> None:
         sa.Column('delivery_address', sa.String(length=255), nullable=False),
         sa.Column('delivery_track_number', sa.String(length=255), nullable=True),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        sa.PrimaryKeyConstraint('id'),
         if_not_exists=True
     )
     op.create_index(op.f('ix_orders_id'), 'orders', ['id'], unique=False)

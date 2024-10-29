@@ -30,8 +30,8 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
         if_not_exists=True
     )
-    op.create_index(op.f('ix_banners_id'), 'banners', ['id'], unique=False)
-    op.create_index(op.f('ix_banners_name'), 'banners', ['name'], unique=True)
+    op.create_index(op.f('ix_banners_id'), 'banners', ['id'], unique=False, if_not_exists=True)
+    op.create_index(op.f('ix_banners_name'), 'banners', ['name'], unique=True, if_not_exists=True)
 
     op.create_table(
         'manufacturers',
@@ -42,7 +42,7 @@ def upgrade() -> None:
         sa.UniqueConstraint('name'),
         if_not_exists=True
     )
-    op.create_index(op.f('ix_manufacturers_id'), 'manufacturers', ['id'], unique=False)
+    op.create_index(op.f('ix_manufacturers_id'), 'manufacturers', ['id'], unique=False, if_not_exists=True)
 
     op.create_table(
         'product_configurations',
@@ -54,7 +54,7 @@ def upgrade() -> None:
         sa.UniqueConstraint('name'),
         if_not_exists=True
     )
-    op.create_index(op.f('ix_product_configurations_id'), 'product_configurations', ['id'], unique=False)
+    op.create_index(op.f('ix_product_configurations_id'), 'product_configurations', ['id'], unique=False, if_not_exists=True)
 
     op.create_table(
         'users',
@@ -73,7 +73,7 @@ def upgrade() -> None:
         sa.UniqueConstraint('yandex_id'),
         if_not_exists=True
     )
-    op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
+    op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False, if_not_exists=True)
 
     op.create_table(
         'orders',
@@ -93,7 +93,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
         if_not_exists=True
     )
-    op.create_index(op.f('ix_orders_id'), 'orders', ['id'], unique=False)
+    op.create_index(op.f('ix_orders_id'), 'orders', ['id'], unique=False, if_not_exists=True)
 
     op.create_table(
         'products',
@@ -110,8 +110,8 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
         if_not_exists=True
     )
-    op.create_index(op.f('ix_products_id'), 'products', ['id'], unique=False)
-    op.create_index(op.f('ix_products_name'), 'products', ['name'], unique=True)
+    op.create_index(op.f('ix_products_id'), 'products', ['id'], unique=False, if_not_exists=True)
+    op.create_index(op.f('ix_products_name'), 'products', ['name'], unique=True, if_not_exists=True)
 
     op.create_table(
         'available_product_configurations',
@@ -123,7 +123,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
         if_not_exists=True
     )
-    op.create_index(op.f('ix_available_product_configurations_id'), 'available_product_configurations', ['id'], unique=False)
+    op.create_index(op.f('ix_available_product_configurations_id'), 'available_product_configurations', ['id'], unique=False, if_not_exists=True)
 
     op.create_table(
         'order_products',
@@ -138,7 +138,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
         if_not_exists=True
     )
-    op.create_index(op.f('ix_order_products_id'), 'order_products', ['id'], unique=False)
+    op.create_index(op.f('ix_order_products_id'), 'order_products', ['id'], unique=False, if_not_exists=True)
 
     op.create_table(
         'payments',
@@ -150,9 +150,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
         if_not_exists=True
     )
-    op.create_index(op.f('ix_payments_date'), 'payments', ['date'], unique=False)
-    op.create_index(op.f('ix_payments_id'), 'payments', ['id'], unique=False)
-    op.create_index(op.f('ix_payments_status'), 'payments', ['status'], unique=False)
+    op.create_index(op.f('ix_payments_date'), 'payments', ['date'], unique=False, if_not_exists=True)
+    op.create_index(op.f('ix_payments_id'), 'payments', ['id'], unique=False, if_not_exists=True)
+    op.create_index(op.f('ix_payments_status'), 'payments', ['status'], unique=False, if_not_exists=True)
 
     op.create_table(
         'user_products',
@@ -167,7 +167,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
         if_not_exists=True
     )
-    op.create_index(op.f('ix_user_products_id'), 'user_products', ['id'], unique=False)
+    op.create_index(op.f('ix_user_products_id'), 'user_products', ['id'], unique=False, if_not_exists=True)
     # ### end Alembic commands ###
 
 

@@ -17,12 +17,14 @@ class ConfigurationRepository:
             ProductConfiguration.id == id
         ).first()
 
-    def get_configurations_by_names(
+    def get_available_configurations(
         self,
-        names: list[str]
+        additional_ram: bool = False,
+        soldered_ram: int = 0
     ) -> list[ProductConfiguration]:
         return self.db.query(ProductConfiguration).filter(
-            ProductConfiguration.name.in_(names)
+            ProductConfiguration.additional_ram == additional_ram,
+            ProductConfiguration.soldered_ram == soldered_ram
         ).all()
 
     def get_default_configurations(self):
@@ -38,8 +40,12 @@ class ConfigurationRepository:
 
         stmt = (
             select(ProductConfiguration.id,
-                   ProductConfiguration.name,
-                   ProductConfiguration.additional_price).
+                   ProductConfiguration.ram_amount,
+                   ProductConfiguration.ssd_amount,
+                   ProductConfiguration.additional_price,
+                   ProductConfiguration.is_default,
+                   ProductConfiguration.additional_ram,
+                   ProductConfiguration.soldered_ram).
             join(AvailableProductConfiguration,
                  AvailableProductConfiguration.configuration_id == ProductConfiguration.id).
             filter(AvailableProductConfiguration.product_id == product_id).
@@ -47,9 +53,11 @@ class ConfigurationRepository:
         )
 
         for row in self.db.execute(stmt).all():
-            id, name, price = row
+            id, ram_amount, ssd_amount, additional_price, is_default, additional_ram, soldered_ram = row
             configuration_dto = ConfigurationDTO(
-                id=id, name=name, additional_price=price
+                id=id, ram_amount=ram_amount, ssd_amount=ssd_amount,
+                additional_price=additional_price, is_default=is_default,
+                additional_ram=additional_ram, soldered_ram=soldered_ram
             )
 
             result.append(configuration_dto)

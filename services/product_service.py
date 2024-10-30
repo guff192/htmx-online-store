@@ -25,7 +25,6 @@ from schema.product_schema import (
     ProductPhotoPath,
     ProductPhotoSize,
     ProductPrices,
-    ProductUpdate,
     ProductUpdateResponse,
     ProductConfiguration as ProductConfigurationSchema,
 )
@@ -50,6 +49,26 @@ class ProductService:
         self.config_repo = configuration_repo
         self.photo_storage = photo_storage
 
+    def _orm_configuration_to_config_schema(self, orm_config: ProductConfiguration) -> ProductConfigurationSchema:
+        config_dict = orm_config.__dict__
+        id = config_dict.get('id', 0)
+        ram_amount = config_dict.get('ram_amount', 0)
+        ssd_amount = config_dict.get('ssd_amount', 0)
+        additional_price = config_dict.get('additional_price', 0)
+        is_default = config_dict.get('is_default', False)
+        additional_ram = config_dict.get('additional_ram', False)
+        soldered_ram = config_dict.get('soldered_ram', 0)
+
+        return ProductConfigurationSchema(
+            id=id,
+            ram_amount=ram_amount,
+            ssd_amount=ssd_amount,
+            additional_price=additional_price,
+            is_default=is_default,
+            additional_ram=additional_ram,
+            soldered_ram=soldered_ram
+        )
+
     def _orm_product_to_product_schema(self, orm_product: Product) -> ProductSchema:
         product_dict = orm_product.__dict__
         manufacturer_dict = orm_product.manufacturer.__dict__
@@ -69,8 +88,20 @@ class ProductService:
     def get_config_by_id(self, config_id: int) -> ProductConfiguration:
         return self.config_repo.get_by_id(config_id)
     
-    def get_configs_by_names(self, names: list[str]) -> list[ProductConfiguration]:
-        return self.config_repo.get_configurations_by_names(names)
+    def get_available_configurations(
+        self,
+        additional_ram: bool = False,
+        soldered_ram: int = 0
+    ) -> list[ProductConfigurationSchema]:
+        orm_configs = self.config_repo.get_available_configurations(additional_ram, soldered_ram)
+
+        schema_configs: list[ProductConfigurationSchema] = []
+        for config in orm_configs:
+            schema_config = self._orm_configuration_to_config_schema(config)
+            schema_configs.append(schema_config)
+
+        return schema_configs
+
 
     def get_all_basic_configs(
         self
@@ -79,20 +110,9 @@ class ProductService:
 
         schema_configs: list[ProductConfigurationSchema] = []
         for config in orm_configs:
-            config_dict = config.__dict__
-            id = config_dict.get('id')
-            name = config_dict.get('name')
-            additional_price = config_dict.get('additional_price')
-            if not id or not name or additional_price is None:
-                continue
+            schema_config = self._orm_configuration_to_config_schema(config)
 
-            schema_configs.append(
-                ProductConfigurationSchema(
-                    id=id,
-                    name=name,
-                    additional_price=additional_price
-                )
-            )
+            schema_configs.append(schema_config)
 
         return schema_configs
 
@@ -103,8 +123,12 @@ class ProductService:
         return [
             ProductConfigurationSchema(
                 id=config.id,
-                name=config.name,
-                additional_price=config.additional_price
+                ram_amount=config.ram_amount,
+                ssd_amount=config.ssd_amount,
+                additional_price=config.additional_price,
+                is_default=config.is_default,
+                additional_ram=config.additional_ram,
+                soldered_ram=config.soldered_ram
             )
             for config in self.config_repo.get_configurations_for_product(product_id)
         ]
@@ -304,9 +328,25 @@ class ProductService:
             raise ErrInvalidProduct()
 
         # getting configurations
-        update_configurations: list[ProductConfiguration] = self.get_configs_by_names(
-            list(map(lambda x: x.name, product_update.configurations))
+        if product_update.can_add_ram is None or product_update.soldered_ram is None:
+            logger.debug(f'Invalid product: {product_update}')
+            raise ErrInvalidProduct()
+        update_configurations: list[ProductConfiguration] = self.config_repo.get_available_configurations(
+            additional_ram=product_update.can_add_ram,
+            soldered_ram=product_update.soldered_ram
         )
+
+        # getting additional specs
+        name = product_update.name
+        description = product_update.description
+        count = product_update.count
+        price = product_update.price
+        soldered_ram = product_update.soldered_ram
+        can_add_ram = product_update.can_add_ram
+        resolution = product_update.resolution if product_update.resolution else ''
+        cpu = product_update.cpu if product_update.cpu else ''
+        gpu = product_update.gpu if product_update.gpu else ''
+        touch_screen = product_update.touch_screen if product_update.touch_screen is not None else False
 
         # searching product
         found_product: Product | None = self.repo.get_by_name(product_update.name)
@@ -314,12 +354,10 @@ class ProductService:
             # creating new product
             logger.debug(f'Creating new product: {product_update}')
             self.repo.create(
-                product_update.name,
-                product_update.description,
-                product_update.price,
-                count=product_update.count,
-                manufacturer=manufacturer,
-                configurations=update_configurations
+                name, description, price, count=count,
+                manufacturer=manufacturer, configurations=update_configurations,
+                soldered_ram=soldered_ram, can_add_ram=can_add_ram,
+                resolution=resolution, cpu=cpu, gpu=gpu, touch_screen=touch_screen
             )
             return ProductUpdateResponse(count=1)
 
@@ -327,12 +365,15 @@ class ProductService:
         logger.debug(f'Updating product: {found_product.__dict__}')
         updated_products_count = self.repo.update(
             id=found_product.__dict__['_id'],
-            name=product_update.__dict__.get("name", ""),
-            description=product_update.__dict__.get("description", ""),
-            price=product_update.__dict__.get("price", ""),
-            count=product_update.__dict__.get("count", ""),
+            name=name, description=description, price=price, count=count,
             manufacturer=manufacturer,
-            configurations=update_configurations
+            configurations=update_configurations,
+            soldered_ram=soldered_ram,
+            can_add_ram=can_add_ram,
+            resolution=resolution,
+            cpu=cpu,
+            gpu=gpu,
+            touch_screen=touch_screen
         )
         return ProductUpdateResponse(count=updated_products_count)
 
@@ -345,80 +386,6 @@ class ProductService:
 
         product_list = ProductList(products=schema_products, offset=offset)
         return product_list
-
-    def create(self, product_create_schema: ProductCreate) -> ProductSchema:
-        if not product_create_schema.is_valid():
-            logger.error(f'invalid product: {product_create_schema}')
-            raise ErrInvalidProduct()
-
-        found_product = self.repo.get_by_name(product_create_schema.name)
-        if found_product:
-            product_id = found_product.__dict__.get('_id', '')
-
-            created_product = ProductUpdate(
-                name=product_create_schema.name,
-                description=product_create_schema.description,
-                price=product_create_schema.price,
-                count=product_create_schema.count,
-                manufacturer_name=product_create_schema.manufacturer_name,
-                configurations=product_create_schema.configurations,
-            )
-            self.update_or_create_by_name(created_product)
-
-            orm_manufacturer = self._manufacturer_repo.get_by_name(
-                product_create_schema.manufacturer_name
-            )
-            manufacturer_dict = orm_manufacturer.__dict__
-            manufacturer_name = manufacturer_dict.get('name', '')
-            manufacturer_logo_url = manufacturer_dict.get('logo_url', '')
-            manufacturer_schema = ManufacturerSchema(
-                name=manufacturer_name, logo_url=manufacturer_logo_url
-            )
-
-            product_schema = ProductSchema(
-                id=product_id,
-                name=created_product.name,
-                description=created_product.description,
-                price=created_product.price,
-                manufacturer=manufacturer_schema,
-                configurations=product_create_schema.configurations,
-            )
-
-        else:
-            created_product = self.repo.create(
-                name=product_create_schema.name,
-                description=product_create_schema.description,
-                price=product_create_schema.price,
-                count=product_create_schema.count,
-                manufacturer=self._manufacturer_repo.get_by_name(
-                    product_create_schema.manufacturer_name
-                )
-            )
-            created_product_dict = created_product.__dict__
-            product_id: int = created_product_dict.get('_id', -1)
-            product_name = created_product_dict.get('name', '')
-            product_description = created_product_dict.get('description', '')
-            product_price = created_product_dict.get('price', '')
-
-            if not hasattr(created_product, 'manufacturer'):
-                raise ErrInvalidProduct()
-
-            product_manufacturer = created_product.manufacturer
-            manufacturer_name = product_manufacturer.get('name', '')
-            manufacturer_logo_url = product_manufacturer.get('logo_url', '')
-            manufacturer_schema = ManufacturerSchema(
-                name=manufacturer_name, logo_url=manufacturer_logo_url
-            )
-
-            product_schema = ProductSchema(
-                id=product_id,
-                name=product_name,
-                description=product_description,
-                price=product_price,
-                manufacturer=manufacturer_schema
-            )
-
-        return product_schema
 
 
 def product_service_dependency(

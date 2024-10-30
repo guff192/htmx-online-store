@@ -47,6 +47,13 @@ class ProductRepository:
             manufacturer_id = product_dict.get('manufacturer_id', 0)
             manufacturer_id = manufacturer_id if manufacturer_id else 0
 
+            soldered_ram = product_dict.get('soldered_ram', 0)
+            can_add_ram = product_dict.get('can_add_ram', True)
+            resolution = product_dict.get('resolution', '')
+            cpu = product_dict.get('cpu', '')
+            gpu = product_dict.get('gpu', '')
+            touch_screen = product_dict.get('touch_screen', False)
+
             dto_list.append(
                 ProductDTO(
                     id=product_id,
@@ -57,6 +64,12 @@ class ProductRepository:
                     manufacturer_id=manufacturer_id,
                     configurations=configurations,
                     selected_configuration=selected_configuration,
+                    soldered_ram=soldered_ram,
+                    can_add_ram=can_add_ram,
+                    resolution=resolution,
+                    cpu=cpu,
+                    gpu=gpu,
+                    touch_screen=touch_screen
                 )
             )
 
@@ -141,7 +154,13 @@ class ProductRepository:
                price: int,
                count: int = 0,
                manufacturer: Manufacturer | None = None,
-               configurations: list[ProductConfiguration] = []
+               configurations: list[ProductConfiguration] = [],
+               soldered_ram: int = 0,
+               can_add_ram: bool = True,
+               resolution: str = '',
+               cpu: str = '',
+               gpu: str = '',
+               touch_screen: bool = False
     ) -> Product:
         product = Product(
             name=name,
@@ -149,6 +168,12 @@ class ProductRepository:
             price=price,
             count=count,
             manufacturer=manufacturer,
+            soldered_ram=soldered_ram,
+            can_add_ram=can_add_ram,
+            resolution=resolution,
+            cpu=cpu,
+            gpu=gpu,
+            touch_screen=touch_screen
         )
         self.db.add(product)
         self.db.flush([product])
@@ -174,7 +199,13 @@ class ProductRepository:
                price: int,
                count: int,
                manufacturer: Manufacturer,
-               configurations: list[ProductConfiguration]) -> int:
+               configurations: list[ProductConfiguration],
+               soldered_ram: int = 0,
+               can_add_ram: bool = True,
+               resolution: str = '',
+               cpu: str = '',
+               gpu: str = '',
+               touch_screen: bool = False) -> int:
 
         transaction = self.db.begin(nested=True)
         updated_product_query = self.db.query(Product).filter(
@@ -191,6 +222,12 @@ class ProductRepository:
             'price': price,
             'count': count,
             'manufacturer_id': manufacturer.id,
+            'soldered_ram': soldered_ram,
+            'can_add_ram': can_add_ram,
+            'resolution': resolution,
+            'cpu': cpu,
+            'gpu': gpu,
+            'touch_screen': touch_screen
         })
 
         found_config_ids = map(lambda available_config: available_config.id,

@@ -89,7 +89,7 @@ class UserProductModelView(ModelView):
 
     column_list: list[str] = ['user.name', 'product.name', 'count']
     form_columns: list[str] = ['user_id', 'product_id', 'count', 'selected_configuration_id']
-    column_details_list: list[str] = ['user.name', 'product.name', 'count', 'selected_configuration.name']
+    column_details_list: list[str] = ['user.name', 'product.name', 'count', 'selected_configuration']
 
     # form_overrides = dict(
     #     user=Select2Field,
@@ -124,8 +124,10 @@ class ProductConfigurationModelView(ModelView):
     can_delete = True
     can_create = True
 
-    column_list: list[str] = ['name', 'additional_price']
+    column_list: list[str] = ['id', 'ram_amount', 'ssd_amount', 'additional_price', 'is_default', 'additional_ram', 'soldered_ram']
     column_editable_list: list[str] = ['additional_price']
+
+    column_searchable_list: list[str] = ['id']
     
     form_excluded_columns: tuple[str] = ('products',)
 
@@ -136,7 +138,7 @@ class AvailableProductConfigurationModelView(ModelView):
     can_delete = True
     can_create = True
 
-    column_list: list[str] = ['product.name', 'configuration.name']
+    column_list: list[str] = ['product.name', 'configuration.id']
     form_excluded_columns: list[str] = ['product', 'configuration']
 
 

@@ -25,9 +25,16 @@ class ProductViewModel:
     def get_all(
         self,
         offset: int,
-        user: LoggedUser | None = None
+        user: LoggedUser | None = None,
+        ram: list[int] = [], ssd: list[int] = [], cpu: list[str] = [],
+        resolution: list[str] = [], touchscreen: list[bool] = [],
+        graphics: list[bool] = [],
     ) -> ProductList:
-        return self._service.get_all(offset=offset, user=user)
+        return self._service.get_all(
+            offset=offset, user=user,
+            ram=ram, ssd=ssd, cpu=cpu, resolution=resolution,
+            touchscreen=touchscreen, graphics=graphics
+        )
 
     def get_newcomers(
         self,

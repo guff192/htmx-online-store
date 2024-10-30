@@ -133,7 +133,6 @@ class ProductService:
             for config in self.config_repo.get_configurations_for_product(product_id)
         ]
 
-
     def get_product_prices(
         self,
         product_id: int,
@@ -165,15 +164,26 @@ class ProductService:
     def get_all(
         self,
         offset: int,
-        user: LoggedUser | None = None
+        user: LoggedUser | None = None,
+        ram: list[int] = [], ssd: list[int] = [], cpu: list[str] = [],
+        resolution: list[str] = [], touchscreen: list[bool] = [],
+        graphics: list[bool] = [],
     ) -> ProductList:
         if offset < 0:
             raise ErrProductNotFound()
 
         if user:
-            dto_list = self.repo.get_all_with_cart_info(str(user.id), offset)
+            dto_list = self.repo.get_all_with_cart_info(
+                str(user.id), offset,
+                ram=ram, ssd=ssd, cpu=cpu, resolution=resolution,
+                touchscreen=touchscreen, graphics=graphics
+            )
         else:
-            dto_list = self.repo.get_all(offset=offset)
+            dto_list = self.repo.get_all(
+                offset=offset,
+                ram=ram, ssd=ssd, cpu=cpu, resolution=resolution,
+                touchscreen=touchscreen, graphics=graphics
+            )
 
         if not dto_list:
             return ProductList(products=[], offset=-5)

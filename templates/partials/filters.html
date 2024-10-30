@@ -1,17 +1,20 @@
-<div class="w-4/5 mx-auto flex flex-col items-start">
+<div class="w-4/5 mx-auto flex flex-col items-start"
+    hx-target="#products"
+    hx-query="#products"
+    hx-get="/products">
     <!-- RAM -->
     <h3 class="text-lg font-bold">Оперативная память</h3>
     <div class="flex flex-col items-start">
         <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="all_ram">8 GB</label>
-            <input name="ram" id="ram_8" type="checkbox" class="w-6 h-6"
-            hx-get="/products" hx-trigger="change" value="8GB" checked>
+            <label for="ram_8">8 GB</label>
+            <input data-filter-input name="ram" id="ram_8" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="8" checked>
         </div>
 
         <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="all_ram">16 GB</label>
-            <input name="ram" id="ram_16" type="checkbox" class="w-6 h-6"
-            hx-get="/products" hx-trigger="change" value="16GB" checked>
+            <label for="ram_16">16 GB</label>
+            <input data-filter-input name="ram" id="ram_16" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="16" checked>
         </div>
     </div>
 
@@ -19,15 +22,15 @@
     <h3 class="text-lg font-bold">Жесткий диск (SSD)</h3>
     <div class="flex flex-col items-start">
         <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="all_ssd">256 GB</label>
-            <input name="ssd" id="ssd_256" type="checkbox" class="w-6 h-6"
-            hx-get="/products" hx-trigger="change" value="256GB" checked>
+            <label for="ssd_256">256 GB</label>
+            <input data-filter-input name="ssd" id="ssd_256" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="256" checked>
         </div>
 
         <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="all_ssd">512 GB</label>
-            <input name="ssd" id="ssd_512" type="checkbox" class="w-6 h-6"
-            hx-get="/products" hx-trigger="change" value="512GB" checked>
+            <label for="ssd_512">512 GB</label>
+            <input data-filter-input name="ssd" id="ssd_512" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="512" checked>
         </div>
     </div>
 
@@ -35,15 +38,39 @@
     <h3 class="text-lg font-bold">Процессор</h3>
     <div class="flex flex-col items-start">
         <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="all_cpu">i7</label>
-            <input name="cpu" id="cpu_i7" type="checkbox" class="w-6 h-6"
-            hx-get="/products" hx-trigger="change" value="i7" checked>
+            <label for="cpu_i7">i7</label>
+            <input data-filter-input name="cpu" id="cpu_i7" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="i7" checked>
         </div>
 
         <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="all_cpu">i5</label>
-            <input name="cpu" id="cpu_i5" type="checkbox" class="w-6 h-6"
-            hx-get="/products" hx-trigger="change" value="i5" checked>
+            <label for="cpu_i5">i5</label>
+            <input data-filter-input name="cpu" id="cpu_i5" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="i5" checked>
+        </div>
+
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="cpu_M7">M7</label>
+            <input data-filter-input name="cpu" id="cpu_M7" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="M7" checked>
+        </div>
+
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="cpu_M5">M5</label>
+            <input data-filter-input name="cpu" id="cpu_M5" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="M5" checked>
+        </div>
+
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="cpu_R7">R7</label>
+            <input data-filter-input name="cpu" id="cpu_R7" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="R7" checked>
+        </div>
+
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="cpu_R5">R5</label>
+            <input data-filter-input name="cpu" id="cpu_R5" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="R5" checked>
         </div>
     </div>
 
@@ -52,14 +79,20 @@
     <div class="flex flex-col items-start">
         <div class="flex flex-row-reverse gap-2 text-xl">
             <label for="resolution_1920x1080">Full HD</label>   
-            <input name="resolution" id="resolution_1920x1080"  type="checkbox" class="w-6 h-6"
-            hx-get="/products" hx-trigger="change" value="1920x1080" checked>
+            <input data-filter-input name="resolution" id="resolution_1920x1080"  type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="1920x1080" checked>
         </div>
         
         <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="resolution_1920x1080">HD</label>   
-            <input name="resolution" id="resolution_1280x720"  type="checkbox" class="w-6 h-6"
-            hx-get="/products" hx-trigger="change" value="1280x720" checked>
+            <label for="resolution_1280x720">HD</label>   
+            <input data-filter-input name="resolution" id="resolution_1280x720"  type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="1280x720" checked>
+        </div>
+
+        <div class="flex flex-row-reverse gap-2 text-xl">
+            <label for="resolution_1920x1200">WUXGA</label>   
+            <input data-filter-input name="resolution" id="resolution_1920x1200"  type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="1920x1200" checked>
         </div>
     </div>
 
@@ -68,14 +101,14 @@
     <div class="flex flex-col items-start">
         <div class="flex flex-row-reverse gap-2 text-xl">
             <label for="touchscreen_true">Есть</label>   
-            <input name="touchscreen" id="touchscreen_true" type="radio" class="w-6 h-6"
-            hx-get="/products" hx-trigger="change" value="true">
+            <input data-filter-input name="touchscreen" id="touchscreen_true" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="true" checked>
         </div>
         
         <div class="flex flex-row-reverse gap-2 text-xl">
             <label for="touchscreen_false">Нет</label>   
-            <input name="touchscreen" id="touchscreen_false" type="radio" class="w-6 h-6"
-            hx-get="/products" hx-trigger="change" value="false" checked>
+            <input data-filter-input name="touchscreen" id="touchscreen_false" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="false" checked>
         </div>
     </div>
 
@@ -83,16 +116,45 @@
     <h3 class="text-lg font-bold">Для работы с графикой</h3>
     <div class="flex flex-col items-start">
         <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="graphics">Да</label>
-            <input type="checkbox" name="graphics" id="graphics_true" class="w-6 h-6" checked
-            hx-get="/products" hx-trigger="change" value="true">
+            <label for="graphics_true">Да</label>
+            <input data-filter-input type="checkbox" name="graphics" id="graphics_true" class="w-6 h-6" checked
+            hx-trigger="change" value="true">
         </div>
 
         <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="graphics">Нет</label>
-            <input type="checkbox" name="graphics" id="graphics_false" class="w-6 h-6" checked
-            hx-get="/products" hx-trigger="change" value="false">
+            <label for="graphics_false">Нет</label>
+            <input data-filter-input type="checkbox" name="graphics" id="graphics_false" class="w-6 h-6" checked
+            hx-trigger="change" value="false">
         </div>
     </div>
+
+    <script>
+        function getFilters() {
+          const checkedInputs = Array.from(document.querySelectorAll('input[data-filter-input]')).filter(el => el.checked);
+          const filterNames = new Set(checkedInputs.map(el => el.name));
+          let filters = new Object();
+          filterNames.forEach((name) => {
+            filters[name] = new Array();
+            filters[name].push(checkedInputs.filter(el => el.name === name).map(i => i.value));
+          });
+          return filters;
+        }
+
+        htmx.on('htmx:configRequest', (e) => {
+            const triggeringEvent = e.detail.triggeringEvent;
+            const requestPath = e.detail.path;
+            let requestParams = e.detail.parameters;
+            if (requestPath.startsWith('/products') && triggeringEvent.type === 'click') {
+              console.log(e);
+              for (const [name, values] of Object.entries(getFilters())) {
+                  console.log(`${name}: ${values}`);
+                  requestParams[name] = new Array();
+                  for (const value of values.toString().split(',')) {
+                      requestParams[name].push(value);
+                  }
+              }
+            }
+        });
+    </script>
 </div>
 

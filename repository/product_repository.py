@@ -1,5 +1,6 @@
 from typing import Generator
 from fastapi import Depends
+from loguru import logger
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
@@ -23,7 +24,12 @@ class ProductRepository:
         self._configuration_repository = configuration_repository
 
 
-    def get_all(self, offset: int) -> list[ProductDTO]:
+    def get_all(
+        self, offset: int, ram: list[int] = [], ssd: list[int] = [],
+        cpu: list[str] = [], resolution: list[str] = [],
+        touchscreen: list[bool] = [], graphics: list[bool] = []
+    ) -> list[ProductDTO]:
+        logger.debug(f'{ram = }\n{ssd = }\n{cpu = }\n{resolution = }\n{touchscreen = }\n{graphics = }\n')
         orm_product_dicts = map(
             lambda p: p.__dict__ if p else {},
             self.db.query(Product).slice(offset, offset + 10).all()
@@ -31,10 +37,59 @@ class ProductRepository:
 
         dto_list: list[ProductDTO] = []
         for product_dict in orm_product_dicts:
+            logger.debug(f'{product_dict = }\n')
             product_id = product_dict.get('_id', 0)
 
             configurations = (self._configuration_repository.
                               get_configurations_for_product(product_id))
+
+            # filtering by ram
+            ram_filtered_configurations = list(filter(
+                lambda c: c.ram_amount in ram, configurations,
+            ))
+            if len(ram) > 0 and len(ram_filtered_configurations) == 0:
+                logger.debug('skipping because of ram filtering\n')
+                continue
+
+            # filtering by ssd
+            ssd_filtered_configurations = list(filter(
+                lambda c: c.ssd_amount in ssd, configurations
+            ))
+            if len(ssd) > 0 and len(ssd_filtered_configurations) == 0:
+                logger.debug('skipping because of ssd filtering\n\n')
+                continue
+
+            # filtering by cpu
+            product_cpu = product_dict.get('cpu', '')
+            if len(cpu) > 0 and not any(c.lower() in product_cpu.lower() for c in cpu):
+                logger.debug('skipping because of cpu filtering\n\n')
+                continue
+            
+            # filtering by resolution
+            product_resolution = product_dict.get('resolution', '')
+            if len(resolution) > 0 and not product_resolution in resolution:
+                logger.debug('skipping because of resolution filtering\n\n')
+                continue
+
+            # filtering by touchscreen
+            product_touch_screen = product_dict.get('touch_screen', False)
+            if len(touchscreen) > 0 and product_touch_screen not in touchscreen:
+                logger.debug('skipping because of touchscreen filtering\n\n')
+                continue
+
+            # filtering by graphics
+            product_gpu = product_dict.get('gpu', '')
+            if len(graphics) == 1:
+                if True in graphics and not product_gpu:
+                    logger.debug('skipping because of graphics filtering\n\n')
+                    continue
+                if False in graphics and product_gpu:
+                    logger.debug('skipping because of graphics filtering\n\n')
+                    continue
+
+            product_soldered_ram = product_dict.get('soldered_ram', 0)
+            product_can_add_ram = product_dict.get('can_add_ram', True)
+            
             default_configuration_id = product_dict.get(
                 'default_configuration_id',
                 0
@@ -47,12 +102,6 @@ class ProductRepository:
             manufacturer_id = product_dict.get('manufacturer_id', 0)
             manufacturer_id = manufacturer_id if manufacturer_id else 0
 
-            soldered_ram = product_dict.get('soldered_ram', 0)
-            can_add_ram = product_dict.get('can_add_ram', True)
-            resolution = product_dict.get('resolution', '')
-            cpu = product_dict.get('cpu', '')
-            gpu = product_dict.get('gpu', '')
-            touch_screen = product_dict.get('touch_screen', False)
 
             dto_list.append(
                 ProductDTO(
@@ -64,12 +113,12 @@ class ProductRepository:
                     manufacturer_id=manufacturer_id,
                     configurations=configurations,
                     selected_configuration=selected_configuration,
-                    soldered_ram=soldered_ram,
-                    can_add_ram=can_add_ram,
-                    resolution=resolution,
-                    cpu=cpu,
-                    gpu=gpu,
-                    touch_screen=touch_screen
+                    soldered_ram=product_soldered_ram,
+                    can_add_ram=product_can_add_ram,
+                    resolution=product_resolution,
+                    cpu=product_cpu,
+                    gpu=product_gpu,
+                    touch_screen=product_touch_screen
                 )
             )
 
@@ -78,7 +127,10 @@ class ProductRepository:
     def get_all_with_cart_info(
         self,
         user_id: str,
-        offset: int
+        offset: int,
+        ram: list[int] = [], ssd: list[int] = [], cpu: list[str] = [], 
+        resolution: list[str] = [], touchscreen: list[bool] = [],
+        graphics: list[bool] = [],
     ) -> list[ProductDTO]:
         result: list[ProductDTO] = []
 
@@ -86,6 +138,9 @@ class ProductRepository:
         stmt = (
             select(Product._id, Product.name, Product.description,
                    Product.price, Product.manufacturer_id,
+                   Product.soldered_ram, Product.can_add_ram,
+                   Product.resolution, Product.cpu, Product.gpu,
+                   Product.touch_screen,
                    UserProduct.count, UserProduct.selected_configuration_id).
             join(UserProduct,  # joining for getting count from user_product
                  Product._id == UserProduct.product_id,
@@ -101,17 +156,59 @@ class ProductRepository:
         # Execute and add to result
         rows = self.db.execute(stmt).all()
         for row in rows:
-            id_, name, description, price, manufacturer_id, user_count, selected_configuration_id = row
+            id_, product_name, product_description, product_price, \
+            product_manufacturer_id, product_soldered_ram, product_can_add_ram, \
+            product_resolution, product_cpu, product_gpu, product_touch_screen, \
+            user_count, selected_configuration_id = row
 
-            manufacturer_id = manufacturer_id if manufacturer_id else 0
+            product_manufacturer_id = product_manufacturer_id if product_manufacturer_id else 0
             user_count = user_count if user_count else 0
             selected_configuration_id = selected_configuration_id if selected_configuration_id else 0
 
             configs = (self._configuration_repository.
                               get_configurations_for_product(id_))
-
             if not configs:
                 continue
+
+            # filtering by ram
+            ram_filtered_configurations = list(filter(
+                lambda c: c.ram_amount in ram, configs,
+            ))
+            if len(ram) > 0 and len(ram_filtered_configurations) == 0:
+                logger.debug('skipping because of ram filtering\n')
+                continue
+
+            # filtering by ssd
+            ssd_filtered_configurations = list(filter(
+                lambda c: c.ssd_amount in ssd, configs
+            ))
+            if len(ssd) > 0 and len(ssd_filtered_configurations) == 0:
+                logger.debug('skipping because of ssd filtering\n\n')
+                continue
+
+            # filtering by cpu
+            if len(cpu) > 0 and not any(c.lower() in product_cpu.lower() for c in cpu):
+                logger.debug('skipping because of cpu filtering\n\n')
+                continue
+            
+            # filtering by resolution
+            if len(resolution) > 0 and not product_resolution in resolution:
+                logger.debug('skipping because of resolution filtering\n\n')
+                continue
+
+            # filtering by touchscreen
+            if len(touchscreen) > 0 and product_touch_screen not in touchscreen:
+                logger.debug('skipping because of touchscreen filtering\n\n')
+                continue
+
+            # filtering by graphics
+            if len(graphics) == 1:
+                if True in graphics and not product_gpu:
+                    logger.debug('skipping because of graphics filtering\n\n')
+                    continue
+                if False in graphics and product_gpu:
+                    logger.debug('skipping because of graphics filtering\n\n')
+                    continue
 
             selected_config = tuple(filter(
                 lambda c: c.id == selected_configuration_id or selected_configuration_id == 0,
@@ -119,9 +216,11 @@ class ProductRepository:
             ))[0]
 
             product = ProductDTO(
-                id=id_, name=name, description=description,
-                price=price, count=user_count,
-                manufacturer_id=manufacturer_id,
+                id=id_, name=product_name, description=product_description,
+                price=product_price, count=user_count,
+                manufacturer_id=product_manufacturer_id, soldered_ram=product_soldered_ram,
+                can_add_ram=product_can_add_ram, resolution=product_resolution, cpu=product_cpu,
+                gpu=product_gpu, touch_screen=product_touch_screen,
                 configurations=configs,
                 selected_configuration=selected_config
             )

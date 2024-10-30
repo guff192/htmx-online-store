@@ -82,7 +82,7 @@ def fetch_products(db: Session):
         try:
             # Use the service to create the product
             product = product_service.update_or_create_by_name(product_create)
-            logger.info(f"Created product: {product}")
+            logger.info(f"Created product: {product_create}")
         except HTTPException as e:
             logger.info(f"Error creating product: {e.detail}")
 

@@ -85,21 +85,29 @@ class CartService:
             name=manufacturer_name, logo_url=manufacturer_logo_url
         )
 
-        orm_configs = [self._products.get_config_by_id(config.__dict__['configuration_id'])
+        orm_config_dicts = [self._products.get_config_by_id(config.__dict__['configuration_id']).__dict__
                       for config in product.configurations]
         schema_configs = [
             ProductConfigurationSchema(
-                id=config.__dict__['id'],
-                name=config.__dict__['name'],
-                additional_price=config.__dict__['additional_price'],
-            ) for config in orm_configs
+                id=config_dict.get('id', 0),
+                ram_amount=config_dict.get('ram_amount', 0),
+                ssd_amount=config_dict.get('ssd_amount', 0),
+                additional_price=config_dict.get('additional_price', 0),
+                is_default=config_dict.get('is_default', False),
+                additional_ram=config_dict.get('additional_ram', False),
+                soldered_ram=config_dict.get('soldered_ram', 0)
+            ) for config_dict in orm_config_dicts
         ]
 
-        selected_config = userproduct.selected_configuration
+        selected_config_orm_dict = userproduct.selected_configuration.__dict__
         selected_config_schema = ProductConfigurationSchema(
-            id=selected_config.__dict__['id'],
-            name=selected_config.__dict__['name'],
-            additional_price=selected_config.__dict__['additional_price'],
+            id=selected_config_orm_dict.get('id', 0),
+            ram_amount=selected_config_orm_dict.get('ram_amount', 0),
+            ssd_amount=selected_config_orm_dict.get('ssd_amount', 0),
+            additional_price=selected_config_orm_dict.get('additional_price', 0),
+            is_default=selected_config_orm_dict.get('is_default', False),
+            additional_ram=selected_config_orm_dict.get('additional_ram', False),
+            soldered_ram=selected_config_orm_dict.get('soldered_ram', 0)
         )
 
         product_in_cart = ProductInCart(

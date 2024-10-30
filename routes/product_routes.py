@@ -1,8 +1,10 @@
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Body, Depends, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from loguru import logger
+from pydantic import BaseModel
 from routes.auth_routes import oauth_user_dependency
 
 from schema.product_schema import (
@@ -41,13 +43,23 @@ def get_catalog(
 def get_product_list(
     request: Request,
     offset: int = 0,
+    ram: Annotated[list[int], Query()] = [],
+    ssd: Annotated[list[int], Query()] = [],
+    cpu: Annotated[list[str], Query()] = [],
+    resolution: Annotated[list[str], Query()] = [],
+    touchscreen: Annotated[list[bool], Query()] = [],
+    graphics: Annotated[list[bool], Query()] = [],
     product_vm: ProductViewModel = Depends(product_viewmodel_dependency),
     user: LoggedUser | None = Depends(oauth_user_dependency),
 ):
     if not request.headers.get('hx-request'):
         return RedirectResponse('/products/catalog')
 
-    products_data: ProductList = product_vm.get_all(offset=offset, user=user)
+    products_data: ProductList = product_vm.get_all(
+        offset=offset, user=user,
+        ram=ram, ssd=ssd, cpu=cpu, resolution=resolution,
+        touchscreen=touchscreen, graphics=graphics
+    )
 
     context_data: dict[str, Any] = {'request': request}
     context_data.update(products_data.build_context())

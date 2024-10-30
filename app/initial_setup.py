@@ -47,9 +47,20 @@ def fetch_products(db: Session):
         cpu = product_data.get("cpu", "")
         gpu = product_data.get("gpu", "")
         touch_screen = product_data.get("touch_screen", False)
-        if not name or not price or price == '#N/A' or not use_basic_configs:
+        if not name or not price or price == '#N/A' or \
+                not soldered_ram or can_add_ram is None or \
+                not cpu or gpu is None or touch_screen is None:
             logger.info(f"Skipping product: {product_data}")
             continue
+
+        if use_basic_configs:
+            configurations = basic_configs
+        else:
+            configurations = product_service.get_available_configurations(
+                additional_ram=can_add_ram,
+                soldered_ram=soldered_ram
+            )
+
 
         # Validate data using the schema
         product_create = ProductCreate(
@@ -58,8 +69,15 @@ def fetch_products(db: Session):
             price=price,
             count=count if count != '#N/A' else 0,
             manufacturer_name=manufacturer_name,
-            configurations=basic_configs,
+            configurations=configurations,
+            soldered_ram=soldered_ram,
+            can_add_ram=can_add_ram,
+            resolution=resolution,
+            cpu=cpu,
+            gpu=gpu,
+            touch_screen=touch_screen
         )
+        logger.debug(product_create)
 
         try:
             # Use the service to create the product

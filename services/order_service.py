@@ -242,11 +242,12 @@ class OrderService:
         )
 
         for product in order_schema.products: 
+            config_name = f'{product.selected_configuration.ram_amount}GB RAM/{product.selected_configuration.ssd_amount}GB SSD'
             cookie_order_product = CookieOrderProduct(
                 product_id=product.product_id,
                 product_name=product.product_name,
                 configuration_id=product.selected_configuration.id,
-                configuration_name=product.selected_configuration.name,
+                configuration_name=config_name,
                 count=product.count
             )
             cookie_order.products.append(cookie_order_product)

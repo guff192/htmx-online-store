@@ -245,7 +245,10 @@ class ProductRepository:
 
     def search(self, query: str, offset: int) -> list[Product]:
         return self.db.query(Product).\
-            filter(Product.name.like(f'%{query.replace(" ", "%")}%')).slice(offset, offset + 10).all()
+            where(or_(
+                Product.name.like(f'%{query.replace(" ", "%")}%'),
+                Product.description.like(f'%{query.replace(" ", "%")}%')
+            )).slice(offset, offset + 10).all()
 
     def create(self,
                name: str,

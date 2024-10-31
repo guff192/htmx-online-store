@@ -9,7 +9,7 @@
             hx-trigger="loadPrice"
             hx-target="#product{{ product_id }}priceValue"
             hx-select="#product{{ product_id }}priceValue"
-            hx-get="/products/{{ product_id }}/prices/{{ config.id }}">{{ config.name }}</button>
+            hx-get="/products/{{ product_id }}/prices/{{ config.id }}">{{ config.ram_amount }}GB RAM/{{ config.ssd_amount }}GB SSD</button>
 
     {% endfor %}
         

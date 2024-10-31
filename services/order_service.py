@@ -86,10 +86,19 @@ class OrderService:
 
             count = op_dict.get('count', 0)
             selected_config_dict = order_product.selected_configuration.__dict__
+            id = selected_config_dict.get('id', 0)
+            ram_amount = selected_config_dict.get('ram_amount', 0)
+            ssd_amount = selected_config_dict.get('ssd_amount', 0)
+            additional_price = selected_config_dict.get('additional_price', 0)
+            is_default = selected_config_dict.get('is_default', False)
+            additional_ram = selected_config_dict.get('additional_ram', False)
+            soldered_ram = selected_config_dict.get('soldered_ram', 0)
+
             selected_configuration = ProductConfigurationSchema(
-                id=selected_config_dict['id'],
-                name=selected_config_dict['name'],
-                additional_price=selected_config_dict['additional_price'],
+                id=id,
+                ram_amount=ram_amount, ssd_amount=ssd_amount,
+                additional_price=additional_price, is_default=is_default,
+                additional_ram=additional_ram, soldered_ram=soldered_ram
             )
             
             order_product_schema = OrderProductSchema(

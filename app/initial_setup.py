@@ -48,7 +48,7 @@ def fetch_products(db: Session):
         gpu = product_data.get("gpu", "")
         touch_screen = product_data.get("touch_screen", False)
         if not name or not price or price == '#N/A' or \
-                not soldered_ram or can_add_ram is None or \
+                soldered_ram is None or can_add_ram is None or \
                 not cpu or gpu is None or touch_screen is None:
             logger.info(f"Skipping product: {product_data}")
             continue

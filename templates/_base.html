@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/indicator.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/dropdown.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/tinkoff_pay_form.css') }}">
 
     <!-- JS -->
@@ -20,19 +19,19 @@
 
     <!-- Custom JS -->
     <script src="{{ url_for('static', path='js/banner.js') }}" async></script>
-    <!-- <script src="{{ url_for('static', path='js/yandex_pay.js') }}" async></script> -->
     <script src="{{ url_for('static', path='js/datetime_localizator.js') }}" async></script>
 
 </head>
 
 <body class="bg-gray-100 text-black p-0 m-0">
+
     <div id="promocode"
-        class="fixed top-0 w-full h-16 bg-white text-lightBlue text-center leading-loose z-20">
-        Введи промокод <i><b>ничего</b></i> и получи <b>скидку 100% на всю техникуу!</b>
+        class="fixed top-0 w-full h-16 bg-white text-lightBlue text-center leading-10 pt-3 z-20">
+        6 месяцев гарантии и бесплатная доставка для зарегистрированных пользователей
     </div>
 
     {% block navbar %}
-        <nav class="bg-black text-white fixed top-16 w-full z-20 h-screen sm:h-24 "
+        <nav class="transition-all duration-500 bg-black text-white fixed h-[10dvh] md:h-24 w-full top-16 z-20"
             hx-boost="true" hx-target="#content" hx-swap="innerHTML">
         {% include 'partials/navbar.html' %}
         </nav>

@@ -33,8 +33,8 @@ class ProductRepository:
     ) -> list[ProductDTO]:
         if query:
             stmt = self.db.query(Product).where(or_(
-                Product.name.like(f'%{query.replace(" ", "%")}%'),
-                Product.description.like(f'%{query.replace(" ", "%")}%')
+                Product.name.ilike(f'%{query.replace(" ", "%")}%'),
+                Product.description.ilike(f'%{query.replace(" ", "%")}%')
             )).slice(offset, offset + 10)
         else:
             stmt = self.db.query(Product).slice(offset, offset + 10)
@@ -123,18 +123,19 @@ class ProductRepository:
 
             if filtered_configurations:
                 for selected_configuration in filtered_configurations:
-                    dto_list.append(
-                        ProductDTO(
-                           id=product_id, name=product_name,
-                           description=product_dict.get('description', ''),
-                           price=product_price, count=product_dict.get('count', 0),
-                           manufacturer_id=manufacturer_id,
-                           configurations=configurations, selected_configuration=selected_configuration,
-                           soldered_ram=product_soldered_ram, can_add_ram=product_can_add_ram,
-                           resolution=product_resolution, cpu=product_cpu, gpu=product_gpu,
-                           touch_screen=product_touch_screen
+                    if price_from <= product_price + selected_configuration.additional_price <= price_to:
+                        dto_list.append(
+                            ProductDTO(
+                               id=product_id, name=product_name,
+                               description=product_dict.get('description', ''),
+                               price=product_price, count=product_dict.get('count', 0),
+                               manufacturer_id=manufacturer_id,
+                               configurations=configurations, selected_configuration=selected_configuration,
+                               soldered_ram=product_soldered_ram, can_add_ram=product_can_add_ram,
+                               resolution=product_resolution, cpu=product_cpu, gpu=product_gpu,
+                               touch_screen=product_touch_screen
+                            )
                         )
-                    )
             else:
                 dto_list.append(
                     ProductDTO(
@@ -184,14 +185,13 @@ class ProductRepository:
                      Product._id == UserProduct.product_id,
                      isouter=True).
                 where(or_(
-                    Product.name.like(f'%{query.replace(" ", "%")}%'),
-                    Product.description.like(f'%{query.replace(" ", "%")}%')
+                    Product.name.ilike(f'%{query.replace(" ", "%")}%'),
+                    Product.description.ilike(f'%{query.replace(" ", "%")}%')
                 )).
                 where(  # filtering products in cart and products without user
                     or_(UserProduct.user_id == user_id,
                         UserProduct.user_id == None)).  # noqa: E711
                 where(Product.count > 0).
-                group_by(Product._id).
                 order_by(Product.name).
                 slice(offset, offset + 10)
             )
@@ -210,8 +210,6 @@ class ProductRepository:
                     or_(UserProduct.user_id == user_id,
                         UserProduct.user_id == None)).  # noqa: E711
                 where(Product.count > 0).
-                group_by(Product._id).
-                order_by(Product.name).
                 slice(offset, offset + 10)
             )
 
@@ -290,17 +288,18 @@ class ProductRepository:
 
             if filtered_configurations:
                 for selected_configuration in filtered_configurations:
-                    result.append(
-                        ProductDTO(
-                           id=id_, name=product_name, description=product_description,
-                           price=product_price, count=user_count,
-                           manufacturer_id=product_manufacturer_id,
-                           soldered_ram=product_soldered_ram, can_add_ram=product_can_add_ram,
-                           resolution=product_resolution, cpu=product_cpu, gpu=product_gpu,
-                           touch_screen=product_touch_screen,
-                           configurations=configs, selected_configuration=selected_configuration,
+                    if price_from <= product_price + selected_configuration.additional_price <= price_to:
+                        result.append(
+                            ProductDTO(
+                                id=id_, name=product_name, description=product_description,
+                                price=product_price, count=user_count,
+                                manufacturer_id=product_manufacturer_id,
+                                soldered_ram=product_soldered_ram, can_add_ram=product_can_add_ram,
+                                resolution=product_resolution, cpu=product_cpu, gpu=product_gpu,
+                                touch_screen=product_touch_screen,
+                                configurations=configs, selected_configuration=selected_configuration,
+                            )
                         )
-                    )
             else:
                 result.append(
                     ProductDTO(
@@ -342,8 +341,8 @@ class ProductRepository:
     def search(self, query: str, offset: int) -> list[Product]:
         return self.db.query(Product).\
             where(or_(
-                Product.name.like(f'%{query.replace(" ", "%")}%'),
-                Product.description.like(f'%{query.replace(" ", "%")}%')
+                Product.name.ilike(f'%{query.replace(" ", "%")}%'),
+                Product.description.ilike(f'%{query.replace(" ", "%")}%')
             )).slice(offset, offset + 10).all()
 
     def create(self,

@@ -37,7 +37,7 @@ async def lifecycle(app: FastAPI):
     run_migrations()
 
     if settings.debug:
-        token = get_auth_service().create_access_token({'sub': '3b15eef2e9f24623afeda25d49b95960'})
+        token = get_auth_service().create_access_token({'sub': '6fd6a87b-3ad3-4064-8f4b-cc76d33b1c4e'})
         logger.debug(f'{token = }')
     else:
         fetch_products(get_db())

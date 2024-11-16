@@ -123,18 +123,19 @@ class ProductRepository:
 
             if filtered_configurations:
                 for selected_configuration in filtered_configurations:
-                    dto_list.append(
-                        ProductDTO(
-                           id=product_id, name=product_name,
-                           description=product_dict.get('description', ''),
-                           price=product_price, count=product_dict.get('count', 0),
-                           manufacturer_id=manufacturer_id,
-                           configurations=configurations, selected_configuration=selected_configuration,
-                           soldered_ram=product_soldered_ram, can_add_ram=product_can_add_ram,
-                           resolution=product_resolution, cpu=product_cpu, gpu=product_gpu,
-                           touch_screen=product_touch_screen
+                    if price_from <= product_price + selected_configuration.additional_price <= price_to:
+                        dto_list.append(
+                            ProductDTO(
+                               id=product_id, name=product_name,
+                               description=product_dict.get('description', ''),
+                               price=product_price, count=product_dict.get('count', 0),
+                               manufacturer_id=manufacturer_id,
+                               configurations=configurations, selected_configuration=selected_configuration,
+                               soldered_ram=product_soldered_ram, can_add_ram=product_can_add_ram,
+                               resolution=product_resolution, cpu=product_cpu, gpu=product_gpu,
+                               touch_screen=product_touch_screen
+                            )
                         )
-                    )
             else:
                 dto_list.append(
                     ProductDTO(
@@ -290,17 +291,18 @@ class ProductRepository:
 
             if filtered_configurations:
                 for selected_configuration in filtered_configurations:
-                    result.append(
-                        ProductDTO(
-                           id=id_, name=product_name, description=product_description,
-                           price=product_price, count=user_count,
-                           manufacturer_id=product_manufacturer_id,
-                           soldered_ram=product_soldered_ram, can_add_ram=product_can_add_ram,
-                           resolution=product_resolution, cpu=product_cpu, gpu=product_gpu,
-                           touch_screen=product_touch_screen,
-                           configurations=configs, selected_configuration=selected_configuration,
+                    if price_from <= product_price + selected_configuration.additional_price <= price_to:
+                        result.append(
+                            ProductDTO(
+                                id=id_, name=product_name, description=product_description,
+                                price=product_price, count=user_count,
+                                manufacturer_id=product_manufacturer_id,
+                                soldered_ram=product_soldered_ram, can_add_ram=product_can_add_ram,
+                                resolution=product_resolution, cpu=product_cpu, gpu=product_gpu,
+                                touch_screen=product_touch_screen,
+                                configurations=configs, selected_configuration=selected_configuration,
+                            )
                         )
-                    )
             else:
                 result.append(
                     ProductDTO(

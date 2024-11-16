@@ -192,7 +192,6 @@ class ProductRepository:
                     or_(UserProduct.user_id == user_id,
                         UserProduct.user_id == None)).  # noqa: E711
                 where(Product.count > 0).
-                group_by(Product._id).
                 order_by(Product.name).
                 slice(offset, offset + 10)
             )
@@ -211,8 +210,6 @@ class ProductRepository:
                     or_(UserProduct.user_id == user_id,
                         UserProduct.user_id == None)).  # noqa: E711
                 where(Product.count > 0).
-                group_by(Product._id).
-                order_by(Product.name).
                 slice(offset, offset + 10)
             )
 

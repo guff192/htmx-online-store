@@ -33,8 +33,8 @@ class ProductRepository:
     ) -> list[ProductDTO]:
         if query:
             stmt = self.db.query(Product).where(or_(
-                Product.name.like(f'%{query.replace(" ", "%")}%'),
-                Product.description.like(f'%{query.replace(" ", "%")}%')
+                Product.name.ilike(f'%{query.replace(" ", "%")}%'),
+                Product.description.ilike(f'%{query.replace(" ", "%")}%')
             )).slice(offset, offset + 10)
         else:
             stmt = self.db.query(Product).slice(offset, offset + 10)
@@ -184,8 +184,8 @@ class ProductRepository:
                      Product._id == UserProduct.product_id,
                      isouter=True).
                 where(or_(
-                    Product.name.like(f'%{query.replace(" ", "%")}%'),
-                    Product.description.like(f'%{query.replace(" ", "%")}%')
+                    Product.name.ilike(f'%{query.replace(" ", "%")}%'),
+                    Product.description.ilike(f'%{query.replace(" ", "%")}%')
                 )).
                 where(  # filtering products in cart and products without user
                     or_(UserProduct.user_id == user_id,

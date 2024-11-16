@@ -1,8 +1,8 @@
 button, a, [hx-trigger="click"] {
-    filter: brightness(90%);
+    filter: brightness(90%) opacity(1);
 }
 
 button:hover, a:hover, [hx-trigger="click"]:hover {
-    filter: brightness(110%);
+    filter: brightness(110%) opacity(1);
 }
 

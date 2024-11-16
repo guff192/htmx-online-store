@@ -44,7 +44,6 @@ class OrderService:
     def _order_model_to_schema(self, order_model: Order) -> OrderSchema | OrderWithPaymentSchema:
         # getting data from model
         order_model_dict = order_model.__dict__
-        logger.debug(f'{order_model_dict=}')
         order_id = order_model_dict.get('id', 0)
         user_id = str(order_model_dict.get('user_id', ''))
         order_date: datetime = order_model_dict.get('date', datetime.now(timezone.utc))
@@ -242,7 +241,7 @@ class OrderService:
         cookie_order = OrderInCookie(
             id=order_schema.id,
             date=order_schema.date,
-            products=[ ],
+            products=[],
             sum=order_schema.sum,
             comment=order_schema.comment,
             buyer_name=order_schema.buyer_name,
@@ -268,7 +267,7 @@ class OrderService:
 
     def update_order(self, order_update: OrderUpdateSchema) -> OrderSchema:
         if order_update.user_id:
-            pass # Create user here
+            logger.debug(f'Updating order with user_id: {order_update.user_id}')
 
         logger.debug(f'Updating order with schema: {order_update}')
         order_model = self._repo.update(

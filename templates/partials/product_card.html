@@ -1,48 +1,77 @@
 <div
     id="product{{ product.id }}card{% if product.selected_configuration %}{{ product.selected_configuration.id }}{% endif %}"
-    class="bg-white w-full px-10 py-5 mb-2 text-center text-black cursor-pointer brightness-100 hover:brightness-105 shadow-lg group"
-    style="height: 50vh;"
+    class="rounded-lg w-full px-1 py-3 mb-2 flex flex-col justify-between text-center text-black cursor-pointer brightness-100 hover:brightness-105 group
+    bg-gradient-to-br from-white via-gray-100 to-gray-200 shadow-[9px_9px_18px_0px_#c4c4c4,-9px_-9px_18px_0px_#e0e0e0]"
     hx-boost="true"
     hx-get="{{ product.absolute_url }}#offset"
     hx-swap="innerHTML show:#offset:bottom"
-    hx-push-url="true"
+    hx-push-url="{{ product.absolute_url }}"
     hx-target="#content">
 
     <!-- Photo -->
-    <div class="h-2/5 box-border flex flex-col justify-center">
+    <div class="box-border flex flex-col justify-center mb-5 relative">
         <img
             class="mx-auto max-h-full"
             hx-trigger="load"
             hx-target="this"
-            hx-get="/photos/main?product_name={{ product.name }}&size=small"
+            hx-get="/photos/main?product_name={{ product.name | urlencode }}&size=small"
             hx-swap="outerHTML"
             hx-push-url="false"
             src="{{ url_for('static', path='images/loading.webp') }}"
             alt="{{ product.name }}"
         >
+
+        {% if not product.selected_configuration %}
+            {% if product.ram_amounts and product.ssd_amounts %}
+            <div class="absolute bottom-0 right-0 w-max rounded flex justify-center gap-2 items-center bg-orange-400 opacity-85 p-0.5 text-white text-xs">
+                <p class="text-center text-2xl uppercase">до</p>
+                <div class="flex flex-col justify-around p-0.5">
+                    <p class="font-extrabold bg-lightBlue mb-1 py-[1px] px-0.5 rounded"><strong>{{ product.ram_amounts|max }}</strong> ГБ RAM</p>
+                    <p class="font-extrabold bg-darkPink py-[1px] px-0.5 rounded"><strong>{{ product.ssd_amounts|max }}</strong> ГБ SSD</p>
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="absolute bottom-0 right-0 w-max rounded flex justify-center gap-2 items-center bg-orange-400 opacity-85 p-0.5 text-white text-xl">
+                <div class="flex flex-col justify-around p-0.5">
+                    <p class="font-extrabold bg-lightBlue mb-1 py-[1px] px-0.5 rounded"><strong>{{ product.selected_configuration.ram_amount }}</strong> ГБ RAM</p>
+                    <p class="font-extrabold bg-darkPink py-[1px] px-0.5 rounded"><strong>{{ product.selected_configuration.ssd_amount }}</strong> ГБ SSD</p>
+                </div>
+            </div>
+        {% endif %}
+
     </div>
 
-    <!-- Product name -->
-    <h3 class="text-lg font-bold uppercase h-1/5 box-border group-hover:underline">
-        <a href="{{ product.absolute_url }}#offset">{{ product.name | replace(',', '') | truncate(40) }}</a>
-    </h3>
+    <!-- Product info -->
+    <div class="box-border flex flex-col justify-around">
 
-    <!-- Reviews -->
-    <div class="h-1/5 box-border my-2 flex flex-col justify-between group-hover:underline">
-        <p class="text-sm flex justify-evenly"><span class="text-red-600 font-bold">★ 4.9</span><span class="text-gray-500">25 отзывов</span></p>
-    </div>
+        <!-- Product name -->
+        <h3 class="text-lg font-bold box-border group-hover:underline">
+            {{ product.short_name|replace('\n', '<br/>')|safe }}
+        </h3>
 
-    <!-- Price -->
-    <div class="h-1/5 box-border my-2 flex justify-around items-center">
-        <strong class="text-2xl inline-block">{{ product.price }}₽</strong>
+        <!-- Reviews -->
+        <div class="box-border my-1 flex flex-col justify-center group-hover:underline">
+            <p class="text-sm flex justify-evenly"><span class="text-red-600 font-bold">★ 4.9</span><span class="text-gray-500">25 отзывов</span></p>
+        </div>
 
-        <img
-            src="{{ url_for('static', path='images/add_to_cart.png') }}" class="w-14"
-            class="bg-lightBlue rounded w-1/5"
-            hx-trigger="click"
-            hx-target="#content"
-            hx-swap="innerHTML show:#product{{ product.id }}photos:bottom"
-            hx-push-url="true">
+        <!-- Price -->
+        <div class="box-border w-3/4 mx-auto flex justify-between items-center">
+            {% if product.selected_configuration %}
+            <strong class="text-2xl inline-block">{{ product.price + product.selected_configuration.additional_price }}₽</strong>
+            {% else %}
+            <strong class="text-2xl inline-block">{{ product.price }}₽</strong>
+            {% endif %}
+
+            <img
+                src="{{ url_for('static', path='images/add_to_cart.png') }}" class="w-14"
+                class="bg-lightBlue rounded w-1/5"
+                hx-trigger="click"
+                hx-target="#content"
+                hx-swap="innerHTML show:#product{{ product.id }}photos:bottom"
+                hx-push-url="true">
+
+        </div>
 
     </div>
 

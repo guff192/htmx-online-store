@@ -4,6 +4,7 @@ from fastapi import Depends
 from loguru import logger
 from pydantic_core import Url
 
+from dto.product_dto import ProductDTO
 from exceptions.product_exceptions import (
     ErrInvalidProduct,
     ErrProductNotFound,
@@ -76,6 +77,12 @@ class ProductService:
             name=manufacturer_dict.get('name', ''),
             logo_url=manufacturer_dict.get('logo_url', '')
         )
+        soldered_ram = product_dict.get('soldered_ram', 0)
+        can_add_ram = product_dict.get('can_add_ram', False)
+        resolution = product_dict.get('resolution', '')
+        cpu = product_dict.get('cpu', '')
+        gpu = product_dict.get('gpu', '')
+        touchscreen = product_dict.get('touch_screen', False)
 
         return ProductSchema(
             id=product_dict.get('_id', 0),
@@ -83,7 +90,59 @@ class ProductService:
             description=product_dict.get('description', ''),
             price=product_dict.get('price', 0),
             manufacturer=manufacturer_schema,
+            soldered_ram=soldered_ram,
+            can_add_ram=can_add_ram,
+            resolution=resolution,
+            cpu=cpu,
+            gpu=gpu,
+            touch_screen=touchscreen
         )
+
+    def _product_dto_to_productincart_schema(self, product_dto: ProductDTO) -> ProductInCart:
+            # searching manufacturer
+            manufacturer_id = product_dto.manufacturer_id
+            if not manufacturer_id:
+                manufacturer_id = 0
+
+            manufacturer = self._manufacturer_repo.get_by_id(manufacturer_id)
+            if not manufacturer:
+                raise NotImplementedError
+
+            manufacturer_dict = manufacturer.__dict__
+            manufacturer_name = manufacturer_dict.get('name', '')
+            manufacturer_logo_url = manufacturer_dict.get('logo_url', '')
+            manufacturer_schema = ManufacturerSchema(
+                name=manufacturer_name, logo_url=manufacturer_logo_url
+            )
+
+            configurations = [ProductConfigurationSchema(
+                id=configuration.id,
+                ram_amount=configuration.ram_amount,
+                ssd_amount=configuration.ssd_amount,
+                additional_price=configuration.additional_price,
+                is_default=configuration.is_default,
+                additional_ram=configuration.additional_ram,
+                soldered_ram=configuration.soldered_ram
+            ) for configuration in product_dto.configurations]
+            selected_configuration = ProductConfigurationSchema(
+                id=product_dto.selected_configuration.id,
+                ram_amount=product_dto.selected_configuration.ram_amount,
+                ssd_amount=product_dto.selected_configuration.ssd_amount,
+                additional_price=product_dto.selected_configuration.additional_price,
+                is_default=product_dto.selected_configuration.is_default,
+                additional_ram=product_dto.selected_configuration.additional_ram,
+                soldered_ram=product_dto.selected_configuration.soldered_ram
+            ) if product_dto.selected_configuration else None
+
+            product_in_cart = ProductInCart(
+                id=product_dto.id, name=product_dto.name,
+                description=product_dto.description,
+                price=product_dto.price, count=product_dto.count,
+                manufacturer=manufacturer_schema,
+                configurations=configurations,
+                selected_configuration=selected_configuration
+            )
+            return product_in_cart
 
     def get_config_by_id(self, config_id: int) -> ProductConfiguration:
         return self.config_repo.get_by_id(config_id)
@@ -101,7 +160,6 @@ class ProductService:
             schema_configs.append(schema_config)
 
         return schema_configs
-
 
     def get_all_basic_configs(
         self
@@ -155,16 +213,18 @@ class ProductService:
             raise ErrPriceNotFound()
 
         return ProductPrices(
-                product_id=product.__dict__.get('_id', 0),
-                basic_price=product.__dict__.get('price', 0),
-                configurations=configurations,
-                selected_configuration=selected_configuration
-            )
+            product_id=product.__dict__.get('_id', 0),
+            basic_price=product.__dict__.get('price', 0),
+            configurations=configurations,
+            selected_configuration=selected_configuration
+        )
 
     def get_all(
         self,
+        query: str,
         offset: int,
         user: LoggedUser | None = None,
+        price_from: int = 0, price_to: int = 150000,
         ram: list[int] = [], ssd: list[int] = [], cpu: list[str] = [],
         resolution: list[str] = [], touchscreen: list[bool] = [],
         graphics: list[bool] = [],
@@ -174,46 +234,28 @@ class ProductService:
 
         if user:
             dto_list = self.repo.get_all_with_cart_info(
-                str(user.id), offset,
+                query, str(user.id), offset,
+                price_from=price_from, price_to=price_to,
                 ram=ram, ssd=ssd, cpu=cpu, resolution=resolution,
                 touchscreen=touchscreen, graphics=graphics
             )
         else:
             dto_list = self.repo.get_all(
-                offset=offset,
+                query=query, offset=offset,
+                price_from=price_from, price_to=price_to,
                 ram=ram, ssd=ssd, cpu=cpu, resolution=resolution,
                 touchscreen=touchscreen, graphics=graphics
             )
 
         if not dto_list:
             return ProductList(products=[], offset=-5)
+        if len(dto_list) == 1 and dto_list[0].id == -5:
+            return ProductList(products=[], offset=offset+10)
 
         # Creating products list
         products: list[ProductInCart] = []
         for product_dto in dto_list:
-            # searching manufacturer
-            manufacturer_id = product_dto.manufacturer_id
-            if not manufacturer_id:
-                manufacturer_id = 0
-
-            manufacturer = self._manufacturer_repo.get_by_id(manufacturer_id)
-            if not manufacturer:
-                continue
-
-            manufacturer_dict = manufacturer.__dict__
-            manufacturer_name = manufacturer_dict.get('name', '')
-            manufacturer_logo_url = manufacturer_dict.get('logo_url', '')
-            manufacturer_schema = ManufacturerSchema(
-                name=manufacturer_name, logo_url=manufacturer_logo_url
-            )
-                
-
-            product = ProductInCart(
-                id=product_dto.id, name=product_dto.name,
-                description=product_dto.description,
-                price=product_dto.price, count=product_dto.count,
-                manufacturer=manufacturer_schema
-            )
+            product = self._product_dto_to_productincart_schema(product_dto)
             products.append(product)
 
         product_list = ProductList(
@@ -259,41 +301,15 @@ class ProductService:
 
     def get_by_id(self, product_id: int) -> ProductSchema:
         orm_product = self.repo.get_by_id(product_id)
+        product_schema = self._orm_product_to_product_schema(orm_product)
         if not orm_product:
             raise ErrProductNotFound()
-        orm_product_dict = orm_product.__dict__
 
-        product_name = orm_product_dict.get('name', '')
-        try:
-            product_photos = self.get_all_photos_by_name(product_name)
-        except (Boto3Error, EndpointConnectionError):
-            product_photos = []
-
-        manufacturer_name = ''
-        if not hasattr(orm_product, 'manufacturer'):
-            raise ErrProductNotFound()
-        manufacturer: Manufacturer = orm_product.manufacturer
-        manufacturer_dict = manufacturer.__dict__
-        manufacturer_name = manufacturer_dict.get('name', '')
-        manufacturer_logo_url = manufacturer_dict.get('logo_url', '')
-        manufacturer_schema = ManufacturerSchema(
-            name=manufacturer_name, logo_url=manufacturer_logo_url
-        )
-        
         available_configurations = self.get_configurations_for_product(
             product_id
         )
+        product_schema.configurations = available_configurations
 
-        product_schema = ProductSchema(
-            id=orm_product_dict.get('_id', 0),
-            photos=product_photos,
-            name=product_name,
-            description=orm_product_dict.get('description', ''),
-            price=orm_product_dict.get('price', 0),
-            manufacturer=manufacturer_schema,
-            configurations=available_configurations,
-            selected_configuration=None
-        )
         return product_schema
 
     def get_by_name(self, name: str) -> Product:
@@ -311,7 +327,6 @@ class ProductService:
         size: ProductPhotoSize = ProductPhotoSize.small
     ) -> ProductPhotoPath | None:
         result = self.photo_storage.get_main_photo_by_name(product_name, size)
-
         return result
 
     def get_all_photos_by_name(
@@ -354,6 +369,7 @@ class ProductService:
         soldered_ram = product_update.soldered_ram
         can_add_ram = product_update.can_add_ram
         resolution = product_update.resolution if product_update.resolution else ''
+        resolution_name = product_update.resolution_name
         cpu = product_update.cpu if product_update.cpu else ''
         gpu = product_update.gpu if product_update.gpu else ''
         touch_screen = product_update.touch_screen if product_update.touch_screen is not None else False
@@ -367,7 +383,8 @@ class ProductService:
                 name, description, price, count=count,
                 manufacturer=manufacturer, configurations=update_configurations,
                 soldered_ram=soldered_ram, can_add_ram=can_add_ram,
-                resolution=resolution, cpu=cpu, gpu=gpu, touch_screen=touch_screen
+                resolution=resolution, resolution_name=resolution_name, cpu=cpu,
+                gpu=gpu, touch_screen=touch_screen
             )
             return ProductUpdateResponse(count=1)
 
@@ -380,7 +397,7 @@ class ProductService:
             configurations=update_configurations,
             soldered_ram=soldered_ram,
             can_add_ram=can_add_ram,
-            resolution=resolution,
+            resolution=resolution, resolution_name=resolution_name,
             cpu=cpu,
             gpu=gpu,
             touch_screen=touch_screen

@@ -1,3 +1,4 @@
+from re import match
 from time import time
 from typing import Generator
 
@@ -144,6 +145,7 @@ class DeliveryService:
         products: list[OrderProductSchema] = [],
     ) -> str:
         auth_token = self._get_cdek_auth_token()
+        recipient_name = f'Покупатель с номером {recipient_name}' if match(r'\d+', recipient_name) else recipient_name
 
         headers = {"Authorization": f"Bearer {auth_token}"}
 

@@ -34,15 +34,16 @@ class ProductModelView(ModelView):
     can_create = True
 
     column_details_list: list[str] = ['name', 'price', 'count',
-                                      'newcomer', 'manufacturer']
+                                      'newcomer', 'manufacturer', 'resolution_name']
 
     column_editable_list: list[str] = ['price', 'count',
-                                       'newcomer', 'manufacturer_id']
+                                       'newcomer', 'manufacturer_id', 'resolution_name']
 
-    column_searchable_list = ('name', 'manufacturer_id')
+    column_searchable_list = ('name', 'manufacturer_id', 'resolution_name')
 
-    form_columns: list[str] = ['name', 'description', 'price',
-                               'manufacturer_id', 'newcomer']
+    form_columns: list[str] = ['name', 'description', 'price', 'manufacturer_id',
+                               'newcomer', 'resolution', 'resolution_name', 'cpu',
+                               'soldered_ram', 'can_add_ram', 'touch_screen']
 
     form_overrides = dict(
         description=TextAreaField,
@@ -158,10 +159,6 @@ class OrderModelView(ModelView):
     column_editable_list: list[str] = ['user_id', 'date', 'buyer_name']
 
     column_default_sort: tuple[str, bool] = ('date', True)
-
-    def delete_view(self):
-        logger.debug('Deleting order from admin panel')
-        return super().delete_view()
 
 
 class PaymentModelView(ModelView):

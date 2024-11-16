@@ -11,7 +11,7 @@ from routes.payment_routes import router as payment_router
 from schema.order_schema import (
     CitySchema, DeliveryAddressSchema, OrderCreateSchema, OrderUpdateSchema, RegionSchema
 )
-from schema.user_schema import LoggedUser, UserCreate
+from schema.user_schema import LoggedUser, UserBase, UserCreate
 from viewmodels.auth_viewmodel import AuthViewModel, auth_viewmodel_dependency
 from viewmodels.delivery_viewmodel import DeliveryViewModel, delivery_viewmodel_dependency
 from viewmodels.order_viewmodel import OrderViewModel, order_viewmodel_dependency
@@ -26,7 +26,7 @@ templates = Jinja2Templates(directory='templates')
 @router.post('/create_from_cart')
 def create_order(
     request: Request,
-    user: LoggedUser | None = Depends(oauth_user_dependency),
+    user: UserBase | None = Depends(oauth_user_dependency),
     vm: OrderViewModel = Depends(order_viewmodel_dependency),
     delivery_vm: DeliveryViewModel = Depends(delivery_viewmodel_dependency),
 ):
@@ -125,7 +125,6 @@ def edit_order(
     cookie_order_str = ''
     if not user:
         order = get_order_from_cookies(request.cookies)
-        logger.debug(f'Got order from cookies: {order}')
         if not order or not order_id == order.id:
             return RedirectResponse('/cart',
                                     status_code=status.HTTP_303_SEE_OTHER)
@@ -142,8 +141,11 @@ def edit_order(
         'regions': regions,
         'editable': True
     }
-    if user and not context.get('buyer_name'):
-        context['buyer_name'] = user.name
+    if user:
+        if not context.get('buyer_name'):
+            context['buyer_name'] = user.name
+        if not context.get('buyer_phone') and user.phone:
+            context['buyer_phone'] = user.phone
 
     if request.headers.get('hx-request'):
         template_name = 'partials/order.html'
@@ -182,7 +184,7 @@ def update_order(
             raise ErrOrderInvalid
         
         # Creating new user and getting its token for cookie
-        user_create_schema = UserCreate(name=buyer_name, email=email)
+        user_create_schema = UserCreate(name=buyer_name, email=email, phone=buyer_phone)
         new_user = vm.create_user_for_order(user_create_schema)
         user_token = auth_vm.create_session({'sub': str(new_user.id)})
 

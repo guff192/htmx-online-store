@@ -1,8 +1,8 @@
-<button id="mobile-menu-button" class="mobile-menu-button my-5 mx-auto z-10">
-    <hr>
+<button id="mobile-menu-button" class="block md:hidden mx-auto mt-2 relative z-30 w-16 h-16" activated="false">
+    <img src="{{ url_for('static', path='images/menu.png') }}" class="min-w-full max-h-full">
 </button>
 
-<div  class="navbar-content flex flex-col sm:flex-row justify-between items-center w-full md:w-5/6 mx-auto z-20">
+<div id="navbar-content" class="invisible hidden md:visible md:flex flex-col sm:flex-row justify-between items-center h-[89%] md:h-full w-full md:w-5/6 mx-auto z-20 transition-all duration-500">
     {% if shop.logo_name %}
     <a href="/home#offset">
         <img class="w-40 self-center" src="{{ url_for('static', path='images/'+shop.logo_name) }}">
@@ -11,36 +11,19 @@
     <p class="text-2xl font-bold w-5/12 h-min p-2 self-center text-center"><a hx-boost="false" href="/">{{ shop.name }}</a></p>
     {% endif %}
 
-    <menu hx-replace-url="true" class="grow flex flex-col sm:flex-row justify-evenly h-full">
+    <menu hx-replace-url="true" hx-push-url="true" class="grow flex flex-col md:flex-row justify-evenly md:h-full">
 
-        <!-- Simple drop-down menu with brands -->
-        <div class="dropdown-menu">
-            <a class="flex justify-center items-center w-20 h-14 sm:h-24" href="/products/catalog#offset">
-                <div class="flex justify-center items-center w-20 h-14 sm:h-24">
-                    <img
-                        src="{{ url_for('static', path='images/search.png') }}"
-                        class="m-auto h-14 w-14 cursor-pointer rounded"
-                        alt="Каталог"
-                    >
-                </div>
-            </a>
-
-            <!--
-            <div class="dropdown-content top-0 translate-y-full bg-sky-700 w-20">
-                <a href="/products/catalog/search?manufacturer=Lenovo">
-                    <div class="p-1 text-center">Lenovo</div>
-                </a>
-                <a href="/products/catalog/search?manufacturer=HP">
-                    <div class="p-1 text-center">HP</div>
-                </a>
-                <a href="/products/catalog/search?manufacturer=Dell">
-                    <div class="p-1 text-center">Dell</div>
-                </a>
+        <a href="/products/catalog#offset">
+            <div class="flex justify-center items-center w-20 h-14 sm:h-24">
+                <img
+                    src="{{ url_for('static', path='images/search.png') }}"
+                    class="m-auto h-14 w-14 cursor-pointer rounded"
+                    alt="Каталог"
+                >
             </div>
-            -->
-        </div>
+        </a>
 
-        <a href="/contacts" hx-boost="false">
+        <a href="/contacts" hx-select="#content" hx-select-oob="#page-header">
             <div class="flex justify-center items-center w-20 h-14 sm:h-24">
                 <img
                 src="{{ url_for('static', path='images/contacts.png') }}"
@@ -48,6 +31,13 @@
                 alt="Контакты"
                 >
             </div>
+            <script>
+                htmx.on('htmx:afterSettle', (evt) => {
+                    if (evt.detail.pathInfo.responsePath === '/contacts') {
+                        setTimeout(() => document.querySelector('#offset').scrollIntoView(true), 50);
+                    }
+                });
+            </script>
         </a>
 
         <a href="/cart#offset">
@@ -59,13 +49,18 @@
                     >
             </div>
         </a>
+
     </menu>
 
     <div class="w-40"
         hx-swap="innerHTML show:#offset:bottom">
         {% if request.state.user %}
             <a href="/auth/profile" hx-boost="true" title="Профиль">
-                <img src="{{ request.state.user.profile_img_url }}" class="w-20 h-20 rounded-lg mx-auto">
+                {% if request.state.user.profile_img_url %}
+                    <img src="{{ request.state.user.profile_img_url }}" class="w-20 h-20 rounded-lg mx-auto">
+                {% else %}
+                    <img src="{{ url_for('static', path='images/user.png') }}" class="w-20 h-20 rounded-lg mx-auto">
+                {% endif %}
             </a>
         {% else %}
             <a href="/auth/login" hx-boost="false">
@@ -77,38 +72,81 @@
 </div>
 
 <script type="text/javascript" async>
-    if (window.innerWidth > 640) {
+    MOBILE_MAX_WIDTH = 768;
+
+    // Collapse navbar on scroll on desktop devices
+    if (window.innerWidth > MOBILE_MAX_WIDTH) {
         window.onscroll = function () {
-            const navbarContent = document.getElementById("navbar-content");
-            const navbar = document.getElementsByTagName('nav')[0];
-            if (document.body.scrollTop > window.innerHeight || document.documentElement.scrollTop > window.innerHeight) {
-                if (!navbar.classList.contains('collapsed-navbar')) {
-                    navbar.classList.add('collapsed-navbar');
+            const navbarContent = document.querySelector('#navbar-content');
+            const navbar = document.querySelector('nav');
+            if (document.body.scrollTop > window.innerHeight / 2 || document.documentElement.scrollTop > window.innerHeight / 2) {
+                if (!navbarContent.classList.contains('scale-75')) {
+                    navbarContent.classList.add('scale-75');
+                    navbar.classList.add('opacity-50');
                 }
-            } else {
-                if (navbar.classList.contains('collapsed-navbar')) {
-                    navbar.classList.remove('collapsed-navbar');
-                }
+            } else if (navbarContent.classList.contains('scale-75')) {
+                navbarContent.classList.remove('scale-75');
+                navbar.classList.remove('opacity-50');
             }
         };
     }
 
+    // Mobile menu logic
     const mobileMenuButton = document.getElementById('mobile-menu-button');
-    mobileMenuButton.addEventListener('click', () => {
-        if (window.innerWidth > 640) {
+    const menuLinks = document.querySelectorAll('#navbar-content a');
+
+    const navbarContent = document.querySelector("#navbar-content");
+    const navbar = document.querySelector('nav');
+    const mobileMenuButtonImg = mobileMenuButton.querySelector('img');
+
+    function openMenu() {
+        mobileMenuButton.setAttribute('activated', 'true');
+        mobileMenuButton.classList.remove('w-16');
+        mobileMenuButton.classList.add('h-[10%]');
+        mobileMenuButtonImg.src = "{{ url_for('static', path='images/close.png') }}";
+        mobileMenuButtonImg.classList.add('invert');
+        
+        navbarContent.classList.remove('hidden');
+        navbarContent.classList.remove('invisible');
+        navbarContent.classList.add('flex');
+        
+        navbar.classList.remove('h-[10dvh]');
+        navbar.classList.remove('top-16');
+        navbar.classList.add('h-[100dvh]');
+    }
+
+    function closeMenu() {
+        mobileMenuButton.setAttribute('activated', 'false');
+        mobileMenuButton.classList.add('w-16');
+        mobileMenuButton.classList.remove('h-[10%]');
+        mobileMenuButtonImg.src = "{{ url_for('static', path='images/menu.png') }}";
+        mobileMenuButtonImg.classList.remove('invert');
+
+        navbarContent.classList.add('hidden');
+        navbarContent.classList.add('invisible');
+        navbarContent.classList.remove('flex');
+
+        navbar.classList.add('h-[10dvh]');
+        navbar.classList.add('top-16');
+        navbar.classList.remove('h-[100dvh]');
+    }
+
+    function toggleMenu() {
+        const activated = mobileMenuButton.getAttribute('activated') === 'true';
+        if (!activated) {
+            openMenu();
+        } else {
+            closeMenu();
+        }
+    }
+    
+
+    [...menuLinks, mobileMenuButton].forEach(btn => btn.addEventListener('click', () => {
+        if (window.innerWidth > MOBILE_MAX_WIDTH) {
             return;
         }
-        const navbarContent = document.getElementsByClassName("navbar-content")[0];
-        navbarContent.classList.toggle('closed-navbar');
-
-        document.getElementsByTagName('nav')[0].classList.toggle('collapsed-navbar');
-    });
-    document.querySelectorAll('menu a').forEach(link => link.addEventListener('click', () => {
-        console.log('clicked');
-        mobileMenuButton.click();
+        toggleMenu();
     }));
 
-    window.onload = () => {
-        mobileMenuButton.click();
-    }
 </script>
+

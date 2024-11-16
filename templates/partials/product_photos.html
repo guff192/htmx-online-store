@@ -1,15 +1,14 @@
 {% if photo_urls %}
 
-
     {% if photo_urls[1:] %}
         <div
-            class="w-1/5 h-full p-1 box-border border border-gray-800 shadow-xl shadow-sky-400 rounded cursor-pointer transition-all duration-300">
+            class="w-1/2 md:w-1/5 h-full p-1 box-border border border-gray-800 shadow-xl shadow-sky-400 rounded cursor-pointer transition-all duration-300">
             <img class="w-full" src="{{ photo_urls[0] }}"/>
         </div>
 
         {% for link in photo_urls[1:] %}
         <div
-            class="w-1/5 h-full p-1 box-border border border-gray-300 shadow-l shadow-gray-800 rounded cursor-pointer transition-all duration-300"
+            class="w-1/2 md:w-1/5 h-full p-1 box-border border border-gray-300 shadow-l shadow-gray-800 rounded cursor-pointer transition-all duration-300"
             >
             <img class="w-full" src="{{ link }}" />
         </div>
@@ -58,6 +57,10 @@
             });
         });
 
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#small-photos div.shadow-xl').click();
+        });
+
         </script>
 
     {% else %}
@@ -65,7 +68,7 @@
         {% if request.query_params.get('size') == '' %}
             <img
                 src="{{ photo_urls[0] }}"
-                class="h-72 mx-auto"
+                class="mx-auto"
                 id="large-photo"
                 >
                 <!-- <p>Size large</p> -->

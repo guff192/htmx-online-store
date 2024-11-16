@@ -16,7 +16,7 @@
 
 
     {% if not payment or payment.status.value != 'success' %}
-        <button class="bg-red-500 rounded p-2 font-bold mb-5"
+        <button class="bg-red-500 rounded p-2 font-bold"
             hx-delete="/order/{{ id }}/cancel" hx-target="#order{{ id }}"
             hx-confirm="Вы действительно хотите отменить заказ {{ id }}?"
             hx-swap="outerHTML">Отменить заказ</button>
@@ -46,7 +46,9 @@
 
             <div> 
                 <label for="buyer_phone" class="block font-bold mb-2 after:content-['*'] after:text-red-500">Телефон:</label>
-                <input type="text" name="buyer_phone" id="buyer_phone" class="text-black text-center w-full border border-gray-300 rounded p-2" value="{{ buyer_phone }}" required>
+                <input type="text" name="buyer_phone" id="buyer_phone" data-tel-input class="text-black text-center w-full border border-gray-300 rounded p-2" value="{{ buyer_phone }}" required>
+
+                <script src="{{ url_for('static', path='js/phoneinput.js') }}" async></script>
             </div>
 
             <div> 
@@ -58,7 +60,7 @@
             <div>
                 <div class="h-20 flex justify-around items-center">
                     <div>
-                        <label class="w-1/3" for="delivery">Доставка</label>
+                        <label class="w-1/3" for="delivery">Бесплатная доставка</label>
                         <input type="radio" name="delivery" id="delivery" value="true"
                         hx-trigger="change"
                         hx-get="/delivery/form"
@@ -118,6 +120,10 @@
                 hx-get="/order/payment/{{ id }}" hx-target="#content"
                 hx-replace-url="/order/payment/{{ id }}"
                 hx-swap="innerHTML">Перейти к оплате</button>
+            <br>
+            <a class="inline-block bg-orange-500 rounded p-2 font-bold mb-5 mt-2"
+                href="https://t.me/evmstore" target="_blank">
+                Получить видео товара перед покупкой</a>
         {% endif %}
 
         <br>
@@ -131,7 +137,10 @@
         {% endif %}
         {% if delivery_track_number %}
         <br>
-        <p>Номер для отслеживания доставки: {{ delivery_track_number }}</p>
+        <p>
+            Номер для отслеживания доставки: 
+            <a href="https://www.cdek.ru/ru/tracking/?order_id={{ delivery_track_number }}" target="_blank">{{ delivery_track_number }}</a>
+        </p>
         {% endif %}
 
 

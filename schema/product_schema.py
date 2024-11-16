@@ -44,6 +44,9 @@ class ProductConfiguration(BaseModel):
     additional_ram: bool = False
     soldered_ram: int = 0
 
+    def __repr__(self) -> str:
+        return f'{self.ram_amount}ГБ RAM/{self.ssd_amount}ГБ SSD'
+
 
 class ProductPrices(BaseModel):
     product_id: int
@@ -77,6 +80,7 @@ class ProductBase(BaseModel):
 class ProductCreate(ProductBase):
     count: int
     manufacturer_name: str
+    resolution_name: str
 
     def is_valid(self) -> bool:
         return super().is_valid() and self.count > 0
@@ -98,6 +102,22 @@ class Product(ProductBase):
     @property
     def absolute_url(self) -> str:
         return f'/products/{self.id}'
+
+    @property
+    def short_name(self) -> str:
+        name_parts = self.name.split(',')
+        name, cpu, resolution = name_parts[:3]
+        name = name + '\n'
+        resolution = name_parts[3] if 'gb' in resolution else resolution
+        return ''.join((name, cpu, resolution))
+
+    @property
+    def ram_amounts(self) -> set[int]:
+        return set(map(lambda c: c.ram_amount, self.configurations))
+
+    @property
+    def ssd_amounts(self) -> set[int]:
+        return set(map(lambda c: c.ssd_amount, self.configurations))
 
     @utils.add_shop_to_context
     def build_context(self) -> dict[str, Any]:

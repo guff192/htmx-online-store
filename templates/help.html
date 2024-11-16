@@ -1,0 +1,75 @@
+{% extends '_base.html' %}
+
+{% block title %}{{ shop.name }} | Помощь в подборе{% endblock %}
+
+{% block header %}
+<h1 id="page-header" class="text-4xl font-bold text-center mb-4 mt-2">Помощь в подборе</h1>
+{% endblock %}
+
+{% block content %}
+
+{% if request.headers.get('hx-request') %}
+
+<script>
+    // Replace page header text
+    var pageHeader = document.getElementsByTagName('header')[0];
+    pageHeader.innerHTML = `
+        <h1 id="page-header" class="text-4xl font-bold text-center mb-4 mt-2">Помощь в подборе</h1>
+    `;
+
+    document.title = '{{ shop.name }} | Помощь в подборе'
+</script>
+
+{% endif %}
+
+<p class="text-center mb-5">В данном разделе вы можете получить помощь в подборе и оформлении заказа.</p>
+
+<div class="my-5 mx-auto w-max h-[70dvh]">
+   <video src="https://pub-8dad9fb788704075a85e929377d4d155.r2.dev/Promo%20videos/help%20to%20choose.mp4"
+       poster="https://pub-8dad9fb788704075a85e929377d4d155.r2.dev/Promo%20videos/help%20to%20choose.png"
+       controls loop playsinline
+       class="h-full">
+   </video>
+</div>
+
+<p class="text-center">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus at volutpat ipsum, elementum faucibus orci.
+    Aenean leo magna, finibus ut imperdiet vel, euismod in turpis. Proin in arcu id mi pharetra porttitor.
+    Cras scelerisque lorem in consequat congue. Cras tempor lacinia elit, quis accumsan sem ultrices vel.
+    Proin in mi volutpat, placerat augue eu, convallis massa. Fusce scelerisque purus purus, ac condimentum libero accumsan vel.
+    Ut ac dui ultricies, malesuada metus eu, auctor orci. Phasellus et magna sem. Maecenas enim dolor, faucibus vitae nibh et, ultrices maximus tellus.
+    Fusce id feugiat mi. Nunc dui nisi, blandit sed enim ut, bibendum venenatis risus. Mauris enim sem, laoreet quis lectus non, gravida elementum purus.
+    Nunc aliquam et mauris a mollis. Cras eros enim, efficitur ut dui et, molestie mattis sapien. Suspendisse sed diam sit amet tellus aliquam tristique a et nisi.
+<br>
+    Mauris a interdum nunc. Donec iaculis tempor tellus, interdum hendrerit eros interdum nec. Vivamus lacinia purus sed felis tempus ornare.
+    Sed arcu massa, ultricies eget erat ac, eleifend tempus dui. Donec convallis facilisis sodales. Sed mollis augue vitae ullamcorper sagittis.
+    In felis velit, sodales sit amet turpis eu, malesuada varius quam. Donec aliquam purus libero, eu euismod nisl commodo et.
+    Quisque tincidunt ac leo vel lacinia. In id vulputate leo. Curabitur quis mollis erat, ac rutrum risus. Integer id imperdiet diam.
+    Praesent efficitur neque a lacus suscipit, ut ultricies ipsum ultrices.
+    Donec ullamcorper, ipsum in auctor ultricies, nisl odio hendrerit tellus, sed tempor enim nibh non enim.
+    Pellentesque imperdiet lacus sit amet erat vestibulum, non imperdiet erat finibus. Aenean vel purus lacus.
+<br>
+    Mauris leo enim, tempor vitae libero vel, porta ultrices nibh. In sit amet efficitur augue, at egestas nulla. Quisque quis dolor quam.
+    Suspendisse vulputate, augue sit amet bibendum rutrum, ligula enim elementum ante, et cursus mi elit non odio. Fusce consectetur ac lacus quis blandit.
+    Nam quis metus sapien. Cras viverra risus nulla, auctor mollis libero pellentesque vel. Nulla ultricies lorem ut nibh faucibus consectetur.
+    Sed ullamcorper erat purus, ac bibendum elit vulputate vitae. Suspendisse potenti.
+<br>
+    Aenean massa sem, eleifend et elit non, vulputate malesuada dui. Integer auctor magna in hendrerit tincidunt.
+    Sed ullamcorper libero ac turpis elementum rutrum. Sed nec lorem vel lacus suscipit lobortis id nec eros.
+    Curabitur pretium sollicitudin dui, quis consequat augue porta sed. Duis sed quam nulla.
+    Sed porttitor tortor sit amet neque rutrum, eget ornare eros maximus. Etiam eget hendrerit justo.
+    Proin id sem eget metus facilisis vulputate vitae sit amet urna. Cras vel nibh vestibulum, imperdiet felis id, molestie nisl.
+    Phasellus mi dolor, suscipit at blandit a, elementum sit amet erat.
+<br>
+    Curabitur dignissim turpis orci, et rhoncus justo vehicula a. Vestibulum porta consequat porttitor. Morbi suscipit pulvinar sapien in tempus.
+    Duis at nisi posuere, elementum lacus eu, congue diam. Suspendisse iaculis suscipit sollicitudin. Integer aliquam nunc id accumsan condimentum.
+    Etiam feugiat pretium nulla, non pulvinar turpis placerat sit amet. Nunc ut arcu interdum, viverra elit non, pellentesque elit.
+    Sed ut neque molestie, vulputate magna sed, commodo urna.
+</p>
+
+
+{% endblock %}
+
+
+
+

@@ -183,6 +183,7 @@ class AuthService:
         user_data_dict = user_data.__dict__
         name = user_data_dict.get("name", "")
         email = user_data_dict.get("email", "")
+        phone = user_data_dict.get("phone", "")
         profile_img_url = user_data_dict.get("profile_img_url", "")
         google_id = user_data_dict.get("google_id", "")
         yandex_id = user_data_dict.get("yandex_id", 0)
@@ -194,6 +195,7 @@ class AuthService:
             id=user_id,
             name=name,
             email=email,
+            phone=phone,
             profile_img_url=profile_img_url,
             google_id=google_id,
             yandex_id=yandex_id,

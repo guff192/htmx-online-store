@@ -12,6 +12,7 @@ from app.initial_setup import fetch_products, reload_tailwindcss, run_migrations
 from db import init_db
 from db.session import get_db
 from middleware.auth_middleware import AdminMiddleware, LoginMiddleware
+from repository.product_repository import test_product_repository
 from routes.auth_routes import router as auth_router
 from routes.cart_routes import router as cart_router
 from routes.delivery_routes import router as delivery_router

@@ -4,7 +4,7 @@
     {% block title %}{{ shop.name }} | Каталог{% endblock %}
 
     {% block header %}
-    <h1 id="page-header" class="text-4xl font-bold text-center mb-5 mt-2">Товары в наличии</h1>
+    <h1 id="page-header" class="text-4xl font-bold text-center mb-5 mt-2 drop-shadow-[2px_2px_10px_0px_#c4c4c4,-2px_-2px_10px_0px_#ffffff]">Товары в наличии</h1>
     {% endblock %}
 
 {% else %}
@@ -21,29 +21,66 @@
 
 
 {% block content %}
+
+<!-- Search bar -->
+<div class="flex justify-center mb-5 w-full">
+    <form method="get" action="/products" class="w-3/4
+        bg-gradient-to-br from-white to-gray-300 shadow-[9px_9px_18px_0px_#c4c4c4,-9px_-9px_18px_0px_#ffffff]">
+        <input type="text" name="query" placeholder="Поиск по названию или описанию"
+        class="w-full text-center border border-gray-500 rounded-lg p-2"
+        hx-trigger="keyup changed delay:200ms"
+        data-filter-input
+        hx-get="/products"
+        hx-target="#products"
+        hx-swap="innerHTML">
+    </form>
+</div>
+
 <!-- Filters and products grid -->
-<div class="flex justify-center md:gap-4 mb-5">
+<div class="flex flex-col md:flex-row justify-center md:gap-4 mb-5">
 
     <!-- Filters -->
-    <div id="filters" class="w-1/4 bg-white shadow-lg">
-        {% include 'partials/filters.html' %}
+    <div class="md:w-1/4">
+        <button id="filters-btn" activated="false" class="md:hidden
+            border border-gray-100 rounded-lg w-40 h-14 mx-auto mb-5 py-3 px-7 flex justify-between items-center
+            filter-none transition-all duration-300 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-300 shadow-[6px_6px_12px_0px_#c5c5c5,-6px_-6px_12px_0px_#ffffff]
+            hover:filter-none
+            group
+            active:text-gray-500 active:shadow-[inset_4px_4px_12px_0px_#c5c5c5,inset_-4px_-4px_12px_0px_#ffffff]"
+            >
+            <img src="{{ url_for('static', path='images/filter.png') }}" class="max-h-full group-active:contrast-50">
+            <span class="group-active:text-gray-500">Фильтры</span>
+        </button>
+
+        <div id="filters" class="rounded hidden md:block bg-gradient-to-br from-white via-gray-100 to-gray-200 shadow-[9px_9px_18px_0px_#c4c4c4,-9px_-9px_18px_0px_#ffffff]">
+            {% include 'partials/filters.html' %}
+        </div>
+
+        <script type="text/javascript">
+            if (typeof(filters) === 'undefined') { let filters; }
+            if (typeof(filtersBtn) === 'undefined') { let filtersBtn; }
+            filtersBtn = document.querySelector('#filters-btn');
+            filters = document.querySelector('#filters');
+            
+            filtersBtn.addEventListener('click', (evt) => {
+                const activated = filtersBtn.getAttribute('activated') === 'true';
+                if (!activated) {
+                    filtersBtn.querySelector('img').src = "{{ url_for('static', path='images/close.png') }}";
+                    filtersBtn.querySelector('span').innerText = 'Скрыть';
+                    filters.classList.remove('hidden');
+                    filtersBtn.setAttribute('activated', 'true');
+                } else {
+                    filtersBtn.querySelector('img').src = "{{ url_for('static', path='images/filter.png') }}";
+                    filtersBtn.querySelector('span').innerText = 'Фильтры';
+                    filters.classList.add('hidden');
+                    filtersBtn.setAttribute('activated', 'false');
+                }
+            });
+        </script>
     </div>
 
-
     <!-- Products -->
-    <div class="flex flex-col items-center w-3/4">
-
-        <!-- Search bar -->
-        <div class="flex justify-center mb-5 w-full">
-            <form method="get" action="/products/search" class="w-3/4">
-                <input type="text" name="query" placeholder="Поиск по названию или описанию"
-                class="w-full text-center border border-gray-500 rounded-lg p-2"
-                hx-trigger="keyup changed delay:200ms"
-                hx-get="/products/search"
-                hx-target="#products"
-                hx-swap="innerHTML">
-            </form>
-        </div>
+    <div class="flex flex-col items-center md:w-3/4">
 
         <!-- Products grid -->
         <div id="products" class="md:grid md:grid-cols-3 md:gap-2">

@@ -13,7 +13,11 @@
 
 <div id="profile-info" class="w-full md:w-3/4 mx-auto h-min relative" hx-target="#content" hx-push-url="true">
 
-    <img src="{{ user.profile_img_url }}" class="w-60 h-60 mb-2 mx-auto rounded-xl">
+    {% if user.profile_img_url %}
+        <img src="{{ user.profile_img_url }}" class="w-60 h-60 mb-2 mx-auto rounded-xl">
+    {% else %}
+        <img src="{{ url_for('static', path='images/user.png') }}" class="w-60 h-60 mb-2 mx-auto rounded-xl invert">
+    {% endif %}
 
     <div class="flex justify-around items-center w-4/5 md:w-1/2 mx-auto rounded-3xl mb-4 p-1 bg-black">
         {% if request.state.user.is_admin %}

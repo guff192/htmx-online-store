@@ -187,10 +187,10 @@ class ProductRepository:
                     Product.name.like(f'%{query.replace(" ", "%")}%'),
                     Product.description.like(f'%{query.replace(" ", "%")}%')
                 )).
-                filter(  # filtering products in cart and products without user
+                where(  # filtering products in cart and products without user
                     or_(UserProduct.user_id == user_id,
                         UserProduct.user_id == None)).  # noqa: E711
-                filter(Product.count > 0).
+                where(Product.count > 0).
                 group_by(Product._id).
                 order_by(Product.name).
                 slice(offset, offset + 10)
@@ -206,10 +206,10 @@ class ProductRepository:
                 join(UserProduct,  # joining for getting count from user_product
                      Product._id == UserProduct.product_id,
                      isouter=True).
-                filter(  # filtering products in cart and products without user
+                where(  # filtering products in cart and products without user
                     or_(UserProduct.user_id == user_id,
                         UserProduct.user_id == None)).  # noqa: E711
-                filter(Product.count > 0).
+                where(Product.count > 0).
                 group_by(Product._id).
                 order_by(Product.name).
                 slice(offset, offset + 10)

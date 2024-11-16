@@ -39,10 +39,13 @@ def get_catalog(
     )
 
 
-@router.get('', response_class=HTMLResponse)
+@router.get('', response_class=HTMLResponse, name='product_list')
 def get_product_list(
     request: Request,
+    query: str = '',
     offset: int = 0,
+    price_from: int = 0,
+    price_to: int = 150000,
     ram: Annotated[list[int], Query()] = [],
     ssd: Annotated[list[int], Query()] = [],
     cpu: Annotated[list[str], Query()] = [],
@@ -56,13 +59,26 @@ def get_product_list(
         return RedirectResponse('/products/catalog')
 
     products_data: ProductList = product_vm.get_all(
+        query=query,
         offset=offset, user=user,
+        price_from=price_from, price_to=price_to,
         ram=ram, ssd=ssd, cpu=cpu, resolution=resolution,
         touchscreen=touchscreen, graphics=graphics
     )
 
+    filter_params_str = ''
+    filter_params_str += f'query={query}&'
+    filter_params_str += f'price_from={price_from}&price_to={price_to}&'
+    filter_params_str += '&'.join('ram=' + str(r) for r in ram) + '&'
+    filter_params_str += '&'.join('ssd=' + str(s) for s in ssd) + '&'
+    filter_params_str += '&'.join('cpu=' + str(c) for c in cpu) + '&'
+    filter_params_str += '&'.join('resolution=' + str(r) for r in resolution) + '&'
+    filter_params_str += '&'.join('touchscreen=' + str(t) for t in touchscreen) + '&'
+    filter_params_str += '&'.join('graphics=' + str(g) for g in graphics)
+
     context_data: dict[str, Any] = {'request': request}
     context_data.update(products_data.build_context())
+    context_data.update(filter_params=filter_params_str)
 
     return templates.TemplateResponse(
         'partials/product_list.html',
@@ -128,6 +144,42 @@ def get_product_prices(
 
     prices = product_vm.get_product_prices(product_id,
                                            product_configuration_id)
+    # building context
+    prices_context = prices.build_context()
+
+    setups = list(map(
+        lambda c: {'ram': c.ram_amount, 'ssd': c.ssd_amount, 'id': c.id, 'name': c.__repr__()},
+        prices_context['configurations']
+    ))
+    ram_amounts = list(set(map(lambda c: c.ram_amount, prices_context['configurations'])))
+    ssd_amounts = list(set(map(lambda c: c.ssd_amount, prices_context['configurations'])))
+    
+    ram_configurations = []
+    for i, amount in enumerate(ram_amounts):
+        ram_configurations.append({'setups': [], 'ram': amount})
+        for setup in setups:
+            if amount == setup['ram']:
+                ram_configurations[i]['setups'].append({
+                    'id': setup['id'],
+                    'name': setup['name'],
+                    'ssd': setup['ssd']
+                })
+                
+    ssd_configurations = []
+    for i, amount in enumerate(ssd_amounts):
+        ssd_configurations.append({'setups': [], 'ssd': amount})
+        for setup in setups:
+            if amount == setup['ssd']:
+                ssd_configurations[i]['setups'].append({
+                    'id': setup['id'],
+                    'name': setup['name'],
+                    'ram': setup['ram']
+                })
+                
+    ram_configurations = sorted(ram_configurations, key=lambda c: c['ram'])
+    ssd_configurations = sorted(ssd_configurations, key=lambda c: c['ssd'])
+    prices_context['ram_configurations'] = ram_configurations
+    prices_context['ssd_configurations'] = ssd_configurations
 
     return templates.TemplateResponse(
         'partials/price_configurator.html',

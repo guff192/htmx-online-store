@@ -14,7 +14,7 @@ class OrderViewModel:
     def __init__(self, service: OrderService):
         self._service = service
     
-    def get_by_id(self, order_id: int, user_id: str) -> OrderSchema:
+    def get_by_id(self, order_id: int, user_id: str | None = None) -> OrderSchema:
         return self._service.get_by_id(order_id, user_id)
 
     def list_user_orders(self, user_id: str) -> UserOrderListSchema:

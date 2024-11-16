@@ -96,3 +96,27 @@ def contacts(
     }
     return templates.TemplateResponse('contacts.html', context=context_data)
 
+
+@router.get('/help', response_class=HTMLResponse, name='help')
+def help(
+    request: Request,
+    default_vm: DefaultViewModel = Depends(default_viewmodel_dependency),
+):
+    context_data: dict[str, Any] = {
+        'request': request,
+        **default_vm.build_context(),
+    }
+    return templates.TemplateResponse('help.html', context=context_data)
+
+
+@router.get('/secret', response_class=HTMLResponse, name='secret')
+def secret_page(
+    request: Request,
+    default_vm: DefaultViewModel = Depends(default_viewmodel_dependency),
+):
+    context_data: dict[str, Any] = {
+        'request': request,
+        **default_vm.build_context(),
+    }
+    return templates.TemplateResponse('secret.html', context=context_data)
+

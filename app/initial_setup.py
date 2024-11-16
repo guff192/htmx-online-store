@@ -33,6 +33,7 @@ def fetch_products(db: Session):
     )
 
     basic_configs = product_service.get_all_basic_configs()
+    logger.debug(f'{basic_configs = }')
 
     for product_data in data:
         name = product_data.get("name", "")
@@ -44,6 +45,7 @@ def fetch_products(db: Session):
         soldered_ram = product_data.get("soldered_ram", 0)
         can_add_ram = product_data.get("can_add_ram", False)
         resolution = product_data.get("resolution", "")
+        resolution_name = product_data.get("resolution_name", "")
         cpu = product_data.get("cpu", "")
         gpu = product_data.get("gpu", "")
         touch_screen = product_data.get("touch_screen", False)
@@ -61,7 +63,6 @@ def fetch_products(db: Session):
                 soldered_ram=soldered_ram
             )
 
-
         # Validate data using the schema
         product_create = ProductCreate(
             name=name,
@@ -73,15 +74,15 @@ def fetch_products(db: Session):
             soldered_ram=soldered_ram,
             can_add_ram=can_add_ram,
             resolution=resolution,
+            resolution_name=resolution_name,
             cpu=cpu,
             gpu=gpu,
             touch_screen=touch_screen
         )
-        logger.debug(product_create)
 
         try:
             # Use the service to create the product
-            product = product_service.update_or_create_by_name(product_create)
+            count = product_service.update_or_create_by_name(product_create)
             logger.info(f"Created product: {product_create}")
         except HTTPException as e:
             logger.info(f"Error creating product: {e.detail}")

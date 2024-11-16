@@ -130,10 +130,9 @@ class UserService:
     ) -> UserResponse:
         user_model = self.repo.get_by_phone(phone)
         if not user_model:
-            user_name = f"Пользователь с номером {phone}"
             user_email = f"{str(uuid4()).split('-')[0]}@{settings.shop_public_url.host}"
             user_model = self.repo.create(
-                name=user_name,
+                name=phone,
                 email=user_email,
                 phone=phone
             )
@@ -187,7 +186,8 @@ class UserService:
         try:
             user_model =  self.repo.create(
                 user_create_schema.name,
-                user_create_schema.email
+                user_create_schema.email,
+                phone=user_create_schema.phone
             )
         except IntegrityError as e:
             logger.error(e)

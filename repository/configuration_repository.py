@@ -20,12 +20,19 @@ class ConfigurationRepository:
     def get_available_configurations(
         self,
         additional_ram: bool = False,
-        soldered_ram: int = 0
+        soldered_ram: int = 0,
+        ram_amount: int | None = None,
+        ssd_amount: int | None = None
     ) -> list[ProductConfiguration]:
-        return self.db.query(ProductConfiguration).filter(
-            ProductConfiguration.additional_ram == additional_ram,
-            ProductConfiguration.soldered_ram == soldered_ram
-        ).all()
+        filters = [ProductConfiguration.additional_ram == additional_ram, 
+                   ProductConfiguration.soldered_ram == soldered_ram]
+
+        if ram_amount is not None:
+            filters.append(ProductConfiguration.ram_amount == ram_amount)
+        if ssd_amount is not None:
+            filters.append(ProductConfiguration.ssd_amount == ssd_amount)
+
+        return self.db.query(ProductConfiguration).filter(*filters).all()
 
     def get_default_configurations(self):
         return self.db.query(ProductConfiguration).filter(

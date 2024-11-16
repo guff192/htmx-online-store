@@ -1,111 +1,200 @@
-<div class="w-4/5 mx-auto flex flex-col items-start"
+<div class="w-11/12 md:w-4/5 mx-auto py-2 flex flex-col md:items-start"
     hx-target="#products"
     hx-query="#products"
     hx-get="/products">
+
+    <!-- Price -->
+    <h3 class="text-lg font-bold">Цена</h3>
+    <div class="w-full flex gap-2 justify-between items-center" id="price-filters">
+        <div class="w-1/2 flex flex-col justify-between gap-2 text-xl">
+            <label for="price_from">От</label>
+            <input data-filter-input="" name="price_from" value="0" id="price_from" type="text" 
+                hx-trigger="input changed delay:500ms" hx-get="/products"
+                class="w-full border border-gray-500 rounded-lg p-2 text-center"
+                >
+        </div>
+
+        <div class="w-1/2 flex flex-col justify-between gap-2 text-xl">
+            <label for="price_to">До</label>
+            <input data-filter-input="" name="price_to" value="200000" max="200000" id="price_to" type="text" 
+                hx-trigger="input changed delay:500ms" hx-get="/products"
+                class="w-full border border-gray-500 rounded-lg p-2 text-center"
+                >
+        </div>
+
+        <script type="text/javascript">
+            // Enhancing price input focus
+            const priceInputs = document.querySelectorAll('#price-filters input[data-filter-input]');
+            priceInputs.forEach((input) => {
+                input.addEventListener('focus', (e) => {
+                    e.target.select();
+                });
+                input.addEventListener('keyup', (e) => {
+                    if (e.keyCode == 8 && e.target.value.length == 0) {
+                        e.target.value = "0";
+                        e.target.select();
+
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+                input.addEventListener('change', (e) => {
+                    if (e.target.value == "" && e.target.hasAttribute('max')) {
+                        e.target.value = e.target.getAttribute('max');
+                    }
+                });
+            });
+
+            // Preventing sending request when clicking on label
+            const priceLabels = document.querySelectorAll('#price-filters label');
+            priceLabels.forEach((label) => {
+                label.addEventListener('click', (e) => {
+                    // Force select input value
+                    Array.from(priceInputs).filter(input => input.name == e.target.htmlFor)[0].select();
+                    
+                    e.preventDefault();
+                    return;
+                });
+            });
+
+        </script>
+    </div>
+
     <!-- RAM -->
+    <hr class="mt-3 mb-2 w-full mx-auto h-0.5 bg-gray-300">
     <h3 class="text-lg font-bold">Оперативная память</h3>
-    <div class="flex flex-col items-start">
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="ram_8">8 GB</label>
+    <div class="flex flex-row flex-wrap md:flex-nowrap gap-5 md:gap-0 justify-around md:justify-around md:flex-col items-start">
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="ram_4">4 ГБ</label>
+            <input data-filter-input name="ram" id="ram_4" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="4" checked>
+        </div>
+
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="ram_8">8 ГБ</label>
             <input data-filter-input name="ram" id="ram_8" type="checkbox" class="w-6 h-6"
             hx-trigger="change" value="8" checked>
         </div>
 
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="ram_16">16 GB</label>
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="ram_16">16 ГБ</label>
             <input data-filter-input name="ram" id="ram_16" type="checkbox" class="w-6 h-6"
             hx-trigger="change" value="16" checked>
+        </div>
+
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="ram_32">32 ГБ</label>
+            <input data-filter-input name="ram" id="ram_32" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="32" checked>
         </div>
     </div>
 
     <!-- SSD -->
+    <hr class="mt-3 mb-2 w-full mx-auto h-0.5 bg-gray-300">
     <h3 class="text-lg font-bold">Жесткий диск (SSD)</h3>
-    <div class="flex flex-col items-start">
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="ssd_256">256 GB</label>
+    <div class="flex flex-row flex-wrap md:flex-nowrap gap-5 md:gap-0 justify-around md:flex-col items-start">
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="ssd_128">128 ГБ</label>
+            <input data-filter-input name="ssd" id="ssd_128" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="128" checked>
+        </div>
+
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="ssd_256">256 ГБ</label>
             <input data-filter-input name="ssd" id="ssd_256" type="checkbox" class="w-6 h-6"
             hx-trigger="change" value="256" checked>
         </div>
 
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="ssd_512">512 GB</label>
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="ssd_512">512 ГБ</label>
             <input data-filter-input name="ssd" id="ssd_512" type="checkbox" class="w-6 h-6"
             hx-trigger="change" value="512" checked>
+        </div>
+
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="ssd_1024">1 ТБ</label>
+            <input data-filter-input name="ssd" id="ssd_1024" type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="1024" checked>
         </div>
     </div>
 
     <!-- CPU -->
+    <hr class="mt-3 mb-2 w-full mx-auto h-0.5 bg-gray-300">
     <h3 class="text-lg font-bold">Процессор</h3>
-    <div class="flex flex-col items-start">
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="cpu_i7">i7</label>
+    <div class="flex flex-row flex-wrap md:flex-nowrap gap-5 md:gap-0 justify-around md:flex-col items-start">
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="cpu_i7">Intel Core i7</label>
             <input data-filter-input name="cpu" id="cpu_i7" type="checkbox" class="w-6 h-6"
             hx-trigger="change" value="i7" checked>
         </div>
 
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="cpu_i5">i5</label>
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="cpu_i5">Intel Core i5</label>
             <input data-filter-input name="cpu" id="cpu_i5" type="checkbox" class="w-6 h-6"
             hx-trigger="change" value="i5" checked>
         </div>
 
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="cpu_M7">M7</label>
-            <input data-filter-input name="cpu" id="cpu_M7" type="checkbox" class="w-6 h-6"
-            hx-trigger="change" value="M7" checked>
-        </div>
-
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="cpu_M5">M5</label>
-            <input data-filter-input name="cpu" id="cpu_M5" type="checkbox" class="w-6 h-6"
-            hx-trigger="change" value="M5" checked>
-        </div>
-
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="cpu_R7">R7</label>
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="cpu_R7">AMD Ryzen R7</label>
             <input data-filter-input name="cpu" id="cpu_R7" type="checkbox" class="w-6 h-6"
             hx-trigger="change" value="R7" checked>
         </div>
 
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="cpu_R5">R5</label>
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="cpu_R5">AMD Ryzen R5</label>
             <input data-filter-input name="cpu" id="cpu_R5" type="checkbox" class="w-6 h-6"
             hx-trigger="change" value="R5" checked>
         </div>
     </div>
 
     <!-- Resolution -->
+    <hr class="mt-3 mb-2 w-full mx-auto h-0.5 bg-gray-300">
     <h3 class="text-lg font-bold">Разрешение экрана</h3>
-    <div class="flex flex-col items-start">
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="resolution_1920x1080">Full HD</label>   
-            <input data-filter-input name="resolution" id="resolution_1920x1080"  type="checkbox" class="w-6 h-6"
-            hx-trigger="change" value="1920x1080" checked>
-        </div>
-        
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="resolution_1280x720">HD</label>   
-            <input data-filter-input name="resolution" id="resolution_1280x720"  type="checkbox" class="w-6 h-6"
-            hx-trigger="change" value="1280x720" checked>
+    <div class="flex flex-row flex-wrap md:flex-nowrap gap-5 md:gap-0 justify-around md:flex-col items-start">
+
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="resolution_hd">HD</label>   
+            <input data-filter-input name="resolution" id="resolution_hd"  type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="HD" checked>
         </div>
 
-        <div class="flex flex-row-reverse gap-2 text-xl">
-            <label for="resolution_1920x1200">WUXGA</label>   
-            <input data-filter-input name="resolution" id="resolution_1920x1200"  type="checkbox" class="w-6 h-6"
-            hx-trigger="change" value="1920x1200" checked>
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="resolution_fullhd">Full HD</label>   
+            <input data-filter-input name="resolution" id="resolution_fullhd"  type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="FullHD" checked>
         </div>
+
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="resolution_3k">3K</label>   
+            <input data-filter-input name="resolution" id="resolution_3k"  type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="3K" checked>
+        </div>
+
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="resolution_3.5k">3.5K</label>   
+            <input data-filter-input name="resolution" id="resolution_3.5k"  type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="3.5K" checked>
+        </div>
+
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
+            <label for="resolution_4kuhd">4K</label>   
+            <input data-filter-input name="resolution" id="resolution_4kuhd"  type="checkbox" class="w-6 h-6"
+            hx-trigger="change" value="4K" checked>
+        </div>
+
     </div>
 
     <!-- Touchscreen -->
+    <hr class="mt-3 mb-2 w-full mx-auto h-0.5 bg-gray-300">
     <h3 class="text-lg font-bold">Сенсорный экран</h3>
-    <div class="flex flex-col items-start">
-        <div class="flex flex-row-reverse gap-2 text-xl">
+    <div class="flex flex-row flex-wrap md:flex-nowrap gap-5 md:gap-0 justify-around md:flex-col items-start">
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
             <label for="touchscreen_true">Есть</label>   
             <input data-filter-input name="touchscreen" id="touchscreen_true" type="checkbox" class="w-6 h-6"
             hx-trigger="change" value="true" checked>
         </div>
         
-        <div class="flex flex-row-reverse gap-2 text-xl">
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
             <label for="touchscreen_false">Нет</label>   
             <input data-filter-input name="touchscreen" id="touchscreen_false" type="checkbox" class="w-6 h-6"
             hx-trigger="change" value="false" checked>
@@ -113,15 +202,16 @@
     </div>
 
     <!-- Graphics -->
+    <hr class="mt-3 mb-2 w-full mx-auto h-0.5 bg-gray-300">
     <h3 class="text-lg font-bold">Для работы с графикой</h3>
-    <div class="flex flex-col items-start">
-        <div class="flex flex-row-reverse gap-2 text-xl">
+    <div class="flex flex-row flex-wrap md:flex-nowrap gap-5 md:gap-0 justify-around md:flex-col items-start">
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
             <label for="graphics_true">Да</label>
             <input data-filter-input type="checkbox" name="graphics" id="graphics_true" class="w-6 h-6" checked
             hx-trigger="change" value="true">
         </div>
 
-        <div class="flex flex-row-reverse gap-2 text-xl">
+        <div class="flex flex-row-reverse justify-between gap-2 text-xl">
             <label for="graphics_false">Нет</label>
             <input data-filter-input type="checkbox" name="graphics" id="graphics_false" class="w-6 h-6" checked
             hx-trigger="change" value="false">
@@ -130,29 +220,75 @@
 
     <script>
         function getFilters() {
-          const checkedInputs = Array.from(document.querySelectorAll('input[data-filter-input]')).filter(el => el.checked);
-          const filterNames = new Set(checkedInputs.map(el => el.name));
-          let filters = new Object();
-          filterNames.forEach((name) => {
-            filters[name] = new Array();
-            filters[name].push(checkedInputs.filter(el => el.name === name).map(i => i.value));
-          });
-          return filters;
+            const query = document.querySelector('input[name="query"]').value;  
+            const filterInputs = Array.from(document.querySelectorAll('input[data-filter-input]'))
+            const filterNames = new Set(filterInputs.map(el => el.name));
+
+            const checkedInputs = filterInputs.filter(el => el.getAttribute('type') === 'checkbox' && el.checked);
+            const textInputs = filterInputs.filter(el => el.getAttribute('type') === 'text');
+
+            let filters = new Object();
+            filterNames.forEach((name) => {
+                if (checkedInputs.map(el => el.name).includes(name)) {
+                    // Skip filter if all values are checked
+                    if (filterInputs.filter(el => el.name === name).every(el => el.checked)) {
+                        return;
+                    }
+
+                    filters[name] = new Array();
+                    filters[name].push(checkedInputs.filter(el => el.name === name).map(i => i.value));
+                } else if(textInputs.map(el => el.name).includes(name)) {
+                    filters[name] = textInputs.filter(el => el.name === name)[0].value;
+                }
+            });
+
+            filters['query'] = query;
+
+            return filters;
         }
 
         htmx.on('htmx:configRequest', (e) => {
             const triggeringEvent = e.detail.triggeringEvent;
             const requestPath = e.detail.path;
             let requestParams = e.detail.parameters;
-            if (requestPath.startsWith('/products') && triggeringEvent.type === 'click') {
-              console.log(e);
-              for (const [name, values] of Object.entries(getFilters())) {
-                  console.log(`${name}: ${values}`);
-                  requestParams[name] = new Array();
-                  for (const value of values.toString().split(',')) {
-                      requestParams[name].push(value);
-                  }
-              }
+            if (typeof(triggeringEvent) === 'undefined') {
+                return;
+            }
+
+            const eventTarget = triggeringEvent.target;
+            const eventType = triggeringEvent.type;
+            if (!eventTarget.hasAttribute('data-filter-input')) {
+                return;
+            }
+
+            if (requestPath.startsWith('/products')) {
+                // Preventing from request when clicked on a text input
+                if (eventTarget.getAttribute('type') === 'text' && eventType === 'click') {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Sending request when clicked on checkbox input
+                if (eventTarget.getAttribute('type') === 'checkbox' && eventType === 'click') {
+                    for (const [name, values] of Object.entries(getFilters())) {
+                        requestParams[name] = new Array();
+                        for (const value of values.toString().split(',')) {
+                            requestParams[name].push(value);
+                        }
+                    }
+                    console.log(requestParams);
+                    console.log(e.detail.parameters);
+                }
+
+                // Sending request when changed text input
+                if (eventTarget.getAttribute('type') === 'text') {
+                    for (const [name, values] of Object.entries(getFilters())) {
+                        requestParams[name] = new Array();
+                        for (const value of values.toString().split(',')) {
+                            requestParams[name].push(value);
+                        }
+                    }
+                }
             }
         });
     </script>

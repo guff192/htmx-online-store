@@ -1,65 +1,168 @@
-<div class="flex flex-col" id="product{{ product_id }}priceTabs" role="tablist">
-    {% for config in configurations %}
+<div class="" id="product{{ product_id }}priceTabs" role="tablist">
+    <div class="my-5">
+        <h3 class="font-bold">Оперативная память (RAM):</h3>
+        {% for config in ram_configurations %}
         <button
             role="tab"
             aria-controls="product{{ product_id }}priceValue"
-            aria-selected="{% if config.id == selected_configuration.id %}true{% else %}false{% endif %}"
-            config-name="{{ config.name }}"
-            class="rounded transition-all duration-700 {% if config.id == selected_configuration.id %}bg-lightBlue{% endif %}"
+            aria-selected="{% if config.ram == selected_configuration.ram_amount %}true{% else %}false{% endif %}"
+            ram-config
+            possible-setups="{% for setup in config.setups %}{{ setup.id }}//{{ config.ram }}//{{ setup.ssd }}//{{ setup.name }}///{% endfor %}"
+            class="p-2 rounded-2xl border transition-all duration-700 {% if config.ram == selected_configuration.ram_amount %}border-black{% else %}border-gray-300{% endif %}"
             hx-trigger="loadPrice"
             hx-target="#product{{ product_id }}priceValue"
             hx-select="#product{{ product_id }}priceValue"
-            hx-get="/products/{{ product_id }}/prices/{{ config.id }}">{{ config.ram_amount }}GB RAM/{{ config.ssd_amount }}GB SSD</button>
+            hx-get="/products/{{ product_id }}/prices/">{{ config.ram }} ГБ</button>
+        {% endfor %}
+    </div>
 
-    {% endfor %}
+    <div class="my-5">
+        <h3 class="font-bold">Общий объём накопителей (SSD):</h3>
+        {% for config in ssd_configurations %}
+        <button
+            role="tab"
+            aria-controls="product{{ product_id }}priceValue"
+            aria-selected="{% if config.ssd == selected_configuration.ssd_amount %}true{% else %}false{% endif %}"
+            ssd-config
+            possible-setups="{% for setup in config.setups %}{{ setup.id }}//{{ setup.ram }}//{{ config.ssd }}//{{ setup.name }}///{% endfor %}"
+            class="p-2 rounded-2xl border transition-all duration-700 {% if config.ssd == selected_configuration.ssd_amount %}border-black{% else %}border-gray-300{% endif %}"
+            hx-trigger="loadPrice"
+            hx-target="#product{{ product_id }}priceValue"
+            hx-select="#product{{ product_id }}priceValue"
+            hx-get="/products/{{ product_id }}/prices/">{{ config.ssd }} ГБ</button>
+        {% endfor %}
+    </div>
+
         
 </div>
 
 <script type="text/javascript" async>
-    if (typeof(priceButtons) === 'undefined'){ let priceButtons; }
-    if (typeof(previousSelectedButton) === 'undefined'){ let previousSelectedButton; }
-    if (typeof(configuration) === 'undefined'){ let configuration; }
-    priceButtons = document.querySelectorAll('#product{{ product_id }}priceTabs button[role="tab"]');
-    previousSelectedButton = document.querySelector('#product{{ product_id }}priceTabs button[role="tab"][aria-selected="true"]');
-    configuration = document.querySelector('#product{{ product_id }}configuration');
+    if (typeof(ramButtons) === 'undefined') { let ramButtons; }
+    if (typeof(ssdButtons) === 'undefined') { let ssdButtons; }
+    if (typeof(previousSelectedRamButton) === 'undefined') { let previousSelectedRamButton; }
+    if (typeof(previousSelectedSsdButton) === 'undefined') { let previousSelectedSsdButton; }
+    if (typeof(configurationNameElt) === 'undefined'){ let configurationNameElt; }
+    ramButtons = document.querySelectorAll('button[ram-config]');
+    ssdButtons = document.querySelectorAll('button[ssd-config]');
+    previousSelectedRamButton = document.querySelector('button[ram-config][aria-selected="true"]');
+    previousSelectedSsdButton = document.querySelector('button[ssd-config][aria-selected="true"]');
+    configurationNameElt = document.querySelector('#product{{ product_id }}configuration');
+
+    function changeSelectedBtnTo(btn, isRamBtn) {
+        // changing attributes
+        if (isRamBtn) {
+            previousSelectedRamButton.setAttribute('aria-selected', false);
+        } else {
+            previousSelectedRamButton.setAttribute('aria-selected', false);
+        }
+        btn.setAttribute('aria-selected', true);
+
+        // changing styles
+        if (isRamBtn) {
+            ramButtons.forEach(b => {
+                b.classList.remove('border-black');
+                b.classList.add('border-gray-300');
+            });
+        } else {
+            ssdButtons.forEach(b => {
+                b.classList.remove('border-black');
+                b.classList.add('border-gray-300');
+            });
+        }
+        btn.classList.remove('border-gray-300');
+        btn.classList.add('border-black');
+
+        // changing variables
+        if (isRamBtn) {
+            previousSelectedRamButton = btn;
+        } else {
+            previousSelectedSsdButton = btn;
+        }
+    }
+
+    function getButtonSetups(btn) {
+        const setupStrings = btn.getAttribute('possible-setups').split('///').slice(0, -1);
+        const setups = new Array;
+        for (const setup of setupStrings) {
+            const [id, ram, ssd, name] = setup.split('//');
+            setups.push({id: id, ram: ram, ssd: ssd, name: name});
+        }
+        return setups;
+    }
+
+    function hasCommonSetup(btn1, btn2) {
+        const [setupArr1, setupArr2] = [getButtonSetups(btn1), getButtonSetups(btn2)];
+        for (const setup1 of setupArr1) {
+            for (const setup2 of setupArr2) {
+                if (setup1.id === setup2.id) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    function getCommonSetup(btn1, btn2) {
+        const [setupArr1, setupArr2] = [getButtonSetups(btn1), getButtonSetups(btn2)];
+        for (const setup1 of setupArr1) {
+            for (const setup2 of setupArr2) {
+                if (setup1.id === setup2.id) {
+                    return setup1;
+                }
+            }
+        }
+        throw new Error('No common setups');
+    }
 
 
-    priceButtons.forEach(button => {
-        button.addEventListener('mouseover', function() {
-            button.dispatchEvent(new Event('loadPrice'));
-            button.setAttribute('aria-selected', true);
-            previousSelectedButton.setAttribute('aria-selected', false);
+    ramButtons.forEach((ramBtn) => {
+        ramBtn.addEventListener('click', function handleClick(evt) {
+            if (!hasCommonSetup(ramBtn, previousSelectedSsdButton)) {
+                for (const ssdBtn of ssdButtons) {
+                    if (hasCommonSetup(ramBtn, ssdBtn)) {
+                        changeSelectedBtnTo(ssdBtn, false);
+                        break;
+                    }
+                }
+            }
+            
+            changeSelectedBtnTo(ramBtn, true);
 
-            setTimeout(() => { configuration.innerText = button.getAttribute('config-name'); }, 200);
+            const commonSetup = getCommonSetup(ramBtn, previousSelectedSsdButton);
+            setTimeout(() => { configurationNameElt.innerText = commonSetup.name; }, 200);
 
-            priceButtons.forEach(btn => btn.classList.remove('bg-lightBlue'));
-            button.classList.add('bg-lightBlue');
-        })
+            ramBtn.dispatchEvent(new Event('loadPrice'));
+        });
+    });
 
-        button.addEventListener('mouseout', function() {
-            previousSelectedButton.dispatchEvent(new Event('loadPrice'));
-            button.setAttribute('aria-selected', false);
-            previousSelectedButton.setAttribute('aria-selected', true);
+    ssdButtons.forEach((ssdBtn) => {
+        ssdBtn.addEventListener('click', function handleClick(evt) {
+            if (!hasCommonSetup(ssdBtn, previousSelectedRamButton)) {
+                for (const ramBtn of ramButtons) {
+                    if (hasCommonSetup(ssdBtn, ramBtn)) {
+                        changeSelectedBtnTo(ramBtn, true);
+                        break;
+                    }
+                }
+            }
 
-            setTimeout(() => { configuration.innerText = previousSelectedButton.getAttribute('config-name'); }, 200);
+            changeSelectedBtnTo(ssdBtn, false);
 
-            priceButtons.forEach(btn => btn.classList.remove('bg-lightBlue'));
-            previousSelectedButton.classList.add('bg-lightBlue');
-        })
+            const commonSetup = getCommonSetup(ssdBtn, previousSelectedRamButton);
+            setTimeout(() => { configurationNameElt.innerText = commonSetup.name; }, 200);
 
-        button.addEventListener('click', function() {
-            button.dispatchEvent(new Event('loadPrice'));
-            button.setAttribute('aria-selected', true);
-            previousSelectedButton.setAttribute('aria-selected', false);
+            ssdBtn.dispatchEvent(new Event('loadPrice'));
+        });
+    });
 
-            setTimeout(() => { configuration.innerText = button.getAttribute('config-name'); }, 200);
+    htmx.on('htmx:configRequest', (evt) => {
+        if (typeof (evt.detail.triggeringEvent) !== 'undefined' && evt.detail.triggeringEvent.type === "loadPrice") {
+            if (!/prices\/\d+/g.test(evt.detail.path)) {
+                evt.detail.path += getCommonSetup(previousSelectedRamButton, previousSelectedSsdButton).id;
+            }
+        }
+    });
 
-            priceButtons.forEach(btn => btn.classList.remove('bg-lightBlue'));
-            button.classList.add('bg-lightBlue');
-
-            previousSelectedButton = button;
-        })
-    })
 </script>
 
 <div id="product{{ product_id }}priceValue" role="tabpanel">

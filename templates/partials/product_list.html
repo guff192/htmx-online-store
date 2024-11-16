@@ -3,17 +3,28 @@
 {% endif %}
 {% for product in products %}
 
-    {% include 'partials/product_card.html' %}
+    {% if request.query_params.get('ram') or request.query_params.get('ssd') %}
+        {% include 'partials/product_card.html' %}
+    {% else %}
+        {% include 'partials/product_card.html' %}
+    {% endif %}
 
 {% endfor %}
-{% if offset > 0 %}
+{% if offset >= 0 %}
+<div
+    class="rounded-lg flex items-center
+    bg-gradient-to-br from-white via-gray-100 to-gray-200 shadow-[9px_9px_18px_0px_#c4c4c4,-9px_-9px_18px_0px_#e0e0e0]">
     <img
         src="{{ url_for('static', path='images/loading.webp') }}"
         id="products-loader"
+        class="w-full overflow-hidden"
         hx-trigger="intersect once delay:400"
-        hx-get="/products?offset={{ offset }}"
+        hx-target="closest div"
+        hx-get="/products?offset={{ offset }}&{{ filter_params }}"
         hx-swap="outerHTML"
         ></img>
+</div>
+
 {% endif %}
 
 {% if not request.headers.get('hx-request') %}

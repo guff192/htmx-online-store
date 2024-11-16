@@ -118,7 +118,7 @@ def process_phone_login(
     response = Response(
         status_code=status.HTTP_200_OK,
         headers={
-            "Hx-Trigger": '{"redirect": "/auth/profile"}',
+            "Hx-Trigger": '{"redirect": "/products/catalog"}',
         },
     )
     response.set_cookie(

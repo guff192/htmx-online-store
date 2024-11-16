@@ -23,21 +23,32 @@ class PaymentStatus(str, enum.Enum):
     failed = 'failed'
 
 
-# TODO: Finish this schema and add to OrderSchema
 class RegionSchema(BaseModel):
     code: int
     name: str
+
+    def __str__(self):
+        return '{' + f'"code": {self.code}, "name": "{self.name}"' + '}'
 
 
 class CitySchema(BaseModel):
     code: int
     name: str
 
+    def __str__(self):
+        return '{' + f'"code": {self.code}, "name": "{self.name}"' + '}'
+
+
+
 
 class DeliveryAddressSchema(BaseModel):
     region: RegionSchema
     city: CitySchema
     address: str
+
+    def __str__(self) -> str:
+        repr_str = '{' + f'"region": {self.region}, "city": {self.city}, "address": "{self.address}"' + '}'
+        return repr_str
 
 
 class PaymentBase(BaseModel):
@@ -118,7 +129,7 @@ class OrderProductSchema(BaseModel):
     selected_configuration: ProductConfiguration
 
     def get_full_name(self) -> str:
-        return f'{self.product_name} ({self.selected_configuration.name})'
+        return f'{self.product_name} ({self.selected_configuration})'
 
     def get_full_price(self) -> int:
         return self.basic_price + self.selected_configuration.additional_price
@@ -215,7 +226,7 @@ class OrderInCookie(BaseModel):
         cookie_order_str = '{'
         cookie_order_str += f'"id": {self.id}, "date": "{self.date}", "sum": {self.sum}, '
         cookie_order_str += f'"comment": "{self.comment}", "buyer_name": "{self.buyer_name}", '
-        cookie_order_str += f'"buyer_phone": "{self.buyer_phone}", "delivery_address": "{self.delivery_address}", '
+        cookie_order_str += f'"buyer_phone": "{self.buyer_phone}", "delivery_address": {self.delivery_address}, '
         cookie_order_str += '"products": ['
 
         products_count = len(self.products)

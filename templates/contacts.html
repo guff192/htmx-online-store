@@ -7,7 +7,30 @@
 {% endblock %}
 
 {% block content %}
+
+{% if request.headers.get('hx-request') %}
+
+<script>
+    // Replace page header text
+    var pageHeader = document.getElementsByTagName('header')[0];
+    pageHeader.innerHTML = `
+        <h1 id="page-header" class="text-4xl font-bold text-center mb-4 mt-2">Контакты</h1>
+    `;
+
+    document.title = '{{ shop.name }} | Контакты'
+</script>
+
+{% endif %}
    <div>
+
+       <div class="my-5 mx-auto w-max h-[70dvh]">
+           <video src="https://pub-8dad9fb788704075a85e929377d4d155.r2.dev/Promo%20videos/%D1%8D%D0%B2%D0%BC_no_sound.mp4"
+               poster="https://pub-8dad9fb788704075a85e929377d4d155.r2.dev/Promo%20videos/%D1%8D%D0%B2%D0%BC_poster.png"
+               autoplay loop muted playsinline
+               class="h-full">
+           </video>
+       </div>
+
        <div class="w-1/2 p-10 border rounded-lg mx-auto text-left">
 
            <div class="mb-2">

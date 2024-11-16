@@ -114,6 +114,11 @@ class OrderRepository:
         
         found_order_dict = found_order.__dict__
         found_order_user_id = found_order_dict.get('user_id', '')
+        logger.debug(f'Found order user id: {found_order_user_id}')
+        if found_order_user_id and str(found_order_user_id) != user_id:
+            logger.debug(f'User id of found order ({found_order_user_id}) doesn\'t match with user\'s id ({user_id})')
+            raise ErrAccessDenied(f'order {order_id}')
+
         update_dict = {
             Order.comment: comment,
             Order.buyer_name: buyer_name,
@@ -124,13 +129,9 @@ class OrderRepository:
             Order.delivery_address: delivery_address,
             Order.buyer_phone: buyer_phone,
         }
-
-        if found_order_user_id:
-            if str(found_order_user_id) != user_id:
-                logger.debug(f'User id of found order ({found_order_user_id}) doesn\'t match with user\'s id ({user_id})')
-                raise ErrAccessDenied(f'order {order_id}')
+        if not found_order_user_id:
             logger.info('Setting new user id')
-            update_dict[Order.user_id] = found_order_user_id
+            update_dict[Order.user_id] = user_id
         if delivery_track_number:
             update_dict[Order.delivery_track_number] = delivery_track_number
 

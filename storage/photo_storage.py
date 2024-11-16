@@ -2,6 +2,7 @@ from abc import ABC
 from typing import Generator
 
 import boto3
+from loguru import logger
 from mypy_boto3_s3.client import S3Client
 from pydantic_core import Url
 

@@ -24,14 +24,18 @@ class ProductViewModel:
 
     def get_all(
         self,
+        query: str,
         offset: int,
         user: LoggedUser | None = None,
+        price_from: int = 0, price_to: int = 150000,
         ram: list[int] = [], ssd: list[int] = [], cpu: list[str] = [],
         resolution: list[str] = [], touchscreen: list[bool] = [],
         graphics: list[bool] = [],
     ) -> ProductList:
         return self._service.get_all(
+            query=query,
             offset=offset, user=user,
+            price_from=price_from, price_to=price_to,
             ram=ram, ssd=ssd, cpu=cpu, resolution=resolution,
             touchscreen=touchscreen, graphics=graphics
         )
@@ -54,7 +58,6 @@ class ProductViewModel:
         return self._service.get_url_by_photo_path(photo_path)
 
     def get_main_photo(
-        # TODO: change size to enum
         self,
         product_name: str,
         size: ProductPhotoSize = ProductPhotoSize.small,

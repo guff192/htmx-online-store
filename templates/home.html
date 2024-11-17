@@ -86,17 +86,7 @@
     {% include 'empty.html' %}
 {% endif %}
 
-{% if not user %}
-    {% include 'partials/oauth_buttons.html' %}
-{% endif %}
-
 <div id="main-content" class="container text-center mx-auto my-8">
-    <p>
-        Добро пожаловать
-        {% if request.state.user %}, <span class="font-bold">{{ request.state.user.name }}</span>,{% endif %}
-        ну и т.д.<br />
-        Здесь вы можете найти корпоративные ноутбуки в замечательном состоянии и по привлекательной цене.
-    </p>
 
    <div id="new-products">
        <h2 class="text-3xl font-bold text-center mb-1 mt-12">Новинки</h2>

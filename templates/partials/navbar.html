@@ -113,6 +113,8 @@
         navbar.classList.remove('h-[10dvh]');
         navbar.classList.remove('top-16');
         navbar.classList.add('h-[100dvh]');
+
+        document.querySelector('#login_choice').classList.add('hidden');
     }
 
     function closeMenu() {
@@ -129,6 +131,8 @@
         navbar.classList.add('h-[10dvh]');
         navbar.classList.add('top-16');
         navbar.classList.remove('h-[100dvh]');
+
+        document.querySelector('#login_choice').classList.remove('hidden');
     }
 
     function toggleMenu() {

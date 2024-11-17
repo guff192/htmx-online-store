@@ -82,7 +82,7 @@
     {% if product.count %}
         <p class="my-2">Добавлен в корзину ({{ product.count }} шт.)</p>
         <a 
-            class="hover:underline"
+            class="underline md:no-underline md:hover:underline mb-5"
             href="/cart#offset"
             hx-boost="true"
             hx-trigger="click"

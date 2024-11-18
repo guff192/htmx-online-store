@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
+from routes.cookies import get_cart_from_cookies
 from schema.auth_schema import (
     GoogleLoginForm,
     GoogleOAuthCredentials,
@@ -26,6 +27,7 @@ from viewmodels.auth_viewmodel import (
     auth_viewmodel_dependency,
     get_auth_viewmodel,
 )
+from viewmodels.cart_viewmodel import CartViewModel, cart_viewmodel_dependency
 from viewmodels.user_viewmodel import (
     UserViewModel,
     get_user_viewmodel,
@@ -97,6 +99,7 @@ def process_phone_login(
     code: str,
     auth_vm: AuthViewModel = Depends(auth_viewmodel_dependency),
     user_vm: UserViewModel = Depends(user_viewmodel_dependency),
+    cart_vm: CartViewModel = Depends(cart_viewmodel_dependency),
 ):
     form = PhoneLoginForm(phone=phone, code=code)
 
@@ -115,10 +118,22 @@ def process_phone_login(
 
     user = user_vm.get_by_phone(form.phone)
     token = auth_vm.create_session({'phone': form.phone, 'sub': str(user.id)})
+
+    if 'cart' in request.headers.get('Hx-Current-URL', ''):
+        redirect_url = '/cart'
+        cookie_cart = get_cart_from_cookies(request.cookies)
+        for cart_product in cookie_cart.product_list:
+            logger.debug(f"""Adding product to cart:
+                {user.id=}, product_id={cart_product.product_id}, configuration_id={cart_product.configuration_id}
+            """)
+            cart_vm.add_to_cart(str(user.id), cart_product.product_id, cart_product.configuration_id)
+    else:
+        redirect_url = '/products/catalog'
+
     response = Response(
         status_code=status.HTTP_201_CREATED,
         headers={
-            "Hx-Trigger": '{"redirect": "/products/catalog"}',
+            "Hx-Trigger": f'{{"redirect": "{redirect_url}"}}',
         },
     )
     response.set_cookie(

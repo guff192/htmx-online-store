@@ -23,7 +23,7 @@
 </div>
 {% endif %}
 
-{% if product_list[0] %}
+{% if product_list[0] and product_list[0].count > 0 %}
     <button
         hx-post="/order/create_from_cart"
         hx-target="#content"

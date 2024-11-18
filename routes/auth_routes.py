@@ -119,15 +119,13 @@ def process_phone_login(
     user = user_vm.get_by_phone(form.phone)
     token = auth_vm.create_session({'phone': form.phone, 'sub': str(user.id)})
 
+    cookie_cart = get_cart_from_cookies(request.cookies)
+    for cart_product in cookie_cart.product_list:
+        for _ in range(cart_product.count):
+            cart_vm.add_to_cart(str(user.id), cart_product.product_id, cart_product.configuration_id)
+
     if 'cart' in request.headers.get('Hx-Current-URL', ''):
         redirect_url = '/cart'
-        cookie_cart = get_cart_from_cookies(request.cookies)
-        for cart_product in cookie_cart.product_list:
-            for _ in range(cart_product.count):
-                logger.debug(f"""Adding product to cart:
-                    {user.id=}, product_id={cart_product.product_id}, configuration_id={cart_product.configuration_id}
-                """)
-                cart_vm.add_to_cart(str(user.id), cart_product.product_id, cart_product.configuration_id)
     else:
         redirect_url = '/products/catalog'
 

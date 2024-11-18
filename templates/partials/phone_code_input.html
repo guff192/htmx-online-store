@@ -34,7 +34,7 @@
     });
 
     htmx.config.methodsThatUseUrlParams = ['get', 'post'];
-    if (typeof (phone_login_form) === 'undefined') {let phone_login_form;}
+    if (typeof(phone_login_form) === 'undefined') {let phone_login_form;}
     phone_login_form = document.querySelector('#phone_login_form');
     phone_login_form.removeAttribute('hx-get');
     phone_login_form.setAttribute('hx-post', '/auth/login/phone');

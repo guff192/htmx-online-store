@@ -1,7 +1,8 @@
 <div class="w-11/12 md:w-4/5 mx-auto py-2 flex flex-col md:items-start"
     hx-target="#products"
     hx-query="#products"
-    hx-get="/products">
+    hx-get="/products"
+    hx-replace-url="true">
 
     <!-- Price -->
     <h3 class="text-lg font-bold">Цена</h3>
@@ -276,8 +277,6 @@
                             requestParams[name].push(value);
                         }
                     }
-                    console.log(requestParams);
-                    console.log(e.detail.parameters);
                 }
 
                 // Sending request when changed text input
@@ -288,6 +287,35 @@
                             requestParams[name].push(value);
                         }
                     }
+                }
+            }
+        });
+
+        htmx.on('htmx:historyRestore', (evt) => {
+            if (!evt.detail.path.startsWith('/products')) {
+                return;
+            }
+
+            const paramsObject = {};
+            const filterInputs = Array.from(document.querySelectorAll('input[data-filter-input]'));
+            const filterNames = new Set(filterInputs.map(el => el.name));
+            const checkedInputs = filterInputs.filter(el => el.getAttribute('type') === 'checkbox' && el.checked);
+
+            // getting all selected filters from url
+            evt.detail.path.replace('/products?', '').split('&').map(param => {
+              const [name, value] = param.split('=');
+                if (!paramsObject.hasOwnProperty(name)) { paramsObject[name] = new Array; }
+                paramsObject[name].push(value);
+            });
+
+            for (const [name, values] of Object.entries(paramsObject)) {
+                if (document.querySelector(`input[name="${name}"]`).type === 'checkbox') { // if input is of checkbox type
+                    document.querySelectorAll(`input[name="${name}"]`).forEach(el => el.checked = false);
+                    for (const value of values) {
+                        document.querySelector(`input[name="${name}"][value="${value}"]`).checked = true;
+                    }
+                } else if (document.querySelector(`input[name="${name}"]`).type === 'text' && values.length === 1) { // if input is of text type
+                    document.querySelector(`input[name="${name}"]`).value = values[0];
                 }
             }
         });

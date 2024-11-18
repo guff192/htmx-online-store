@@ -156,7 +156,7 @@
     });
 
     htmx.on('htmx:configRequest', (evt) => {
-        if (typeof (evt.detail.triggeringEvent) !== 'undefined' && evt.detail.triggeringEvent.type === "loadPrice") {
+        if (typeof(evt.detail.triggeringEvent) !== 'undefined' && evt.detail.triggeringEvent.type === "loadPrice") {
             if (!/prices\/\d+/g.test(evt.detail.path)) {
                 evt.detail.path += getCommonSetup(previousSelectedRamButton, previousSelectedSsdButton).id;
             }

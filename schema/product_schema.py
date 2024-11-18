@@ -110,7 +110,7 @@ class Product(ProductBase):
     def short_name(self) -> str:
         name_parts = self.name.split(',')
         name, cpu, resolution = name_parts[:3]
-        name = name + '\n'
+        name = '\n'.join(name.split(' ', 1)) + '\n'
         resolution = name_parts[3] if 'gb' in resolution else resolution
         return ''.join((name, cpu, resolution))
 

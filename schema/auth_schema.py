@@ -8,7 +8,9 @@ class PhoneLoginForm(BaseModel):
     code: str | None = None
 
     def build_context(self) -> dict[str, Any]:
-        return self.__dict__
+        context_dict = self.__dict__
+        del context_dict['code']
+        return context_dict
 
 
 class GoogleLoginForm(BaseModel):

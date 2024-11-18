@@ -55,7 +55,7 @@ def oauth_user_dependency(
     try:
         user: LoggedUser = auth_service.verify_session_token(credential)
     except Exception as e:
-        logger.debug(f"Failed google authentication: {e}")
+        logger.debug(f"Failed authentication: {e}")
         yield None
         return
 

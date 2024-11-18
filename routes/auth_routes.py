@@ -116,7 +116,7 @@ def process_phone_login(
     user = user_vm.get_by_phone(form.phone)
     token = auth_vm.create_session({'phone': form.phone, 'sub': str(user.id)})
     response = Response(
-        status_code=status.HTTP_200_OK,
+        status_code=status.HTTP_201_CREATED,
         headers={
             "Hx-Trigger": '{"redirect": "/products/catalog"}',
         },

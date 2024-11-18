@@ -58,6 +58,15 @@
             {% include 'partials/filters.html' %}
         </div>
 
+        {% if filter_params %}
+            <script type="text/javascript" async>
+                // toggle filter inputs when loading from pasting a url with query
+                setTimeout(() => {
+                    htmx.trigger('body', 'htmx:historyRestore', {path: window.location.pathname + window.location.search});
+                }, 100);
+            </script>
+        {% endif %}
+
         <script type="text/javascript">
             if (typeof(filters) === 'undefined') { let filters; }
             if (typeof(filtersBtn) === 'undefined') { let filtersBtn; }
@@ -90,7 +99,7 @@
             src="{{ url_for('static', path='images/loading.webp') }}"
             id="products-loader"
             hx-trigger="intersect once"
-            hx-get="/products?offset=0"
+            hx-get="/products?offset=0{% if filter_params %}&{{ filter_params }}{% endif %}"
             hx-swap="outerHTML"
             >
         </div>

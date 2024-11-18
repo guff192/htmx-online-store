@@ -92,12 +92,17 @@
     }
 
     // Mobile menu logic
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const menuLinks = document.querySelectorAll('#navbar-content a');
+    if (typeof(mobileMenuButton) === 'undefined') { let mobileMenuButton; }
+    if (typeof(menuLinks) === 'undefined') { let menuLinks; }
+    mobileMenuButton = document.getElementById('mobile-menu-button');
+    menuLinks = document.querySelectorAll('#navbar-content a');
 
-    const navbarContent = document.querySelector("#navbar-content");
-    const navbar = document.querySelector('nav');
-    const mobileMenuButtonImg = mobileMenuButton.querySelector('img');
+    if (typeof(navbarContent) === 'undefined') { let navbarContent; }
+    if (typeof(navbar) === 'undefined') { let navbar; }
+    if (typeof(mobileMenuButtonImg) === 'undefined') { let mobileMenuButtonImg; }
+    navbarContent = document.querySelector("#navbar-content");
+    navbar = document.querySelector('nav');
+    mobileMenuButtonImg = mobileMenuButton.querySelector('img');
 
     function openMenu() {
         mobileMenuButton.setAttribute('activated', 'true');

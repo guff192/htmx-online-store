@@ -25,7 +25,8 @@
 
         <script type="text/javascript">
             // Enhancing price input focus
-            const priceInputs = document.querySelectorAll('#price-filters input[data-filter-input]');
+            if (typeof(priceInputs) === 'undefined') { let priceInputs; }
+            priceInputs = document.querySelectorAll('#price-filters input[data-filter-input]');
             priceInputs.forEach((input) => {
                 input.addEventListener('focus', (e) => {
                     e.target.select();
@@ -47,7 +48,8 @@
             });
 
             // Preventing sending request when clicking on label
-            const priceLabels = document.querySelectorAll('#price-filters label');
+            if (typeof(priceLabels) === 'undefined') { let priceLabels; }
+            priceLabels = document.querySelectorAll('#price-filters label');
             priceLabels.forEach((label) => {
                 label.addEventListener('click', (e) => {
                     // Force select input value
@@ -309,6 +311,7 @@
             });
 
             for (const [name, values] of Object.entries(paramsObject)) {
+                console.log(name, values);
                 if (document.querySelector(`input[name="${name}"]`).type === 'checkbox') { // if input is of checkbox type
                     document.querySelectorAll(`input[name="${name}"]`).forEach(el => el.checked = false);
                     for (const value of values) {

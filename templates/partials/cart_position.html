@@ -12,11 +12,7 @@
                 hx-replace-url="true"
                 hx-boost="true"
                 href="{{ product.absolute_url }}#offset">
-                {% if product.name %}
-                    {{ product.name }}
-                {% else %}
-                    {{ product.product_name }}
-                {% endif %}
+                    {{ product.short_name|replace('\n', '<br/>')|safe }}
             </a>
         </h3>
     </div>
@@ -25,13 +21,13 @@
     <!-- Product price and configuration -->
     {% if product.selected_configuration %}
         <div class="flex flex-col grow justify-center text-center w-1/4">
-                {% if product.price %}
+            {% if product.price %}
                 <p class="text-xl">{{ product.price + product.selected_configuration.additional_price }}₽</p>
-                {% else %}
+            {% else %}
                 <p class="text-xl">{{ product.basic_price + product.selected_configuration.additional_price }}₽</p>
-                {% endif %}
+            {% endif %}
 
-                <p class="text-sm">{{ product.selected_configuration.name }}</p>
+            <p class="text-sm">{{ product.selected_configuration }}</p>
         </div>
     {% endif %}
 

@@ -216,8 +216,6 @@ def process_yandex_login(
         raise ErrWrongCredentials()
 
     user: UserResponse | None = user_vm.get_by_email(email)
-    if not user:
-        user = user_vm.get_by_yandex_id_or_create(id_info)
     token = auth_vm.create_session({'sub': str(user.id)})
 
     response = Response(

@@ -38,14 +38,10 @@ class UserService:
         yandex_id = user_model_dict.get("yandex_id")
 
         return UserResponse(
-            id=user_id,
-            name=name,
-            email=email,
+            id=user_id, name=name, email=email,
             profile_img_url=profile_img_url if profile_img_url else "",
-            google_id=google_id,
-            yandex_id=yandex_id,
+            google_id=google_id, yandex_id=yandex_id,
         )
-
 
     def _get_by_google_id(self, google_id: str) -> User | None:
         return self.repo.get_by_google_id(google_id)
@@ -119,7 +115,7 @@ class UserService:
             return None
 
     def get_by_email(self, email: str) -> User | None:
-        return self.repo.get_by_email(email)
+        return self.user_model_to_userresponse_schema(self.repo.get_by_email(email))
 
     def get_by_id(self, user_id: str) -> User | None:
         return self.repo.get_by_id(user_id)

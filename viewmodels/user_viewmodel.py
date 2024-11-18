@@ -31,8 +31,7 @@ class UserViewModel:
         return self.user_service.get_or_create_by_yandex_id(id_info)
 
     def get_by_email(self, email: str) -> UserResponse:
-        user = self.user_service.get_by_email(email)
-        return user
+        return self.user_service.get_by_email(email)
 
     def update(self, user_update: UserUpdate) -> UserResponse:
         return self.user_service.update(user_update)

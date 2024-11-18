@@ -1,5 +1,9 @@
-document.addEventListener("DOMContentLoaded", function () {
-    var phoneInputs = document.querySelectorAll('input[data-tel-input]');
+PHONEINPUTS_REDEFINE_EVENTS = ['DOMContentLoaded', 'phoneInputUpdate'];
+
+if (typeof(phoneInputs) === 'undefined') { let phoneInputs; }
+
+PHONEINPUTS_REDEFINE_EVENTS.forEach(event => document.addEventListener(event, function () {
+    phoneInputs = document.querySelectorAll('input[data-tel-input]');
 
     var getInputNumbersValue = function (input) {
         // Return stripped input value — just numbers
@@ -79,4 +83,4 @@ document.addEventListener("DOMContentLoaded", function () {
         phoneInput.addEventListener('input', onPhoneInput, false);
         phoneInput.addEventListener('paste', onPhonePaste, false);
     }
-});
+}));

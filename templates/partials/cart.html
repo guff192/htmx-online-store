@@ -37,6 +37,9 @@
             {% include 'partials/cart_position.html' %}
         {% endfor %}
     </div>
+
+    <script src="{{ url_for('static', path='js/config_to_cart.js') }}" async></script>
+
 {% else %}
     <p class="text-center font-bold">
         В твоей корзине пусто 🙃. 

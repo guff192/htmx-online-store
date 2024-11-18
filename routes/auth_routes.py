@@ -123,10 +123,11 @@ def process_phone_login(
         redirect_url = '/cart'
         cookie_cart = get_cart_from_cookies(request.cookies)
         for cart_product in cookie_cart.product_list:
-            logger.debug(f"""Adding product to cart:
-                {user.id=}, product_id={cart_product.product_id}, configuration_id={cart_product.configuration_id}
-            """)
-            cart_vm.add_to_cart(str(user.id), cart_product.product_id, cart_product.configuration_id)
+            for _ in range(cart_product.count):
+                logger.debug(f"""Adding product to cart:
+                    {user.id=}, product_id={cart_product.product_id}, configuration_id={cart_product.configuration_id}
+                """)
+                cart_vm.add_to_cart(str(user.id), cart_product.product_id, cart_product.configuration_id)
     else:
         redirect_url = '/products/catalog'
 

@@ -37,6 +37,7 @@ class CookieCartProduct(BaseModel):
 
 class CartInCookie(BaseModel):
     product_list: list[CookieCartProduct]
+
     @utils.add_shop_to_context
     def build_context(self) -> dict[str, Any]:
         return self.__dict__

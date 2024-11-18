@@ -47,6 +47,9 @@ class ProductConfiguration(BaseModel):
     def __repr__(self) -> str:
         return f'{self.ram_amount}ГБ RAM/{self.ssd_amount}ГБ SSD'
 
+    def __str__(self) -> str:
+        return self.__repr__()
+
 
 class ProductPrices(BaseModel):
     product_id: int

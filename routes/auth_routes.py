@@ -55,7 +55,7 @@ def oauth_user_dependency(
     try:
         user: LoggedUser = auth_service.verify_session_token(credential)
     except Exception as e:
-        logger.debug(f"Failed google authentication: {e}")
+        logger.debug(f"Failed authentication: {e}")
         yield None
         return
 
@@ -143,16 +143,19 @@ def process_phone_login(
         secure=True,
         max_age=86400000,
     )
+    response.delete_cookie("_cart")
     return response
 
 
 @router.post("/login/google")
 def login_with_google_account(
+    request: Request,
     credential: Annotated[str, Form()],
     g_csrf_token: Annotated[str, Form()],
     cookie_csrf_token: str = Cookie(alias="g_csrf_token"),
     auth_vm: AuthViewModel = Depends(get_auth_viewmodel),
     user_vm: UserViewModel = Depends(get_user_viewmodel),
+    cart_vm: CartViewModel = Depends(cart_viewmodel_dependency),
 ):
     user_google_credential = GoogleOAuthCredentials(
         form_data=GoogleLoginForm(
@@ -168,8 +171,18 @@ def login_with_google_account(
     user: UserResponse = user_vm.get_by_google_id_or_create(id_info)
     token = auth_vm.create_session({'sub': str(user.id)})
 
+    cookie_cart = get_cart_from_cookies(request.cookies)
+    for cart_product in cookie_cart.product_list:
+        for _ in range(cart_product.count):
+            cart_vm.add_to_cart(str(user.id), cart_product.product_id, cart_product.configuration_id)
+
+    if 'cart' in request.headers.get('Referer', ''):
+        redirect_url = '/cart'
+    else:
+        redirect_url = '/products/catalog'
+
     response = RedirectResponse(
-        "/auth/profile",
+        redirect_url,
         status_code=status.HTTP_302_FOUND,
     )
     response.set_cookie(
@@ -180,6 +193,7 @@ def login_with_google_account(
         secure=True,
         max_age=86400000,
     )
+    response.delete_cookie("_cart")
     return response
     # TODO: Create profile template and redirect to it here
 
@@ -211,11 +225,13 @@ def login_with_yandex_account(
 
 @router.post("/login/yandex")
 def process_yandex_login(
+    request: Request,
     access_token: Annotated[str, Body()],
     token_type: Annotated[str, Body()],
     expires_in: Annotated[int, Body()],
     auth_vm: AuthViewModel = Depends(get_auth_viewmodel),
     user_vm: UserViewModel = Depends(get_user_viewmodel),
+    cart_vm: CartViewModel = Depends(cart_viewmodel_dependency),
 ):
     yandex_credentials = YandexOauthCredentials(
         access_token=access_token, token_type=token_type, expires_in=expires_in
@@ -232,9 +248,21 @@ def process_yandex_login(
     user: UserResponse | None = user_vm.get_by_email(email)
     token = auth_vm.create_session({'sub': str(user.id)})
 
+    cookie_cart = get_cart_from_cookies(request.cookies)
+    for cart_product in cookie_cart.product_list:
+        for _ in range(cart_product.count):
+            cart_vm.add_to_cart(str(user.id), cart_product.product_id, cart_product.configuration_id)
+
+    if 'cart' in request.headers.get('Hx-Current-URL', ''):
+        redirect_url = '/cart'
+    else:
+        redirect_url = '/products/catalog'
+
     response = Response(
-        "Successfully authenticated with yandex ID!",
         status_code=status.HTTP_201_CREATED,
+        headers={
+            "Hx-Trigger": f'{{"redirect": "{redirect_url}"}}',
+        },
     )
     response.set_cookie(
         key="_session",
@@ -244,6 +272,7 @@ def process_yandex_login(
         secure=True,
         max_age=86400000,
     )
+    response.delete_cookie("_cart")
     return response
 
 

@@ -55,7 +55,7 @@ def get_product_list(
     product_vm: ProductViewModel = Depends(product_viewmodel_dependency),
     user: LoggedUser | None = Depends(oauth_user_dependency),
 ):
-    if not request.headers.get('hx-request'):
+    if not request.headers.get('hx-request') and not any([ram, ssd, cpu, resolution, touchscreen, graphics]):
         return RedirectResponse('/products/catalog')
 
     products_data: ProductList = product_vm.get_all(
@@ -80,8 +80,14 @@ def get_product_list(
     context_data.update(products_data.build_context())
     context_data.update(filter_params=filter_params_str)
 
+    if request.headers.get('hx-request'):
+        return templates.TemplateResponse(
+            'partials/product_list.html',
+            context=context_data
+        )
+
     return templates.TemplateResponse(
-        'partials/product_list.html',
+        'catalog.html',
         context=context_data
     )
 

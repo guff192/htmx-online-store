@@ -50,6 +50,12 @@
                 <input type="text" name="buyer_phone" id="buyer_phone" data-tel-input class="text-black text-center w-full border border-gray-300 rounded p-2" value="{{ buyer_phone }}" required>
 
                 <script src="{{ url_for('static', path='js/phoneinput.js') }}" async></script>
+                <script type="text/javascript" async>
+                    // Fire phone input update event
+                    setTimeout(() => {
+                        document.dispatchEvent(new Event('phoneInputUpdate'));
+                    }, 500);
+                </script>
             </div>
 
             <div> 

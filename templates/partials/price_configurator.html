@@ -8,11 +8,16 @@
             aria-selected="{% if config.ram == selected_configuration.ram_amount %}true{% else %}false{% endif %}"
             ram-config
             possible-setups="{% for setup in config.setups %}{{ setup.id }}//{{ config.ram }}//{{ setup.ssd }}//{{ setup.name }}///{% endfor %}"
-            class="p-2 rounded-2xl border transition-all duration-700 {% if config.ram == selected_configuration.ram_amount %}border-black{% else %}border-gray-300{% endif %}"
+            class="p-2 rounded-2xl border transition-all duration-700
+            {% if config.ram == selected_configuration.ram_amount %}border-black{% else %}border-gray-300{% endif %}
+            {% if config.ram == 0 %}w-max mb-1{% endif %}"
             hx-trigger="loadPrice"
             hx-target="#product{{ product_id }}priceValue"
             hx-select="#product{{ product_id }}priceValue"
-            hx-get="/products/{{ product_id }}/prices/">{{ config.ram }} ГБ</button>
+            hx-get="/products/{{ product_id }}/prices/">{% if config.ram == 0 %}Без оперативной памяти{% else %}{{ config.ram }} ГБ{% endif %}</button>
+
+            {% if config.ram == 0 %}<br>{% endif %}
+
         {% endfor %}
     </div>
 
@@ -25,11 +30,16 @@
             aria-selected="{% if config.ssd == selected_configuration.ssd_amount %}true{% else %}false{% endif %}"
             ssd-config
             possible-setups="{% for setup in config.setups %}{{ setup.id }}//{{ setup.ram }}//{{ config.ssd }}//{{ setup.name }}///{% endfor %}"
-            class="p-2 rounded-2xl border transition-all duration-700 {% if config.ssd == selected_configuration.ssd_amount %}border-black{% else %}border-gray-300{% endif %}"
+            class="p-2 rounded-2xl border transition-all duration-700
+            {% if config.ssd == selected_configuration.ssd_amount %}border-black{% else %}border-gray-300{% endif %}
+            {% if config.ssd == 0 %}w-max mb-1{% endif %}"
             hx-trigger="loadPrice"
             hx-target="#product{{ product_id }}priceValue"
             hx-select="#product{{ product_id }}priceValue"
-            hx-get="/products/{{ product_id }}/prices/">{{ config.ssd }} ГБ</button>
+            hx-get="/products/{{ product_id }}/prices/">{% if config.ssd == 0 %}Без SSD диска{% else %}{{ config.ssd }} ГБ{% endif %}</button>
+
+            {% if config.ssd == 0 %}<br>{% endif %}
+
         {% endfor %}
     </div>
 
@@ -156,7 +166,7 @@
     });
 
     htmx.on('htmx:configRequest', (evt) => {
-        if (typeof (evt.detail.triggeringEvent) !== 'undefined' && evt.detail.triggeringEvent.type === "loadPrice") {
+        if (typeof(evt.detail.triggeringEvent) !== 'undefined' && evt.detail.triggeringEvent.type === "loadPrice") {
             if (!/prices\/\d+/g.test(evt.detail.path)) {
                 evt.detail.path += getCommonSetup(previousSelectedRamButton, previousSelectedSsdButton).id;
             }

@@ -71,7 +71,12 @@
                 class="mx-auto"
                 id="large-photo"
                 >
-                <!-- <p>Size large</p> -->
+                <script type="text/javascript" async>
+                    setTimeout(() => {
+                        document.querySelector('#small-photos div').click();
+                    }, 500);               
+                </script>
+                <!-- Size large -->
 
         {% else %}
             <img

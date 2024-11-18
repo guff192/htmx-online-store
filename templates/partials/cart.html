@@ -23,7 +23,7 @@
 </div>
 {% endif %}
 
-{% if product_list[0] %}
+{% if product_list[0] and product_list[0].count > 0 %}
     <button
         hx-post="/order/create_from_cart"
         hx-target="#content"
@@ -37,6 +37,9 @@
             {% include 'partials/cart_position.html' %}
         {% endfor %}
     </div>
+
+    <script src="{{ url_for('static', path='js/config_to_cart.js') }}" async></script>
+
 {% else %}
     <p class="text-center font-bold">
         В твоей корзине пусто 🙃. 

@@ -131,8 +131,6 @@ def process_phone_login(
     )
     return response
 
-    return templates.TemplateResponse("partials/phone_code_input.html", context=context_data)
-
 
 @router.post("/login/google")
 def login_with_google_account(

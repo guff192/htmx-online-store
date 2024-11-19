@@ -41,12 +41,20 @@
         </a>
 
         <a href="/cart#offset">
-            <div class="flex justify-center items-center w-20 h-14 sm:h-24">
+            <div class="relative flex justify-center items-center w-20 h-14 sm:h-24">
                 <img
                     src="{{ url_for('static', path='images/cart.png') }}"
                     class="m-auto h-14 w-14 cursor-pointer rounded"
                     alt="Корзина"
                     >
+
+                <span id="cart_count" class="absolute top-1 right-1 block rounded-lg p-0.5 bg-red-500"
+                    hx-trigger="intersect once delay:300ms"
+                    hx-swap="outerHTML"
+                    hx-get="/cart/count"
+                    hx-target="this"
+                    hx-push-url="false"
+                    hx-replace-url="false"></span>
             </div>
         </a>
 

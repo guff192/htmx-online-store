@@ -48,6 +48,25 @@ def get_cart(
     return templates.TemplateResponse(
         'cart.html', context=context_data
     )
+        
+
+@router.get('/count')
+def get_cart_count(
+    request: Request,
+    vm: CartViewModel = Depends(cart_viewmodel_dependency),
+    user: LoggedUser | None = Depends(oauth_user_dependency),
+):
+    if not request.headers.get('hx-request'):
+        return RedirectResponse('/cart', status_code=status.HTTP_303_SEE_OTHER)
+
+    if user:
+        count = vm.get_cart(str(user.id)).total_count()
+    else:
+        count = get_cart_from_cookies(request.cookies).total_count()
+
+    return templates.TemplateResponse(
+        'partials/cart_count.html', {'request': request, 'count': count}
+    )
 
 
 
@@ -173,6 +192,4 @@ def remove_from_cart(
         )
 
     return response
-        
-
 

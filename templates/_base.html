@@ -23,7 +23,7 @@
 
 </head>
 
-<body class="bg-gray-100 text-black p-0 m-0">
+<body class="bg-gray-100 text-black p-0 m-0 relative">
 
     <div id="promocode"
         class="fixed top-0 w-full h-16 bg-white text-lightBlue text-center leading-10 pt-3 z-20">
@@ -47,12 +47,16 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="mt-4">
+    <footer class="absolute bottom-0 mt-4">
         {% block footer %}
             {% include 'partials/footer.html' %}
 
         {% endblock %}
     </footer>
+
+    <div id="footer-offset" class="mt-4 invisible">
+        {% include 'partials/footer.html' %}
+    </div>
 
 </body>
 

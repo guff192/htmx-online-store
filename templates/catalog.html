@@ -1,4 +1,4 @@
-{% if not request.headers.get('hx-request') %}
+{% if not request.headers.get('hx-request') == 'true' %}
     {% extends '_base.html' %}
 
     {% block title %}{{ shop.name }} | Каталог{% endblock %}

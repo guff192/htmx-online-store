@@ -25,6 +25,9 @@ class Cart(BaseModel):
             'user': self.user,
         }
 
+    def total_count(self) -> int:
+        return sum([p.count for p in self.product_list])
+
 
 class CookieCartProduct(BaseModel):
     product_id: int
@@ -53,6 +56,9 @@ class CartInCookie(BaseModel):
         cookie_cart_str += ']}'
 
         return cookie_cart_str
+
+    def total_count(self) -> int:
+        return sum([p.count for p in self.product_list])
 
 
 class ProductAddToCartRequest(BaseModel):

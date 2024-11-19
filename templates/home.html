@@ -90,7 +90,7 @@
 
    <div id="new-products">
        <h2 class="text-3xl font-bold text-center mb-1 mt-12">Новинки</h2>
-       <div id="products" class="md:grid md:grid-cols-4 md:gap-2">
+       <div id="products" class="flex flex-wrap justify-around md:grid md:grid-cols-4 md:gap-2">
            {% for product in products %}
                {% include 'partials/product_card.html' %}
            {% endfor %}

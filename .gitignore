@@ -10,6 +10,9 @@ ENV/
 # Environment Variables
 .env
 
+# Log files
+*.log
+
 # Databases
 *.sqlite3
 db.sqlite3

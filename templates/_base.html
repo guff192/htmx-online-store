@@ -23,27 +23,31 @@
 
 </head>
 
-<body class="bg-gray-100 text-black p-0 m-0 relative">
+<body class="bg-white text-black p-0 m-0 relative">
 
+    <!--
     <div id="promocode"
         class="fixed top-0 w-full h-16 bg-white text-lightBlue text-center leading-10 pt-3 z-20">
         6 месяцев гарантии и бесплатная доставка для зарегистрированных пользователей
     </div>
+    -->
 
     {% block navbar %}
-        <nav class="transition-all duration-500 bg-black text-white fixed h-[10dvh] md:h-24 w-full top-16 z-20"
-            hx-boost="true" hx-target="#content" hx-swap="innerHTML">
+        <nav class="transition-all duration-500 bg-white text-white w-full top-0 z-20 border-b border-gray-200"
+            hx-boost="true" hx-target="#content" hx-swap="innerHTML show:#page-header:top">
         {% include 'partials/navbar.html' %}
         </nav>
     {% endblock %}
 
-    <div id="offset" class="h-40 invisible"></div>
+    <!--
+    <div id="offset" class="h-52 invisible"></div>
+    -->
 
-    <header>
+    <header class="mt-10">
         {% block header %}<h1 id="page-header">Default Header</h1>{% endblock %}
     </header>
 
-    <main id="content" class="w-full md:w-5/6 p-2 md:p-0 mx-auto mt-2 text-center">
+    <main id="content" class="w-full md:w-5/6 p-2 md:p-0 mx-auto mt-8 text-center">
         {% block content %}{% endblock %}
     </main>
 

@@ -10,6 +10,6 @@
 
 
 body a:hover {
-    text-decoration: underline 1px dotted;
+    /* text-decoration: underline 1px dashed; */
 }
 

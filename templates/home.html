@@ -5,21 +5,62 @@
     {% block title %}{{ shop.name }} | Главная{% endblock %}
 
     {% block header %}
+
+    <div id="page-header" class="md:w-5/6 mx-auto text-left uppercase flex justify-between items-center">
+        <div class="w-1/2">
+            <h2 class="text-xl">проверенные б/у</h2>
+            <h1 class="text-5xl font-bold">ноутбуки по </br>низким ценам</h1>
+            <h2 class="text-xl">с доставкой по москве и МО</h2>
+        </div>
+
+        <div id="brands" class="w-1/2">
+            <div id="brands-logos" class="flex justify-around gap-4 content-center"
+                hx-target="#content"
+                hx-swap="outerHTML show:top"
+                hx-select="#content"
+                hx-request="noHeaders"
+                hx-select-oob="#page-header"
+                hx-headers='{"Hx-Request": "false"}'
+                hx-replace-url="true"
+                hx-push-url="true">
+
+                <div class="p-2 h-20 flex justify-center border border-gray-50 rounded-lg"
+                    hx-trigger="click"
+                    hx-get="/products?query=Dell">
+                    <img class="" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Dell_logo_2016.svg/1200px-Dell_logo_2016.svg.png" alt="Dell">
+                </div>
+
+                <div class="p-2 h-20 flex justify-center border border-gray-50 rounded-lg"
+                    hx-trigger="click"
+                    hx-get="/products?query=Lenovo">
+                    <img class="" src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Lenovo_%282015%29.svg" alt="Lenovo">
+                </div>
+
+                <div class="p-2 h-20 flex justify-center border border-gray-50 rounded-lg"
+                    hx-trigger="click"
+                    hx-get="/products?query=HP">
+                    <img class="" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/HP_logo_2012.svg/1200px-HP_logo_2012.svg.png" alt="HP">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!--
     <div class="banners-container">
         <div id="banners" class="mb-1 w-full overflow-hidden mx-auto">
             {% for banner in banners %}
             <div class="banner bg-darkBlue flex justify-between items-center mb-2 h-screen transition-all duration-500">
                 <div class="bg-darkBlue flex flex-col justify-end w-full h-full overflow-hidden rounded-lg"
                     style="background: url('{{ banner.img_url }}') center/cover no-repeat;">
-                        
-                        <!--
                         <h1 class="text-white text-center text-3xl font-bold mb-2" style="text-shadow: 2px 2px 10px white;">{{ banner.name }}</h1>
-                        -->
                 </div>
             </div>
             {% endfor %}
         </div>
     </div>
+    -->
 
 
     {% endblock %}
@@ -29,38 +70,47 @@
     document.title = '{{ shop.name }} | Главная';
 
     pageHeader = document.getElementById('page-header');
-    pageHeader.innerHTML = `
-    <div class="banners-container">
-        <div id="banners" class="mb-1 w-full overflow-hidden mx-auto">
-            {% if banners[0] %}
-            <div class="banner bg-darkBlue flex justify-between items-center mb-2 h-screen transition-all duration-500">
-                <div class="bg-darkBlue flex flex-col justify-end w-full h-full overflow-hidden rounded-lg"
-                    style="background: url('{{ banners[0].img_url }}') center/cover no-repeat;">
-                        
-                    <!--
-                    <h1 class="text-white text-center text-3xl font-bold mb-2" style="text-shadow: 2px 2px 10px white;">{{ banners[0].name }}</h1>
-                    -->
+    pageHeader.outerHTML = `
+    <div id="page-header" class="md:w-5/6 mx-auto text-left uppercase flex justify-between items-center">
+        <div class="w-1/2">
+            <h2 class="text-xl">проверенные б/у</h2>
+            <h1 class="text-5xl font-bold">ноутбуки по </br>низким ценам</h1>
+            <h2 class="text-xl">с доставкой по москве и МО</h2>
+        </div>
 
-                </div>
+    <div id="brands" class="w-1/2">
+        <div id="brands-logos" class="flex justify-around gap-4 content-center"
+            hx-target="#content"
+            hx-swap="outerHTML show:top"
+            hx-select="#content"
+            hx-request="noHeaders"
+            hx-select-oob="#page-header"
+            hx-headers='{"Hx-Request": "false"}'
+            hx-replace-url="true"
+            hx-push-url="true">
+
+            <div class="p-2 h-20 flex justify-center border border-gray-50 rounded-lg"
+                hx-trigger="click"
+                hx-get="/products?query=Dell">
+                <img class="" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Dell_logo_2016.svg/1200px-Dell_logo_2016.svg.png" alt="Dell">
             </div>
-            
-            {% endif %}
 
-            {% for banner in banners[1:] %}
-            <div class="banner bg-darkBlue flex justify-between items-center mb-2 h-screen transition-all duration-500" style="display: none;">
-                <div class="bg-darkBlue flex flex-col justify-end w-full h-full overflow-hidden rounded-lg"
-                    style="background: url('{{ banner.img_url }}') center/cover no-repeat;">
-                        
-                    <!--
-                    <h1 class="text-white text-center text-3xl font-bold mb-2" style="text-shadow: 2px 2px 10px white;">{{ banner.name }}</h1>
-                    -->
-
-                </div>
+            <div class="p-2 h-20 flex justify-center border border-gray-50 rounded-lg"
+                hx-trigger="click"
+                hx-get="/products?query=Lenovo">
+                <img class="" src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Lenovo_%282015%29.svg" alt="Lenovo">
             </div>
-            {% endfor %}
+
+            <div class="p-2 h-20 flex justify-center border border-gray-50 rounded-lg"
+                hx-trigger="click"
+                hx-get="/products?query=HP">
+                <img class="" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/HP_logo_2012.svg/1200px-HP_logo_2012.svg.png" alt="HP">
+            </div>
+
         </div>
     </div>
     `;
+    console.log('Changed header');
 
     setTimeout(function() {
         banners = getBanners();
@@ -86,10 +136,11 @@
     {% include 'empty.html' %}
 {% endif %}
 
-<div id="main-content" class="container text-center mx-auto my-8">
 
-   <div id="new-products">
-       <h2 class="text-3xl font-bold text-center mb-1 mt-12">Новинки</h2>
+<div id="main-content" class="container text-center mx-auto mt-16 mb-8">
+
+   <div id="new-products" class="">
+       <h2 class="text-4xl font-extrabold text-left mb-5 mt-12">Новинки</h2>
        <div id="products" class="flex flex-wrap justify-around md:grid md:grid-cols-4 md:gap-2">
            {% for product in products %}
                {% include 'partials/product_card.html' %}
@@ -97,5 +148,19 @@
        </div>
    </div>
 
+   <div>
+       <button class="my-5 px-16 py-5 border border-lightBlue rounded text-lightBlue" 
+           hx-target="#content" hx-swap="innerHTML show:#page-header:top" hx-get="/products/catalog" hx-boost="true">
+           В каталог →
+       </button>
+   </div>
+
+   <div class="my-16 h-80 p-10 flex justify-center items-center border bg-gray-200">
+       <h2 class="text-4xl uppercase font-extrabold">Коротко о компании</h2>
+   </div>
+
+   <div class="my-16 h-80 p-10 flex justify-center items-center border bg-gray-200">
+       <h2 class="text-4xl uppercase font-extrabold">Нравится покупателям 5 из 5 в рейтинге</h2>
+   </div>
 
 {% endblock %}

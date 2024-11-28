@@ -4,14 +4,18 @@
     {% block title %}{{ shop.name }} | Каталог{% endblock %}
 
     {% block header %}
-    <h1 id="page-header" class="text-4xl font-bold text-center mb-5 mt-2 drop-shadow-[2px_2px_10px_0px_#c4c4c4,-2px_-2px_10px_0px_#ffffff]">Товары в наличии</h1>
+    <h1 id="page-header" class="md:w-5/6 mx-auto text-4xl font-bold text-left mb-5 mt-2 drop-shadow-[2px_2px_10px_0px_#c4c4c4,-2px_-2px_10px_0px_#ffffff]">
+        Каталог ноутбуков
+    </h1>
     {% endblock %}
 
 {% else %}
     <script type="text/javascript">
         pageHeader = document.getElementsByTagName('header')[0];
         pageHeader.innerHTML = `
-            <h1 id="page-header" class="text-4xl font-bold text-center mb-5 mt-2">Товары в наличии</h1>
+            <h1 id="page-header" class="md:w-5/6 mx-auto text-4xl font-bold text-left mb-5 mt-2">
+                Каталог ноутбуков
+            </h1>
         `;
         pageHeader.classList.remove('uppercase');
 
@@ -24,7 +28,7 @@
 
 <!-- Search bar -->
 <div class="flex justify-center mb-5 w-full">
-    <form method="get" action="" class="w-3/4
+    <form method="get" action="" class="w-full
         bg-gradient-to-br from-white to-gray-300 shadow-[9px_9px_18px_0px_#c4c4c4,-9px_-9px_18px_0px_#ffffff]">
         <input type="text" name="query" placeholder="Поиск по названию или описанию"
         class="w-full text-center border border-gray-500 rounded-lg p-2"

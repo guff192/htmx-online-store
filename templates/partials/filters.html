@@ -11,15 +11,15 @@
             <label for="price_from">От</label>
             <input data-filter-input="" name="price_from" value="0" id="price_from" type="text" 
                 hx-trigger="input changed delay:500ms" hx-get="/products"
-                class="w-full border border-gray-500 rounded-lg p-2 text-center"
+                class="w-full border border-gray-200 rounded-3xl p-2 text-center"
                 >
         </div>
 
         <div class="w-1/2 flex flex-col justify-between gap-2 text-xl">
             <label for="price_to">До</label>
-            <input data-filter-input="" name="price_to" value="200000" max="200000" id="price_to" type="text" 
+            <input data-filter-input="" name="price_to" value="200&nbsp;000" max="200000" id="price_to" type="text" 
                 hx-trigger="input changed delay:500ms" hx-get="/products"
-                class="w-full border border-gray-500 rounded-lg p-2 text-center"
+                class="w-full border border-gray-200 rounded-3xl p-2 text-center"
                 >
         </div>
 
@@ -46,6 +46,27 @@
                     }
                 });
             });
+
+            priceInputs.forEach((input) => {
+                input.addEventListener('keydown', (e) => {
+                    if (e.keyCode == 8 && e.selectionEnd - e.selectionStart == 0) {
+                        e.preventDefault();
+                        input.value = input.value.slice(0, e.selectionStart - 1) + input.value.slice(e.selectionEnd);
+                        return false;
+                    }
+                });
+
+                input.addEventListener('input', (e) => {
+                    const start = e.target.selectionStart;
+
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                    const thousands = e.target.value.slice(0, -3);
+                    const decimal = e.target.value.slice(-3);
+                    e.target.value = `${thousands} ${decimal}`;
+
+                    e.target.setSelectionRange(start, start);
+                });
+            })
 
             // Preventing sending request when clicking on label
             if (typeof(priceLabels) === 'undefined') { let priceLabels; }
@@ -247,7 +268,13 @@
                     filters[name] = new Array();
                     filters[name].push(checkedInputs.filter(el => el.name === name).map(i => i.value));
                 } else if(textInputs.map(el => el.name).includes(name)) {
-                    filters[name] = textInputs.filter(el => el.name === name)[0].value;
+                    let value;
+                    if (name.includes('price')) {
+                        value = textInputs.filter(el => el.name === name)[0].value.replace(/[^0-9]/g, '');
+                    } else {
+                        value = textInputs.filter(el => el.name === name)[0].value;
+                    }
+                    filters[name] = value;
                 }
             });
 

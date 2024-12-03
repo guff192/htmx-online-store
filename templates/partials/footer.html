@@ -1,26 +1,99 @@
-<div class="bg-black py-5 w-full text-white" hx-boost="true" hx-target="#content" hx-swap="innerHTML">
-    <div class="flex flex-nowrap justify-evenly w-3/4 mx-auto">
+<div class="w-11/12 mx-auto py-20 text-white"
+    hx-boost="true" hx-target="#content" hx-swap="innerHTML show:#page-header:top">
 
-        <div class="flex flex-col items-center w-full">
-            <p class="text-center">
-                <a class="hover:underline" href="/help" hx-select="#content" hx-select-oob="#page-header">Помощь в подборе</a>
-                <script>
-                    htmx.on('htmx:afterSettle', (evt) => {
-                        if (evt.detail.pathInfo.responsePath === '/help') {
-                            setTimeout(() => document.querySelector('#offset').scrollIntoView(true), 50);
-                        }
-                    });
-                </script>
-            </p>
+    <div class="flex flex-col md:flex-row items-center gap-32 w-full mb-8">
+        <!-- Logo -->
+        <a href="/" hx-swap="innerHTML show:#page-header:top" class="flex justify-start brightness-100">
+            {% if shop.logo_name %}
+                <img class="invert w-32 self-center" src="{{ url_for('static', path='images/'+shop.logo_name) }}">
+            {% else %}
+                <p class="text-2xl font-bold w-5/12 h-min p-2 self-center text-center">{{ shop.name }}</p>
+            {% endif %}
+        </a>
 
-            <p class="text-center"><a class="hover:underline" href="/secret" hx-select="#content" hx-select-oob="#page-header">Секретная страница</a></p>
-            <p class="text-center"><a class="hover:underline" href="#">Гарантия</a></p>
-        </div>
+        <!-- Links -->
+        <menu class="flex justify-around gap-10">
+            <a href="/products/catalog">Каталог ноутбуков</a>
+            <!--
+            <script>
+                htmx.on('htmx:afterSettle', (evt) => {
+                    if (evt.detail.pathInfo.responsePath === '/products/catalog') {
+                        setTimeout(() => document.querySelector('#page-header').scrollIntoView(true), 50);
+                    }
+                });
+            </script>
+            -->
+            <a>Отзывы</a>
+            <a href="/help" hx-select="#content" hx-select-oob="#page-header">Помощь в подборе</a>
+            <a>Гарантия и доставка</a>
+            <a class="hover:underline" href="/secret" hx-select="#content" hx-select-oob="#page-header">Секретная страница</a>
+            <a href="/contacts" hx-select="#content" hx-select-oob="#page-header">Контакты</a>
+        </menu>
 
     </div>
 
-    <hr class="w-2/3 mx-auto my-4">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-20 w-full mb-8">
+        <div class="text-nowrap">
+            <span class="font-['RisingSunBold']">ООО “ЭВМ СТОР”</span></br>
+            <span class="font-['RisingSunBold']">ИНН/КПП:</span> 0000000000/000000000</br>
+            <span class="font-['RisingSunBold']">ОГРН:</span> 0000000000000</br>
+        </div>
 
+        <div class="text-nowrap">
+            <span class="font-['RisingSunBold'] leading-10">Юр. адрес:</span></br>
+            123001, г. Москва,</br>Садовая-Кудринская ул., 23, стр. 5
+        </div>
+
+        <div class="text-nowrap">
+            <span class="font-['RisingSunBold'] leading-10">Режим работы магазина:</span></br>
+            ежедневно с 09:00 до 21:00
+        </div>
+
+        <!-- Contact buttons -->
+        <div class="flex flex-col justify-between gap-2">
+
+            <!-- Phone -->
+            <div class="mb-2 text-center md:text-left">
+                <a href="tel:+79013556515" target="_blank" class="block md:inline text-sm md:text-lg font-['RisingSunBold'] text-nowrap">
+                    +7 (901) 355-65-15
+                </a>
+            </div>
+
+            <div class="flex justify-end gap-2">
+
+                <!-- Telegram -->
+                <div class="mb-2 text-center md:text-left">
+                    <a href="https://t.me/EVMStore" target="_blank" class="block md:inline text-sm md:text-base">
+                        <img src="{{ url_for('static', path='images/telegram.png') }}">
+                    </a>
+                </div>
+
+                <!-- WhatsApp -->
+                <div class="mb-2 text-center md:text-left">
+                    <a href="https://wa.me/79013556515" target="_blank" class="block md:inline text-sm md:text-base">
+                        <img src="{{ url_for('static', path='images/whatsapp.png') }}">
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row justify-between items-center gap-20 w-full">
+        <div>© 2024, ООО “ЭВР СТОР”. Все права защищены</div>
+        <div>Политика конфиденциальности</div>
+        <div>Договор оферты</div>
+        <div>
+            <p class="flex justify-between">
+                <span>Разработка сайта:&nbsp;</span><a class="hover:animate-pulse" href="https://github.com/guff192" target="_blank">@guff192</a>
+            </p>
+            <p class="flex justify-between">
+                <span>Дизайн сайта:&nbsp;</span><a href="#">Сплав</a>
+            </p>
+        </div>
+    </div>
+    <!-- 
     <div id="brands">
         <div id="brands-logos" class="flex flex-wrap justify-evenly content-center w-3/4 mx-auto"
             hx-target="#content"
@@ -52,6 +125,7 @@
 
         </div>
     </div>
+    -->
 
 
 </div>

@@ -3,105 +3,116 @@
 </button>
 
 
-<div id="navbar-content" class="w-5/6 mx-auto bg-white text-black mb-8">
+<div id="navbar-content" class="w-5/6 mx-auto flex justify-around gap-24 text-black">
+    <!-- Logo -->
+    <a href="/" hx-swap="innerHTML show:#page-header:top" class="flex justify-start">
+        {% if shop.logo_name %}
+            <img class="w-32 self-center" src="{{ url_for('static', path='images/'+shop.logo_name) }}">
+        {% else %}
+            <p class="text-2xl font-bold w-5/12 h-min p-2 self-center text-center">{{ shop.name }}</p>
+        {% endif %}
+    </a>
 
-    <!-- First navbar row -->
-    <div class="flex justify-between items-center">
+    <!-- Menu rows -->
+    <div class="grow pt-2.5">
+        <!-- First navbar row -->
         <div class="flex justify-between items-center gap-10">
-            <!-- Logo -->
-            <a href="/" hx-swap="innerHTML show:#page-header:top" class="flex justify-start">
-                {% if shop.logo_name %}
-                    <img class="w-40 self-center" src="{{ url_for('static', path='images/'+shop.logo_name) }}">
-                {% else %}
-                    <p class="text-2xl font-bold w-5/12 h-min p-2 self-center text-center">{{ shop.name }}</p>
-                {% endif %}
-            </a>
-            
             <!-- Offers -->
-            <div class="flex justify-end gap-10">
+            <div class="flex gap-10">
                 <!-- Free delivery in Moscow -->
                 <div class="flex justify-between gap-2 items-center">
-                    <img class="invert w-9 h-9" src="{{ url_for('static', path='images/orders.png') }}">
+                    <img class="w-9 h-9" src="{{ url_for('static', path='images/location.png') }}">
                     <p>
                         <a href="/secret" hx-select="#content" hx-select-oob="#page-header"
                             class="text-[#18a0fb] underline decoration-dashed underline-offset-2">
                             Бесплатная доставка
                         </a>
-                        <br> <span>по Москве и МО</span>
+                        <span> по Москве и МО</span>
                     </p>
                 </div>
 
                 <!-- 6 months warranty for registered users -->
                 <div class="flex justify-between gap-2 items-center">
-                    <img class="invert w-9 h-9" src="{{ url_for('static', path='images/store.png') }}">
+                    <img class="w-9 h-9" src="{{ url_for('static', path='images/warranty.png') }}">
                         <p>
                             <a>6 месяцев <span class="text-[#18a0fb] underline decoration-dashed underline-offset-4">гарантии</span></a>
                         </p>
 
                 </div>
             </div>
+
+            <!-- Contact buttons -->
+            <div class="flex justify-end items-center gap-5">
+
+                <div class="flex gap-2">
+                    <!-- Telegram -->
+                    <div class="mb-2 text-center md:text-left">
+                        <a href="https://t.me/EVMStore" target="_blank" class="block md:inline text-sm md:text-base">
+                            <img src="{{ url_for('static', path='images/telegram.png') }}">
+                        </a>
+                    </div>
+
+                    <!-- WhatsApp -->
+                    <div class="mb-2 text-center md:text-left">
+                        <a href="https://wa.me/79013556515" target="_blank" class="block md:inline text-sm md:text-base">
+                            <img src="{{ url_for('static', path='images/whatsapp.png') }}">
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Phone -->
+               <div class="mb-2 text-center md:text-left">
+                   <a href="tel:+79013556515" target="_blank" class="block md:inline text-sm md:text-lg font-['RisingSunBold'] text-nowrap">
+                       +7 (901) 355-65-15
+                   </a>
+               </div>
+
+            </div>
         </div>
 
-        <!-- Contact buttons -->
-        <div class="flex justify-end gap-2">
-            <!-- Phone -->
-           <div class="mb-2 text-center md:text-left">
-               <h2 class="inline font-bold md:text-2xl">
-                   <a href="tel:+79013556515" target="_blank" class="block md:inline text-sm md:text-base">+7 (901) 355-65-15</a>
-               </h2>
-           </div>
+        <!-- Second navbar row -->
+        <div class="my-2 flex justify-between items-center">
+            <!-- Links -->
+            <menu class="font-['RisingSunBold'] flex justify-around gap-10">
+                <a href="/products/catalog">Каталог ноутбуков</a>
+                <a>Отзывы</a>
+                <a href="/help" hx-select="#content" hx-select-oob="#page-header">Помощь в подборе</a>
+                <a>Гарантия и доставка</a>
+                <a href="/contacts" hx-select="#content" hx-select-oob="#page-header">Контакты</a>
+            </menu>
 
-           <!-- Telegram -->
-           <div class="mb-2 text-center md:text-left">
-               <a href="https://t.me/EVMStore" target="_blank" class="block md:inline text-sm md:text-base">
-                   <img src="{{ url_for('static', path='images/telegram.png') }}">
-               </a>
-           </div>
-
-           <!-- WhatsApp -->
-           <div class="mb-2 text-center md:text-left">
-               <a href="https://wa.me/79013556515" target="_blank" class="block md:inline text-sm md:text-base">
-                   <img src="{{ url_for('static', path='images/whatsapp.png') }}">
-               </a>
-           </div>
-        </div>
-    </div>
-
-    <!-- Second navbar row -->
-    <div class="flex justify-between items-center">
-        <!-- Links -->
-        <menu class="flex justify-around gap-16">
-            <a href="/products/catalog">Каталог ноутбуков</a>
-            <a>Отзывы</a>
-            <a>Помощь в подборе</a>
-            <a>Гарантия и доставка</a>
-            <a href="/contacts" hx-select="#content" hx-select-oob="#page-header">Контакты</a>
-        </menu>
-
-        <!-- Buttons with icons -->
-        <div class="flex justify-between items-center gap-2">
-            <a href="/auth/profile"{% if not request.state.user %} hx-boost="false"{% endif %}>
-                <img src="{{ url_for('static', path='images/user.png') }}"
-                class="invert w-14 h-14">
-            </a>
-
-            <a href="/cart">
-                <div class="relative">
-                    <img src="{{ url_for('static', path='images/cart.png') }}"
-                        class="invert w-14 h-14 rounded"
+            <!-- Buttons with icons -->
+            <div class="flex justify-between items-center gap-2">
+                <a href="/cart">
+                    <div class="relative">
+                        <img src="{{ url_for('static', path='images/cart.svg') }}"
+                        class="w-8 h-8 rounded"
                         alt="Корзина"
                         >
 
-                    <span id="cart_count" class="block absolute top-0 right-1 w-4 rounded-lg bg-red-500 text-xs text-center text-white"
-                        hx-trigger="intersect once delay:300ms"
-                        hx-swap="outerHTML"
-                        hx-get="/cart/count"
-                        hx-target="this"
-                        hx-push-url="false"
-                        hx-replace-url="false"></span>
-                </div>
-            </a>
+                        <span id="cart_count" class="block absolute top-0 right-1 w-4 rounded-lg bg-lightBlue text-[0.5rem] text-center text-white"
+                            hx-trigger="intersect once delay:300ms"
+                            hx-swap="outerHTML"
+                            hx-get="/cart/count"
+                            hx-target="this"
+                            hx-push-url="false"
+                            hx-replace-url="false"></span>
+                    </div>
+                </a>
+
+                <a href="/auth/profile"{% if not request.state.user %} hx-boost="false"{% endif %}>
+                    {% if not request.state.user %}
+                    <img src="{{ url_for('static', path='images/user.svg') }}"
+                    class="w-8 h-8">
+                    {% else %}
+                    <img src="{{ request.state.user.profile_img_url }}"
+                    class="w-8 h-8 rounded-full">
+                    {% endif %}
+                </a>
+
+            </div>
         </div>
+
     </div>
 
 </div>

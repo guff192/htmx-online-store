@@ -33,7 +33,7 @@
     -->
 
     {% block navbar %}
-        <nav class="transition-all duration-500 bg-white text-white w-full top-0 z-20 border-b border-gray-200"
+        <nav class="transition-all duration-500 bg-gray-100 text-white w-full top-0 z-20 border-b border-gray-200"
             hx-boost="true" hx-target="#content" hx-swap="innerHTML show:#page-header:top">
         {% include 'partials/navbar.html' %}
         </nav>
@@ -43,24 +43,21 @@
     <div id="offset" class="h-52 invisible"></div>
     -->
 
-    <header class="mt-10">
+    <header class="uppercase font-['RisingSunBold'] mt-20">
         {% block header %}<h1 id="page-header">Default Header</h1>{% endblock %}
     </header>
 
-    <main id="content" class="w-full md:w-5/6 p-2 md:p-0 mx-auto mt-8 text-center">
+    <main id="content" class="w-full md:w-11/12 md:p-0 mx-auto mt-8 text-center">
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="absolute bottom-0 mt-4">
+    <footer class="mt-25 w-screen bg-[#414141]">
         {% block footer %}
             {% include 'partials/footer.html' %}
 
         {% endblock %}
     </footer>
 
-    <div id="footer-offset" class="mt-4 invisible">
-        {% include 'partials/footer.html' %}
-    </div>
 
 </body>
 

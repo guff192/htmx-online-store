@@ -4,7 +4,7 @@
     {% block title %}{{ shop.name }} | Каталог{% endblock %}
 
     {% block header %}
-    <h1 id="page-header" class="md:w-5/6 mx-auto text-4xl font-bold text-left mb-5 mt-2 drop-shadow-[2px_2px_10px_0px_#c4c4c4,-2px_-2px_10px_0px_#ffffff]">
+    <h1 id="page-header" class="md:w-11/12 mx-auto text-4xl font-bold text-left mb-5 mt-2 drop-shadow-[2px_2px_10px_0px_#c4c4c4,-2px_-2px_10px_0px_#ffffff]">
         Каталог ноутбуков
     </h1>
     {% endblock %}
@@ -13,7 +13,7 @@
     <script type="text/javascript">
         pageHeader = document.getElementsByTagName('header')[0];
         pageHeader.innerHTML = `
-            <h1 id="page-header" class="md:w-5/6 mx-auto text-4xl font-bold text-left mb-5 mt-2">
+            <h1 id="page-header" class="md:w-11/12 mx-auto text-4xl font-bold text-left mb-5 mt-2">
                 Каталог ноутбуков
             </h1>
         `;
@@ -27,17 +27,20 @@
 {% block content %}
 
 <!-- Search bar -->
-<div class="flex justify-center mb-5 w-full">
-    <form method="get" action="" class="w-full
-        bg-gradient-to-br from-white to-gray-300 shadow-[9px_9px_18px_0px_#c4c4c4,-9px_-9px_18px_0px_#ffffff]">
-        <input type="text" name="query" placeholder="Поиск по названию или описанию"
-        class="w-full text-center border border-gray-500 rounded-lg p-2"
-        hx-trigger="keyup changed delay:200ms"
-        data-filter-input
-        hx-get="/products"
-        hx-target="#products"
-        hx-swap="innerHTML"
-        hx-replace-url="true">
+<div class="md:w-3/4 ml-auto mb-5 w-full">
+    <form method="get" action="" class="max-w-full mb-5 flex gap-2 border border-gray-200 rounded-3xl p-2.5
+        bg-gradient-to-br from-white via-white to-gray-50 shadow-[9px_9px_18px_0px_#c4c4c4,-9px_-9px_18px_0px_#ffffff]">
+
+            <img src="{{ url_for('static', path='images/search.svg') }}" class="w-8">
+            <input type="text" name="query" placeholder="Поиск товара по названию или описанию"
+            class="w-full text-left bg-transparent outline-none"
+            hx-trigger="keyup changed delay:200ms"
+            data-filter-input
+            hx-get="/products"
+            hx-target="#products"
+            hx-swap="innerHTML"
+            hx-replace-url="true">
+
     </form>
 </div>
 
@@ -58,7 +61,11 @@
             <span class="group-active:text-gray-500">Фильтры</span>
         </button>
 
-        <div id="filters" class="rounded hidden md:block bg-gradient-to-br from-white via-gray-100 to-gray-200 shadow-[9px_9px_18px_0px_#c4c4c4,-9px_-9px_18px_0px_#ffffff]">
+
+        <div id="filters"
+            class="rounded-3xl border border-gray-200 hidden md:block
+            bg-gradient-to-br from-white via-gray-50 to-gray-100 shadow-[9px_9px_18px_0px_#c4c4c4,-9px_-9px_18px_0px_#ffffff]"
+            >
             {% include 'partials/filters.html' %}
         </div>
 
@@ -96,7 +103,6 @@
 
     <!-- Products -->
     <div class="flex flex-col items-center md:w-3/4">
-
         <!-- Products grid -->
         <div id="products" class="flex flex-wrap justify-around md:grid md:grid-cols-3 md:gap-2">
             <img

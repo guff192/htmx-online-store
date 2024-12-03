@@ -1,7 +1,7 @@
 <div
     id="product{{ product.id }}card{% if product.selected_configuration %}{{ product.selected_configuration.id }}{% endif %}"
-    class="rounded-lg w-[48%] md:w-full px-1 py-3 mb-2 flex flex-col justify-between text-center text-black cursor-pointer brightness-100 hover:brightness-105 group
-    bg-gradient-to-br from-white via-gray-100 to-gray-200 shadow-[9px_9px_18px_0px_#c4c4c4,-9px_-9px_18px_0px_#e0e0e0]"
+    class="rounded-3xl border border-gray-200 w-[48%] md:w-full mb-2 flex flex-col justify-between text-center text-black cursor-pointer brightness-100 hover:brightness-105 group
+    bg-gradient-to-br from-white via-gray-50 to-gray-100 shadow-[9px_9px_18px_0px_#c4c4c4,-4px_-4px_8px_0px_#e0e0e0]"
     hx-boost="true"
     hx-get="{{ product.absolute_url }}#offset"
     hx-swap="innerHTML show:#offset:bottom"
@@ -9,9 +9,9 @@
     hx-target="#content">
 
     <!-- Photo -->
-    <div class="box-border flex flex-col justify-center mb-5 relative">
+    <div class="box-border flex flex-col justify-center relative">
         <img
-            class="mx-auto max-h-full"
+            class="rounded-t-3xl mx-auto max-h-full"
             hx-trigger="load"
             hx-target="this"
             hx-get="/photos/main?product_name={{ product.name | urlencode }}&size=small"
@@ -21,46 +21,50 @@
             alt="{{ product.name }}"
         >
 
-        <div class="absolute bottom-0 right-0 w-max rounded flex justify-center md:gap-2 items-center bg-orange-400 opacity-85 p-[1px] md:p-0.5 text-white">
-        {% if not product.selected_configuration %}
-            {% if product.ram_amounts and product.ssd_amounts %}
-                <p class="text-center text-base md:text-lg uppercase">до</p>
-                <div class="flex flex-col justify-around p-0.5">
-                    <p class="text-[0.5rem] md:text-base bg-lightBlue mb-1 py-[1px] px-0.5 rounded"><strong>{{ product.ram_amounts|max }}</strong> ГБ RAM</p>
-                    <p class="text-[0.5rem] md:text-base bg-darkPink py-[1px] px-0.5 rounded"><strong>{{ product.ssd_amounts|max }}</strong> ГБ SSD</p>
-                </div>
-            {% endif %}
-        {% else %}
-            <div class="flex flex-col justify-around p-0.5">
-                <p class="text-[0.5rem] md:text-base bg-lightBlue mb-1 py-[1px] px-0.5 rounded"><strong>{{ product.selected_configuration.ram_amount }}</strong> ГБ RAM</p>
-                <p class="text-[0.5rem] md:text-base bg-darkPink py-[1px] px-0.5 rounded"><strong>{{ product.selected_configuration.ssd_amount }}</strong> ГБ SSD</p>
-            </div>
-        {% endif %}
-        </div>
-
     </div>
 
     <!-- Product info -->
-    <div class="box-border flex flex-col justify-around">
+    <div class="box-border p-4 flex flex-col justify-around">
 
         <!-- Product name -->
-        <h3 class="text-lg font-bold box-border group-hover:underline">
+        <h3 class="text-lg text-left font-['RisingSunBold'] mb-5 box-border group-hover:underline">
             {{ product.short_name|replace('\n', '<br/>')|safe }}
         </h3>
 
-        <!-- Reviews -->
-        <div class="box-border my-1 flex flex-col justify-center group-hover:underline">
-            <p class="text-sm flex justify-evenly"><span class="text-red-600 font-bold">★ 4.9</span><span class="text-gray-500">25 отзывов</span></p>
-        </div>
+        <!-- Configuration -->
+        {% if not product.selected_configuration %}
+            {% if product.ram_amounts and product.ssd_amounts %}
+                <p class="flex flex-col md:flex-row justify-start mb-5 text-center md:text-left text-[0.7rem] md:text-base rounded">
+                <span>До: </span><span>&nbsp;{{ product.ram_amounts|max }} ГБ RAM / {{ product.ssd_amounts|max }} ГБ SSD</span>
+                </p>
+            {% endif %}
+        {% else %}
+            <p class="mb-5 text-left text-[0.7rem] md:text-base rounded">{{ product.selected_configuration.ram_amount }} ГБ RAM / {{ product.selected_configuration.ssd_amount }} ГБ SSD</p>
+        {% endif %}
 
-        <!-- Price -->
-        <div class="box-border w-3/4 mx-auto flex flex-col md:flex-row justify-between items-center">
+        <!-- Reviews -->
+        <p class="mb-6 text-sm flex justify-between">
+            <span class="text-red-600 font-bold">★ 4.9</span><span class="text-gray-500">25 отзывов</span>
+        </p>
+
+        <div class="box-border flex flex-col md:flex-row justify-between gap-4 items-center">
+            <!-- Price -->
             {% if product.selected_configuration %}
-            <strong class="text-2xl inline-block">{{ product.price + product.selected_configuration.additional_price }}₽</strong>
+            <strong class="font-['RisingSunBold'] text-xl inline-block">
+                {{ ((product.price + product.selected_configuration.additional_price)|string)[:-3] }}&nbsp;
+                {{ ((product.price + product.selected_configuration.additional_price)|string)[-3:] }}₽
+            </strong>
             {% else %}
-            <strong class="text-2xl inline-block">{{ product.price }}₽</strong>
+            <strong class="font-['RisingSunBold'] text-xl inline-block">
+                {{ (product.price|string)[:-3] }}&nbsp;
+                {{ (product.price|string)[-3:] }}₽
+            </strong>
             {% endif %}
 
+            <!-- Add to cart button -->
+            <button class="grow bg-lightBlue py-2.5 px-5 rounded-3xl">В корзину</button>
+
+            <!--
             <img
                 src="{{ url_for('static', path='images/add_to_cart.png') }}"
                 class="w-14"
@@ -68,6 +72,7 @@
                 hx-target="#content"
                 hx-swap="innerHTML show:#product{{ product.id }}photos:bottom"
                 hx-push-url="true">
+            -->
 
         </div>
 

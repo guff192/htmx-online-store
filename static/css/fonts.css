@@ -1,4 +1,9 @@
 @font-face {
+  font-family: "RisingSunBold";
+  src: url("/static/fonts/Rising\ Sun/RisingSun-Bold.ttf");
+}
+
+@font-face {
   font-family: "RisingSunRegular";
   src: url("/static/fonts/Rising\ Sun/RisingSun-Regular.ttf");
 }

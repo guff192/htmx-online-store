@@ -110,9 +110,9 @@ class Product(ProductBase):
     def short_name(self) -> str:
         name_parts = self.name.split(',')
         name, cpu, resolution = name_parts[:3]
-        name = '\n'.join(name.split(' ', 1)) + '\n'
+        # name = '\n'.join(name.split(' ', 1)) + '\n'
         resolution = name_parts[3] if 'gb' in resolution else resolution
-        return ''.join((name, cpu, resolution))
+        return f'{name.upper()}\n{cpu} / {resolution}'
 
     @property
     def ram_amounts(self) -> set[int]:

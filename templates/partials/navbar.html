@@ -5,7 +5,7 @@
 
 <div id="navbar-content" class="w-5/6 mx-auto flex justify-around gap-24 text-black">
     <!-- Logo -->
-    <a href="/" hx-swap="innerHTML show:#page-header:top" class="flex justify-start">
+    <a href="/" hx-swap="outerHTML show:#page-header:top" hx-select="#content" hx-select-oob="#page-header" class="flex justify-start">
         {% if shop.logo_name %}
             <img class="w-32 self-center" src="{{ url_for('static', path='images/'+shop.logo_name) }}">
         {% else %}

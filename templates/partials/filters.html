@@ -43,7 +43,9 @@
                     if (rawValue) {
                         formattedValue = rawValue.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
                     } else {
-                        formattedValue = '0';
+                        e.target.value = '0';
+                        e.target.select();
+                        return;
                     }
 
                     // Set formatted value

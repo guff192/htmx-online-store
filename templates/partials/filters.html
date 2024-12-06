@@ -28,45 +28,32 @@
             if (typeof(priceInputs) === 'undefined') { let priceInputs; }
             priceInputs = document.querySelectorAll('#price-filters input[data-filter-input]');
             priceInputs.forEach((input) => {
+                // Select the whole value when focused
                 input.addEventListener('focus', (e) => {
                     e.target.select();
                 });
-                input.addEventListener('keyup', (e) => {
-                    if (e.keyCode == 8 && e.target.value.length == 0) {
-                        e.target.value = "0";
-                        e.target.select();
-
-                        e.preventDefault();
-                        return false;
-                    }
-                });
-                input.addEventListener('change', (e) => {
-                    if (e.target.value == "" && e.target.hasAttribute('max')) {
-                        e.target.value = e.target.getAttribute('max');
-                    }
-                });
-            });
-
-            priceInputs.forEach((input) => {
-                input.addEventListener('keydown', (e) => {
-                    if (e.keyCode == 8 && e.selectionEnd - e.selectionStart == 0) {
-                        e.preventDefault();
-                        input.value = input.value.slice(0, e.selectionStart - 1) + input.value.slice(e.selectionEnd);
-                        return false;
-                    }
-                });
 
                 input.addEventListener('input', (e) => {
-                    const start = e.target.selectionStart;
+                    const rawValue = e.target.value.replace(/[^0-9]/g, '');
+                    let formattedValue = '';
+                    let caretPosition = e.target.selectionStart;
+                    let rawCaretPosition = caretPosition - (e.target.value.slice(0, caretPosition).match(/ /g) || []).length;
 
-                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
-                    const thousands = e.target.value.slice(0, -3);
-                    const decimal = e.target.value.slice(-3);
-                    e.target.value = `${thousands} ${decimal}`;
+                    // Format value with spaces
+                    if (rawValue) {
+                        formattedValue = rawValue.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
+                    } else {
+                        formattedValue = '0';
+                    }
 
-                    e.target.setSelectionRange(start, start);
+                    // Set formatted value
+                    e.target.value = formattedValue;
+
+                    // Set caret position
+                    const formattedCaretPosition = rawCaretPosition + (formattedValue.slice(0, rawCaretPosition).match(/ /g) || []).length;
+                    e.target.setSelectionRange(formattedCaretPosition, formattedCaretPosition);
                 });
-            })
+            });
 
             // Preventing sending request when clicking on label
             if (typeof(priceLabels) === 'undefined') { let priceLabels; }

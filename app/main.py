@@ -32,26 +32,30 @@ async def lifecycle(app: FastAPI):
     Context manager for FastAPI app. It will run all code before `yield`
     on app startup, and will run code after `yield` on app shutdown.
     '''
+    # add loggers
+    logger.remove()  # remove default logger
+    if settings.debug:
+        logger.add('app.debug.log', level='DEBUG', colorize=True,
+                   format='[{time:HH:mm:ss}] <level>{level}</level> <cyan>{message}</cyan>')
+        log_settings()
+    else:
+        logger.add('app.log', level='INFO', colorize=True,
+                   format='[{time:HH:mm:ss}] <level>{level}</level> <cyan>{message}</cyan>')
+
     # initialize database (create all tables if they don't exist)
     init_db()
     run_migrations()
 
+    # logging access token for cookies in debug mode
     if settings.debug:
         token = get_auth_service().create_access_token({'sub': '6fd6a87b-3ad3-4064-8f4b-cc76d33b1c4e'})
         logger.debug(f'{token = }')
-    else:
-        fetch_products(get_db())
 
+    # fetching products from Google Spreadsheet
+    fetch_products(get_db())
+
+    # reload css styles
     reload_tailwindcss()
-
-    # add loggers
-    logger.remove()  # remove default logger
-    if settings.debug:
-        logger.add(sys.stdout, level='DEBUG', colorize=True,
-                   format='[{time:HH:mm:ss}] <level>{level}</level> <cyan>{message}</cyan>')
-        log_settings()
-    else:
-        pass  # TODO: Create production logger
 
     yield
 

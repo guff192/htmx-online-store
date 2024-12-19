@@ -245,7 +245,7 @@ def process_yandex_login(
     if not email:
         raise ErrWrongCredentials()
 
-    user: UserResponse | None = user_vm.get_by_email(email)
+    user: UserResponse = user_vm.get_by_yandex_id_or_create(id_info)
     token = auth_vm.create_session({'sub': str(user.id)})
 
     cookie_cart = get_cart_from_cookies(request.cookies)

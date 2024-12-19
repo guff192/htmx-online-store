@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from loguru import logger
 from routes.cookies import add_product_to_cookie_cart, get_cart_from_cookies, remove_product_from_cookie_cart
 from routes.auth_routes import oauth_user_dependency
 from schema import SchemaUtils
@@ -36,7 +37,7 @@ def get_cart(
         @schema_utils.add_shop_to_context
         @schema_utils.add_debug_info_to_context
         def context_func():
-            return {'request': request, 'product_list': products}  
+            return {'request': request, 'product_list': products}
 
         context_data = context_func()
 

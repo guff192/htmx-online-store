@@ -1,3 +1,4 @@
+<!-- Cart header -->
 {% if request.headers.get('hx-request') %}
 
 <script>
@@ -14,6 +15,7 @@
 
 {% endif %}
 
+<!-- Login choice -->
 {% if not user %}
 <div id="login_choice" class="md:w-1/2 box-border mx-auto my-5 p-2 relative border rounded">
     <p class="text-center font-bold">
@@ -32,6 +34,7 @@
         class="bg-lightBlue rounded p-2 font-bold mx-auto inline-block"
         >Оформить заказ</button>
 
+    <!-- Products in cart -->
     <div id="cart" class="flex flex-col mt-5">
         {% for product in product_list %}
             {% include 'partials/cart_position.html' %}

@@ -114,8 +114,11 @@ class UserService:
             logger.debug(f"Error parsing user schema: {e}")
             return None
 
-    def get_by_email(self, email: str) -> User | None:
-        return self.user_model_to_userresponse_schema(self.repo.get_by_email(email))
+    def get_by_email(self, email: str) -> UserResponse | None:
+        user_model = self.repo.get_by_email(email)
+        if not user_model:
+            return None
+        return self.user_model_to_userresponse_schema(user_model)
 
     def get_by_id(self, user_id: str) -> User | None:
         return self.repo.get_by_id(user_id)
@@ -143,6 +146,7 @@ class UserService:
         user_schema = self._parse_user_create_yandex_schema(id_info)
         if not user_schema or not user_schema.verify():
             raise ErrWrongCredentials()
+        user_schema.profile_img_url = user_schema.profile_img_url if user_schema.profile_img_url else ''
 
         user: User | None = self._get_by_yandex_id(user_schema.yandex_id)
         if not user:

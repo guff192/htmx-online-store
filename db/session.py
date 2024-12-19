@@ -15,16 +15,14 @@ Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 
 def db_dependency():
-    db = None
+    db_session = Session()
     try:
-        db = Session()
-        yield db
+        yield db_session
     except Exception as e:
         logger.error(f'Error establishing db session: {e}')
         raise e
     finally:
-        if db:
-            db.close()
+        db_session.close()
 
 
 def get_db():

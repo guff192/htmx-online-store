@@ -1,20 +1,14 @@
-from app.config import Settings
-
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
+from loguru import logger
 
-from db.session import Base
+from app.config import Settings
+from db.session import Base, engine
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-
-# also we'll use project settings to get database url
-settings = Settings()
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -33,6 +27,10 @@ target_metadata = Base.metadata
 # ... etc.
 
 
+# settings object
+settings = Settings()
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -45,8 +43,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    # changed default behaviour to use database url from app settings
-    url = settings.db_url
+    url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -65,15 +62,12 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    configuration = config.get_section(config.config_ini_section, {})
-    configuration['sqlalchemy.url'] = settings.db_url
-    connectable = engine_from_config(
-        configuration,
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    alembic_config = config.get_section(config.config_ini_section)
+    alembic_config = {} if not alembic_config else alembic_config
+    alembic_config['sqlalchemy.url'] = settings.db_url
 
-    with connectable.connect() as connection:
+    global engine
+    with engine.connect() as connection:
         context.configure(
             connection=connection, target_metadata=target_metadata
         )
@@ -83,6 +77,9 @@ def run_migrations_online() -> None:
 
 
 if context.is_offline_mode():
+    logger.info("Running migrations offline")
     run_migrations_offline()
 else:
+    logger.info("Running migrations online")
     run_migrations_online()
+

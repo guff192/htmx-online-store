@@ -30,7 +30,7 @@ class UserViewModel:
     ) -> UserResponse:
         return self.user_service.get_or_create_by_yandex_id(id_info)
 
-    def get_by_email(self, email: str) -> UserResponse:
+    def get_by_email(self, email: str) -> UserResponse | None:
         return self.user_service.get_by_email(email)
 
     def update(self, user_update: UserUpdate) -> UserResponse:

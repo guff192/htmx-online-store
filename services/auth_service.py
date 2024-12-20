@@ -161,6 +161,9 @@ class AuthService:
         return encoded_jwt
 
     def verify_session_token(self, session_token: str) -> LoggedUser:
+        """
+        Verify session token. Either returns found user or raises error.
+        """
         try:
             payload = jwt.decode(
                 token=session_token,

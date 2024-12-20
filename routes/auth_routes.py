@@ -47,6 +47,9 @@ def oauth_user_dependency(
     request: Request,
     auth_service: AuthService = Depends(auth_service_dependency),
 ) -> Generator[LoggedUser | None, None, None]:
+    """
+    Dependency for FastAPI's DI system, yields the user that is making sthe request.
+    """
     credential = request.cookies.get("_session")
     if not credential:
         yield None
@@ -246,6 +249,7 @@ def process_yandex_login(
         raise ErrWrongCredentials()
 
     user: UserResponse = user_vm.get_by_yandex_id_or_create(id_info)
+    logger.debug(user)
     token = auth_vm.create_session({'sub': str(user.id)})
 
     cookie_cart = get_cart_from_cookies(request.cookies)

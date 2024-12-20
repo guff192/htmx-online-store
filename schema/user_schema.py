@@ -50,10 +50,6 @@ class UserCreateYandex(UserCreate):
     is_avatar_empty: bool
 
     def verify(self) -> bool:
-        if self.email.endswith('@yandex.ru'):
-            return True
-        elif self.is_avatar_empty:
-            return True
-
-        return False
+        # No need additional verification
+        return True
 

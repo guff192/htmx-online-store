@@ -41,9 +41,13 @@ async def lifecycle(app: FastAPI):
     else:
         logger.add('app.log', level='INFO', colorize=True,
                    format='[{time:HH:mm:ss}] <level>{level}</level> <cyan>{message}</cyan>')
+    logger.info('Logger initialized. Starting app...')
 
     # initialize database (create all tables if they don't exist)
+    logger.info('Initializing database...')
     init_db()
+
+    # run db migrations
     run_migrations()
 
     # logging access token for cookies in debug mode
@@ -61,6 +65,7 @@ async def lifecycle(app: FastAPI):
 
 
 def get_app() -> FastAPI:
+    logger.info('Creating FastAPI app...')
     app = FastAPI(lifespan=lifecycle)
 
     # ==========

@@ -335,7 +335,7 @@ class ProductRepository:
     def get_by_id(self, product_id) -> Product | None:
         return self.db.query(Product).get(product_id)
 
-    def get_by_name(self, name: str) -> Product | None:
+    def get_by_name(self, name: str) -> Product :
         return self.db.query(Product).filter(Product.name == name).first()
 
     def search(self, query: str, offset: int) -> list[Product]:
@@ -358,8 +358,10 @@ class ProductRepository:
                resolution_name: str = '',
                cpu: str = '',
                gpu: str = '',
-               touch_screen: bool = False
-    ) -> Product:
+               touch_screen: bool = False,
+               cpu_speed: str = '',
+               cpu_graphics: str = '',
+            ) -> Product:  # noqa: E125
         product = Product(
             name=name,
             description=description,
@@ -372,7 +374,9 @@ class ProductRepository:
             resolution_name=resolution_name,
             cpu=cpu,
             gpu=gpu,
-            touch_screen=touch_screen
+            touch_screen=touch_screen,
+            cpu_speed=cpu_speed,
+            cpu_graphics=cpu_graphics,
         )
         self.db.add(product)
         self.db.flush([product])
@@ -405,55 +409,69 @@ class ProductRepository:
                resolution_name: str = '',
                cpu: str = '',
                gpu: str = '',
-               touch_screen: bool = False) -> int:
+               touch_screen: bool = False,
+               cpu_speed: str = '',
+               cpu_graphics: str = '') -> int:
 
-        transaction = self.db.begin(nested=True)
         updated_product_query = self.db.query(Product).filter(
             Product._id == id
         )
         found_product = updated_product_query.first()
         if not found_product:
-            transaction.rollback()
             return 0
+        found_product_dict = found_product.__dict__
+        logger.debug(f'Found product to update (in repo): {found_product_dict = }')
 
         updated_products_count = updated_product_query.update({
-            'name': name,
-            'description': description,
-            'price': price,
-            'count': count,
-            'manufacturer_id': manufacturer.id,
-            'soldered_ram': soldered_ram,
-            'can_add_ram': can_add_ram,
-            'resolution': resolution,
-            'resolution_name': resolution_name,
-            'cpu': cpu,
-            'gpu': gpu,
-            'touch_screen': touch_screen
+            Product.name: name,
+            Product.description: description,
+            Product.price: price,
+            Product.count: count,
+            Product.manufacturer_id: manufacturer.id,
+            Product.soldered_ram: soldered_ram,
+            Product.can_add_ram: can_add_ram,
+            Product.resolution: resolution,
+            Product.resolution_name: resolution_name,
+            Product.cpu: cpu,
+            Product.gpu: gpu,
+            Product.touch_screen: touch_screen,
+            Product.cpu_speed: cpu_speed,
+            Product.cpu_graphics: cpu_graphics
         })
+        self.db.commit()
+        logger.debug('Updated product, flushing...')
+        self.db.flush([found_product])
+        found_product = updated_product_query.first()
+        logger.debug(f'Updated product (in repo): {found_product.__dict__ = }')
 
+        product_configs_query = self.db.query(AvailableProductConfiguration).\
+            filter(AvailableProductConfiguration.product_id == id)
+        found_configs = product_configs_query.all()
         found_config_ids = set(map(
-            lambda available_config: available_config.id,
-            found_product.configurations
+            lambda found_config: found_config.__dict__.get('configuration_id'),
+            found_configs
         ))
         update_config_ids = set(map(
             lambda available_config: available_config.id,
             configurations
         ))
         logger.debug(f'{found_config_ids = }\n{update_config_ids = }\n')
+        new_available_configs = []
         if found_config_ids != update_config_ids:
-            self.db.query(AvailableProductConfiguration).\
-                filter(AvailableProductConfiguration.product_id == id).\
-                delete()
+            product_configs_query.delete()
             for config in configurations:
                 available_configuration = AvailableProductConfiguration(
-                    product=updated_product_query.first(), configuration=config
+                    product=found_product, configuration=config
                 )
+                new_available_configs.append(available_configuration)
                 self.db.add(available_configuration)
+            
+            self.db.commit()
+            self.db.flush(new_available_configs)
 
+        self.db.expire_all()
 
-        transaction.commit()
-
-        return updated_products_count
+        return 1
 
 
 def product_repository_dependency(

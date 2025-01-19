@@ -301,9 +301,9 @@ class ProductService:
 
     def get_by_id(self, product_id: int) -> ProductSchema:
         orm_product = self.repo.get_by_id(product_id)
-        product_schema = self._orm_product_to_product_schema(orm_product)
         if not orm_product:
-            raise ErrProductNotFound()
+            raise ErrProductNotFound(product_id)
+        product_schema = self._orm_product_to_product_schema(orm_product)
 
         available_configurations = self.get_configurations_for_product(
             product_id
@@ -340,8 +340,25 @@ class ProductService:
         self,
         product_update: ProductCreate
     ) -> ProductUpdateResponse:
+        # getting configurations
+        if product_update.can_add_ram is None or product_update.soldered_ram is None:
+            logger.debug(f'Invalid product - no information about soldered RAM: {product_update}')
+            raise ErrInvalidProduct()
+
+        update_model_configurations: list[ProductConfiguration] = self.config_repo.get_available_configurations(
+            additional_ram=product_update.can_add_ram,
+            soldered_ram=product_update.soldered_ram
+        )
+        if not update_model_configurations:
+            logger.debug(f'Invalid product - no configurations found: {product_update}')
+            raise ErrInvalidProduct()
+        product_update.configurations = self.get_available_configurations(
+            product_update.can_add_ram,
+            product_update.soldered_ram
+        )
+
         if not product_update.is_valid():
-            logger.debug(f'Invalid product: {product_update}')
+            logger.debug(f'Invalid product - not valid: {product_update}')
             raise ErrInvalidProduct()
 
         # searching manufacturer
@@ -349,17 +366,8 @@ class ProductService:
             product_update.manufacturer_name
         )
         if not manufacturer:
-            logger.debug(f'Invalid product: {product_update}')
+            logger.debug(f'Invalid product - no such manufacturer: {product_update.manufacturer_name = }')
             raise ErrInvalidProduct()
-
-        # getting configurations
-        if product_update.can_add_ram is None or product_update.soldered_ram is None:
-            logger.debug(f'Invalid product: {product_update}')
-            raise ErrInvalidProduct()
-        update_configurations: list[ProductConfiguration] = self.config_repo.get_available_configurations(
-            additional_ram=product_update.can_add_ram,
-            soldered_ram=product_update.soldered_ram
-        )
 
         # getting additional specs
         name = product_update.name
@@ -373,6 +381,8 @@ class ProductService:
         cpu = product_update.cpu if product_update.cpu else ''
         gpu = product_update.gpu if product_update.gpu else ''
         touch_screen = product_update.touch_screen if product_update.touch_screen is not None else False
+        cpu_speed = product_update.cpu_speed if product_update.cpu_speed else ''
+        cpu_graphics = product_update.cpu_graphics if product_update.cpu_graphics else ''
 
         # searching product
         found_product: Product | None = self.repo.get_by_name(product_update.name)
@@ -381,26 +391,28 @@ class ProductService:
             logger.debug(f'Creating new product: {product_update}')
             self.repo.create(
                 name, description, price, count=count,
-                manufacturer=manufacturer, configurations=update_configurations,
+                manufacturer=manufacturer, configurations=update_model_configurations,
                 soldered_ram=soldered_ram, can_add_ram=can_add_ram,
-                resolution=resolution, resolution_name=resolution_name, cpu=cpu,
-                gpu=gpu, touch_screen=touch_screen
+                resolution=resolution, resolution_name=resolution_name if resolution_name else '',
+                cpu=cpu, gpu=gpu, touch_screen=touch_screen,
+                cpu_speed=cpu_speed, cpu_graphics=cpu_graphics,
             )
             return ProductUpdateResponse(count=1)
 
         # updating product
-        logger.debug(f'Updating product: {found_product.__dict__}')
+        logger.debug(f'Updating product (in service): {found_product.__dict__}')
         updated_products_count = self.repo.update(
             id=found_product.__dict__['_id'],
             name=name, description=description, price=price, count=count,
             manufacturer=manufacturer,
-            configurations=update_configurations,
+            configurations=update_model_configurations,
             soldered_ram=soldered_ram,
             can_add_ram=can_add_ram,
-            resolution=resolution, resolution_name=resolution_name,
+            resolution=resolution, resolution_name=resolution_name if resolution_name else '',
             cpu=cpu,
             gpu=gpu,
-            touch_screen=touch_screen
+            touch_screen=touch_screen,
+            cpu_speed=cpu_speed, cpu_graphics=cpu_graphics,
         )
         return ProductUpdateResponse(count=updated_products_count)
 

@@ -49,6 +49,8 @@ def fetch_products(db: Session):
         cpu = product_data.get("cpu", "")
         gpu = product_data.get("gpu", "")
         touch_screen = product_data.get("touch_screen", False)
+        cpu_speed = product_data.get("cpu_speed", "")
+        cpu_graphics = product_data.get("cpu_graphics", "")
         if not name or not price or price == '#N/A' or \
                 soldered_ram is None or can_add_ram is None or \
                 not cpu or gpu is None or touch_screen is None:
@@ -77,7 +79,9 @@ def fetch_products(db: Session):
             resolution_name=resolution_name,
             cpu=cpu,
             gpu=gpu,
-            touch_screen=touch_screen
+            touch_screen=touch_screen,
+            cpu_speed=cpu_speed,
+            cpu_graphics=cpu_graphics
         )
 
         try:

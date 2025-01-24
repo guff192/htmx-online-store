@@ -22,6 +22,7 @@ class Settings(BaseSettings):
         env_file_encoding = 'utf-8'
 
     debug: bool = Field(default=False, alias='DEBUG')
+    testing: bool = Field(default=False, alias='TESTING')
 
     host: str = Field(default='0.0.0.0', alias='HOST')
     port: int = Field(default=42069, alias='PORT')
@@ -138,5 +139,9 @@ class Settings(BaseSettings):
 def log_settings():
     settings = Settings().model_dump()
     logger.debug(f'\n{"="*20} DEBUG MODE {"="*20}')
-    logger.debug(settings)
+
+    settings_str = ''
+    for k, v in settings.items():
+        settings_str += f'{k}: {v}\n'
+    logger.debug(f"Settings:\n{settings_str}")
 

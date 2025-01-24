@@ -3,7 +3,7 @@ from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from db.session import db_dependency
+from db.session import db_dependency, get_db
 from dto.configuration_dto import ConfigurationDTO
 from models.product import AvailableProductConfiguration, ProductConfiguration
 
@@ -80,4 +80,10 @@ def configuration_repository_dependency(
         yield repo
     finally:
         db.close()
+
+
+def get_configuration_repository(
+    db: Session = get_db(),
+) -> ConfigurationRepository:
+    return ConfigurationRepository(db)
 

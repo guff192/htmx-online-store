@@ -3,6 +3,7 @@ from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy_utils import EmailType, UUIDType
 
 from db.session import Base
+from models.order import Order
 
 
 class User(Base):
@@ -22,7 +23,7 @@ class User(Base):
 
     products = relationship('UserProduct', back_populates='user')
 
-    orders = relationship('Order', back_populates='user')
+    orders = relationship(Order, back_populates='user')
 
 
 class UserProduct(Base):

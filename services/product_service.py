@@ -232,6 +232,7 @@ class ProductService:
         if offset < 0:
             raise ErrProductNotFound()
 
+        # getting dto list from repository
         if user:
             dto_list = self.repo.get_all_with_cart_info(
                 query, str(user.id), offset,
@@ -247,17 +248,17 @@ class ProductService:
                 touchscreen=touchscreen, graphics=graphics
             )
 
+        # checking dto list
         if not dto_list:
             return ProductList(products=[], offset=-5)
         if len(dto_list) == 1 and dto_list[0].id == -5:
             return ProductList(products=[], offset=offset+10)
 
-        # Creating products list
+        # creating products list
         products: list[ProductInCart] = []
         for product_dto in dto_list:
             product = self._product_dto_to_productincart_schema(product_dto)
             products.append(product)
-
         product_list = ProductList(
             offset=offset + 10,
             products=products,

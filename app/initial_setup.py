@@ -2,6 +2,7 @@ import subprocess
 from fastapi import HTTPException
 from loguru import logger
 import requests
+from requests.exceptions import JSONDecodeError
 from sqlalchemy.orm import Session
 from repository.configuration_repository import ConfigurationRepository
 
@@ -21,7 +22,12 @@ def fetch_products(db: Session):
     # Fetch data from Google Spreadsheet via REST API
     logger.info("Fetching data from Google Spreadsheet...")
     response = requests.get(settings.posting_endpoint)
-    data = response.json()
+    try:
+        data = response.json()
+    except JSONDecodeError as e:
+        logger.error(f"Failed to decode JSON response from Google Spreadsheets: {e}")
+        logger.error(f"Unparsed response: {e.response}")
+        return
 
     # Initialize the service and repository
     product_repository = ProductRepository(db, ConfigurationRepository(db))

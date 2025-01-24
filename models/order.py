@@ -2,6 +2,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy_utils import UUIDType
 from db.session import Base
+from models.payment import Payment
 
 
 class Order(Base):
@@ -30,7 +31,7 @@ class Order(Base):
 
     delivery_track_number = Column('delivery_track_number', String(255), default='')
 
-    payment = relationship('Payment', back_populates='order', uselist=False)
+    payment = relationship(Payment, back_populates='order', uselist=False)
 
 
 class OrderProduct(Base):

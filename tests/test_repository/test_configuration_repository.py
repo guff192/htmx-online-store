@@ -6,6 +6,8 @@ from models.product import Product, ProductConfiguration, AvailableProductConfig
 from models.manufacturer import Manufacturer
 from repository.configuration_repository import ConfigurationRepository
 
+from tests.test_repository import log_repository_test_info
+
 from tests.fixtures.db_fixtures import db
 from tests.fixtures.model_fixtures import (
     basic_configs,
@@ -16,6 +18,7 @@ from tests.fixtures.model_fixtures import (
 )
 from tests.fixtures.repository_fixtures import configuration_repo
 from tests.helpers.db_helpers import add_all_to_db, add_to_db
+from tests.helpers.logging_helpers import log_test_info
 
 
 # Fixtures
@@ -38,15 +41,13 @@ def test_cleanup(db: Session):  # noqa
 
 # Tests
 def test_pre_cleanup():
-    logger.info("\n" * 2 + "=" * 50)
-    logger.info("Testing Configuration Repository\n" + "=" * 50)
+    log_test_info("Testing Configuration Repository", level=2)
 
 
 class TestGetById:
     @fixture(scope="class", autouse=True)
     def log_info(self):
-        logger.info("\n" * 2 + "=" * 50)
-        logger.info("Testing ConfigurationRepository.get_by_id() method\n" + "=" * 50)
+        log_test_info("Testing ConfigurationRepository.get_by_id() method")
 
     def test_with_valid_config(
         self,
@@ -61,17 +62,18 @@ class TestGetById:
 class TestGetConfigurationsForProduct:
     @fixture(scope="class", autouse=True)
     def log_info(self):
-        logger.info("\n" * 2 + "=" * 50)
-        logger.info("Testing ConfigurationRepository.get_by_id() method\n" + "=" * 50)
+        log_test_info("Testing ConfigurationRepository.get_by_id() method")
 
     def test_with_valid_product(
         self,
         configuration_repo: ConfigurationRepository,  # noqa
         valid_test_product: Product,  # noqa
     ):
-        configs = configuration_repo.get_configurations_for_product(
-            valid_test_product._id
-        )
+        product_id = valid_test_product._id
+        logger.debug(f"Product ID: {product_id}")
+        assert product_id is not None
+
+        configs = configuration_repo.get_configurations_for_product(product_id)
         assert len(configs) > 0
         for config in configs:
             assert config.soldered_ram == valid_test_product.soldered_ram
@@ -82,8 +84,7 @@ class TestGetConfigurationsForProduct:
         configuration_repo: ConfigurationRepository,  # noqa
         invalid_test_product: Product,  # noqa
     ):
-        configs = configuration_repo.get_configurations_for_product(
-            invalid_test_product._id
-        )
+        product_id = invalid_test_product._id
+        assert product_id is not None
+        configs = configuration_repo.get_configurations_for_product(product_id)
         assert len(configs) == 0
-

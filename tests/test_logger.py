@@ -1,10 +1,14 @@
-from loguru import logger
-
-from app.config import log_settings
+from app.config import Settings, log_settings
 
 from tests.fixtures.logging_fixtures import setup_logger
+from tests.helpers.logging_helpers import log_test_info
+
+
+settings = Settings()
 
 
 def test_logger():
-    logger.debug("Testing logger has been initialized")
-    log_settings()
+    log_test_info("Testing Logger has been set up", level=0)
+    if settings.debug:
+        log_settings()
+

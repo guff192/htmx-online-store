@@ -43,7 +43,7 @@ def valid_test_product(
     db: Session, # noqa
     valid_test_manufacturer: Manufacturer,
     basic_configs: list[ProductConfiguration],
-):
+) -> Product:
     product = Product(
         _id=request.param,
         name="test",
@@ -69,6 +69,44 @@ def valid_test_product(
     add_all_to_db(db, [product] + available_configs)
 
     return product
+
+
+@fixture(scope="function")
+def valid_test_products(
+    db: Session, # noqa
+    valid_test_manufacturer: Manufacturer,
+    basic_configs: list[ProductConfiguration],
+) -> list[Product]:
+    products = []
+
+    for _id in range(1, 4):
+        product = Product(
+            _id=_id,
+            name=f"Test product {_id}",
+            description="test" * _id,
+            price=100000 - 30000 * _id,
+            count= 2 * _id,
+            manufacturer=valid_test_manufacturer,
+            manufacturer_id=valid_test_manufacturer.id,
+            resolution="1920x1080",
+            resolution_name="FullHD",
+            cpu="i7-1185G7",
+            gpu="test",
+            touch_screen=True,
+            cpu_speed="test",
+            cpu_graphics="test",
+            soldered_ram=0,
+            can_add_ram=True,
+        )
+        products.append(product)
+    add_all_to_db(db, products)
+
+    for product in products:
+        available_configs = create_available_configs_for_product(db, product, basic_configs)
+
+    add_all_to_db(db, [product] + available_configs)
+
+    return products
 
 
 @fixture(scope="function", params=[x + 1 for x in range(3)])

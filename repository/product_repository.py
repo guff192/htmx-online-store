@@ -2,7 +2,7 @@ from typing import Generator
 from fastapi import Depends
 from loguru import logger
 from sqlalchemy import or_, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Query, Session
 
 from db.session import db_dependency, get_db
 from dto.product_dto import ProductDTO
@@ -24,6 +24,11 @@ class ProductRepository:
         self.db = db
         self._configuration_repository = configuration_repository
 
+    def _add_query_filter(self, stmt: Query[Product], query: str) -> Query[Product]:
+        return stmt.where(or_(
+            Product.name.ilike(f'%{query.replace(" ", "%")}%'),
+            Product.description.ilike(f'%{query.replace(" ", "%")}%')
+        ))
 
     def get_all(
         self, query: str | None = None, offset: int = 0,

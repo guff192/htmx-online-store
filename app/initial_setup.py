@@ -102,7 +102,8 @@ def reload_tailwindcss():
     """Reload the TailwindCSS CSS file."""
     try:
         subprocess.run([
-            'tailwindcss',
+            'npx',
+            '@tailwindcss/cli',
             '-i',
             str(settings.static_dir / 'src' / 'tw.css'),
             '-o',

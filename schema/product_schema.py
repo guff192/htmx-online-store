@@ -73,6 +73,9 @@ class ProductBase(BaseModel):
     cpu: str | None = None
     gpu: str | None = None
     touch_screen: bool | None = None
+    resolution_name: str | None = None
+    cpu_speed: str | None = None
+    cpu_graphics: str | None = None
 
     def is_valid(self) -> bool:
         if not self.name or not self.price or not self.configurations:
@@ -83,7 +86,6 @@ class ProductBase(BaseModel):
 class ProductCreate(ProductBase):
     count: int
     manufacturer_name: str
-    resolution_name: str
 
     def is_valid(self) -> bool:
         return super().is_valid() and self.count > 0

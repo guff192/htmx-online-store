@@ -18,9 +18,10 @@ class ErrInvalidProduct(HTTPException):
 
 
 class ErrProductNotFound(HTTPException):
-    def __init__(self):
+    def __init__(self, product_id: int | None = None):
+        err_detail = f'Product {product_id} not found' if product_id else 'Product not found'
         super().__init__(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Product not found'
+            detail=err_detail
         )
 

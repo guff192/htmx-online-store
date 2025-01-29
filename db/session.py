@@ -31,5 +31,7 @@ def get_db():
 
 
 def init_db():
+    logger.info('Creating database tables if necessary')
     Base.metadata.create_all(engine, checkfirst=True)
+    logger.info('Created database tables')
 

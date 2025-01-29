@@ -45,9 +45,9 @@ class Product(Base):
     name = Column(String(255), index=True, nullable=False, unique=True)
 
     description = Column(String(1000))
-    price = Column(Integer)
+    price = Column(Integer, nullable=False)
 
-    count = Column(Integer, default=0)
+    count = Column(Integer, nullable=False, default=0)
     newcomer = Column(Boolean, default=False, nullable=False)
 
     manufacturer_id = Column(Integer, ForeignKey("manufacturers.id"))
@@ -60,6 +60,9 @@ class Product(Base):
     cpu = Column(String(12), nullable=False)
     gpu = Column(String(12), nullable=False)
     touch_screen = Column(Boolean, default=False, nullable=False)
+
+    cpu_speed = Column(String(12), nullable=True)
+    cpu_graphics = Column(String(32), nullable=True)
 
     users = relationship("UserProduct", back_populates="product")
 

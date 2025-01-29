@@ -186,7 +186,11 @@ class DeliveryService:
             raise e
 
         response = response.json()
-        order_uuid = response['entity']['uuid']
+        try:
+            order_uuid = response['entity']['uuid']
+        except KeyError as e:
+            logger.error(f'Failed to parse order uuid from response:\n{response}')
+            order_uuid = 'unknown'
 
         return order_uuid
 

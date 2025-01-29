@@ -98,7 +98,9 @@ def update_product_by_name(
     product_update: ProductUpdate,
     product_service: ProductService = Depends(product_service_dependency),
 ) -> ProductUpdateResponse:
+    logger.debug(f'Updating product (in route): {product_update}\n\n')
     updated_product_count = product_service.update_or_create_by_name(product_update)
+    logger.debug(f'Updated product count: {updated_product_count}')
     return updated_product_count
 
 

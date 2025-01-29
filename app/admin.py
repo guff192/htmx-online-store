@@ -12,7 +12,6 @@ from starlette.middleware.base import (
 from starlette.types import ASGIApp
 from wtforms.fields import TextAreaField
 
-from db.session import get_db
 from models.banner import Banner
 from models.order import Order
 from models.payment import Payment
@@ -225,7 +224,7 @@ class AdminMiddleware(BaseHTTPMiddleware):
 # ---------------------------------------------------------
 # Admin app function
 # ---------------------------------------------------------
-def get_admin_app(session: Session = get_db()) -> ASGIApp:
+def get_admin_app(session: Session) -> ASGIApp:
     flask_app = Flask(__name__)
     flask_app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
     flask_app.config['SECRET_KEY'] = 'secret_key'

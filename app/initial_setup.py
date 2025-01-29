@@ -2,6 +2,7 @@ import subprocess
 from fastapi import HTTPException
 from loguru import logger
 import requests
+from requests.exceptions import JSONDecodeError
 from sqlalchemy.orm import Session
 from repository.configuration_repository import ConfigurationRepository
 
@@ -21,7 +22,12 @@ def fetch_products(db: Session):
     # Fetch data from Google Spreadsheet via REST API
     logger.info("Fetching data from Google Spreadsheet...")
     response = requests.get(settings.posting_endpoint)
-    data = response.json()
+    try:
+        data = response.json()
+    except JSONDecodeError as e:
+        logger.error(f"Failed to decode JSON response from Google Spreadsheets: {e}")
+        logger.error(f"Unparsed response: {e.response}")
+        return
 
     # Initialize the service and repository
     product_repository = ProductRepository(db, ConfigurationRepository(db))
@@ -49,6 +55,8 @@ def fetch_products(db: Session):
         cpu = product_data.get("cpu", "")
         gpu = product_data.get("gpu", "")
         touch_screen = product_data.get("touch_screen", False)
+        cpu_speed = product_data.get("cpu_speed", "")
+        cpu_graphics = product_data.get("cpu_graphics", "")
         if not name or not price or price == '#N/A' or \
                 soldered_ram is None or can_add_ram is None or \
                 not cpu or gpu is None or touch_screen is None:
@@ -77,7 +85,9 @@ def fetch_products(db: Session):
             resolution_name=resolution_name,
             cpu=cpu,
             gpu=gpu,
-            touch_screen=touch_screen
+            touch_screen=touch_screen,
+            cpu_speed=cpu_speed,
+            cpu_graphics=cpu_graphics
         )
 
         try:

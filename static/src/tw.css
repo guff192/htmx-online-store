@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@theme {
+    --color-darkBlue: #1e1e31;
+    --color-darkPink: #ff6af2;
+    --color-lightBlue: #4082f5;
+}
+
 body {
   font-family: "RisingSunRegular", sans-serif;
 }

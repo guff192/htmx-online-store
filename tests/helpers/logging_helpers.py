@@ -24,19 +24,21 @@ def log_product_short(product: Product | ProductDTO):
 
 
 def log_test_info(info: str, level: int = 3):
-    str_lengths = {0: 100, 1: 80, 2: 65, 3: 50}
+    str_lengths = {0: 115, 1: 100, 2: 85, 3: 70}
     eq_str = "=" * str_lengths[level]
-    if level == 0:
-        info_str = f"{info : ^100}"
-    elif level == 1:
-        info_str = f"{info : ^80}"
-    elif level == 2:
-        info_str = f"{info : ^65}"
-    else:
-        info_str = f"{info : ^50}"
 
+    if level == 0:
+        info_str = f"{info : ^115}"
+    elif level == 1:
+        info_str = f"{info : ^100}"
+    elif level == 2:
+        info_str = f"{info : ^85}"
+    else:
+        info_str = f"{info : ^70}"
+
+    top_margin = 2 if level != 0 else 5
     logger.info(
-        "\n" * 2
+        "\n" * top_margin
         + eq_str
         + "\n"
         + info_str

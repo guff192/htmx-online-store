@@ -1,5 +1,6 @@
 from loguru import logger
 from pytest import fixture
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from dto.product_dto import ProductDTO
@@ -12,7 +13,8 @@ from tests.fixtures.logging_fixtures import setup_logger
 from tests.fixtures.model_fixtures import (
     basic_configs,
     valid_test_product,
-    valid_test_products,
+    valid_test_products_without_soldered_ram,
+    valid_test_products_with_soldered_ram,
     invalid_test_product,
     valid_test_manufacturer,
     valid_test_config,
@@ -39,26 +41,371 @@ def test_cleanup(db: Session):  # noqa
 
 
 # Tests
-def test_pre_cleanup():
-    log_test_info("Testing Product Repository", level=2)
+def test_filtering_log_info():
+    log_test_info("Testing ProductRepository filtering methods", level=2)
 
 
-class TestFiltering:
+class TestQueryFiltering:
     @fixture(scope="class", autouse=True)
     def log_info(self):
-        log_test_info("Testing ProductRepository filtering methods")
+        log_test_info("Testing ProductRepository._add_query_filter() method")
         yield
 
-    def test_query_with_valid_product(
-        self, db: Session, product_repo: ProductRepository, valid_test_products: list[Product]  # noqa
+    def test_query_with_valid_products(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
     ):
-        logger.info("Testing query filter")
-        stmt = db.query(Product)
+        logger.info("Testing query filter with valid product")
+        stmt = select(Product)
 
-        updated_stmt = product_repo._add_query_filter(stmt, valid_test_products[0].name)
-        all_products = updated_stmt.all()
+        updated_stmt = product_repo._add_query_filter(
+            stmt, valid_test_products_without_soldered_ram[0].name
+        )
+        all_products = db.execute(stmt).scalars().all()
+
+        assert len(all_products) == 4
+        assert all(p in all_products for p in valid_test_products_without_soldered_ram)
+        assert all_products[0] is valid_test_products_without_soldered_ram[0]
+
+
+class TestPriceFiltering:
+    @fixture(scope="class", autouse=True)
+    def log_info(self):
+        log_test_info("Testing ProductRepository._add_price_filter() method")
+        yield
+
+    def test_price_filter_narrow(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+    ):  # noqa
+        logger.info("Testing narrow price filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_price_filter(stmt, 10_000, 15_000)
+        all_products = db.execute(updated_stmt).scalars().all()
         assert len(all_products) == 1
-        assert all_products[0] is valid_test_products[0]
+        assert all_products[0] in valid_test_products_without_soldered_ram
+
+    def test_price_filter_wide(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+    ):  # noqa
+        logger.info("Testing wide price filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_price_filter(stmt, 5_000, 150_000)
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == len(valid_test_products_without_soldered_ram)
+
+        all_products_ids = [id(p) for p in all_products]
+        valid_test_products_ids = [
+            id(p) for p in valid_test_products_without_soldered_ram
+        ]
+        assert all(obj_id in all_products_ids for obj_id in valid_test_products_ids)
+
+    def test_price_filter_invalid(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+    ):  # noqa
+        logger.info("Testing invalid price filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_price_filter(stmt, 50_000, 5_000)
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == 0
+
+
+class TestRamFiltering:
+    @fixture(scope="class", autouse=True)
+    def log_info(self):
+        log_test_info("Testing ProductRepository._add_ram_filter() method")
+        yield
+
+    def test_ram_filter_narrow(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+    ):
+        logger.info("Testing narrow ram filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_ram_filter(stmt, [16])
+        all_products = db.execute(updated_stmt).scalars().all()
+        assert len(all_products) == 4
+
+    def test_ram_filter_wide(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        basic_configs,
+    ):
+        logger.info("Testing wide ram filter")
+        stmt = select(Product)
+
+        possible_ram_amounts = set(int(c.ram_amount) for c in basic_configs)
+        updated_stmt = product_repo._add_ram_filter(stmt, list(possible_ram_amounts))
+
+        all_products = db.execute(updated_stmt).scalars().all()
+        assert len(all_products) == 4
+
+    def test_ram_filter_narrow_with_soldered_ram(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_with_soldered_ram: list[Product],  # noqa
+    ):
+        logger.info("Testing narrow ram filter with soldered ram")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_ram_filter(stmt, [16])
+        all_products = db.execute(updated_stmt).scalars().all()
+        assert len(all_products) == 2
+
+    def test_ram_filter_wide_with_soldered_ram(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_with_soldered_ram: list[Product],  # noqa
+    ):
+        logger.info("Testing wide ram filter with soldered ram")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_ram_filter(stmt, [8, 24])
+        all_products = db.execute(updated_stmt).scalars().all()
+        assert len(all_products) == 4
+
+
+class TestSsdFiltering:
+    @fixture(scope="class", autouse=True)
+    def log_info(self):
+        log_test_info("Testing ProductRepository._add_ssd_filter() method")
+        yield
+
+    def test_ssd_filter_narrow(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+    ):
+        logger.info("Testing narrow ssd filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_ssd_filter(stmt, [512])
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == 4
+
+    def test_ssd_filter_wide(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        basic_configs,
+    ):
+        logger.info("Testing wide ssd filter")
+        stmt = select(Product)
+
+        possible_ssd_amounts = set(int(c.ssd_amount) for c in basic_configs)
+        updated_stmt = product_repo._add_ssd_filter(stmt, list(possible_ssd_amounts))
+
+        all_products = db.execute(updated_stmt).scalars().all()
+        for p in all_products:
+            log_product_short(p)
+        assert len(all_products) == 4
+
+
+class TestCpuFiltering:
+    @fixture(scope="class", autouse=True)
+    def log_info(self):
+        log_test_info("Testing ProductRepository._add_cpu_filter() method")
+        yield
+    
+    def test_cpu_filter_wide(
+        self,
+        db: Session,
+        product_repo: ProductRepository,
+        valid_test_products_without_soldered_ram: list[Product],
+        valid_test_products_with_soldered_ram: list[Product],
+    ):
+        logger.info("Testing wide cpu filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_cpu_filter(stmt, ["i7", "i5"])
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == 8
+
+    def test_cpu_filter_narrow(
+        self,
+        db: Session,
+        product_repo: ProductRepository,
+        valid_test_products_without_soldered_ram: list[Product],
+        valid_test_products_with_soldered_ram: list[Product],
+    ):
+        logger.info("Testing narrow cpu filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_cpu_filter(stmt, ["i7"])
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == 4
+
+
+class TestResolutionFiltering:
+    @fixture(scope="class", autouse=True)
+    def log_info(self):
+        log_test_info("Testing ProductRepository._add_resolution_filter() method")
+        yield
+
+    def test_resolution_filter_narrow(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_with_soldered_ram: list[Product],  # noqa
+    ):
+        logger.info("Testing narrow resolution filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_resolution_filter(stmt, ["FullHD"])
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == 4
+
+    def test_resolution_filter_wide(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_with_soldered_ram: list[Product],  # noqa
+    ):
+        logger.info("Testing wide resolution filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_resolution_filter(stmt, ["FullHD", "HD"])
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == 8
+
+
+class TestTouchscreenFiltering:
+    @fixture(scope="class", autouse=True)
+    def log_info(self):
+        log_test_info("Testing ProductRepository._add_touchscreen_filter() method")
+        yield
+
+    def test_touchscreen_filter_true(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_with_soldered_ram: list[Product],  # noqa
+    ):
+        logger.info("Testing true touchscreen filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_touchscreen_filter(stmt, [True])
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == 4
+
+    def test_touchscreen_filter_false(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_with_soldered_ram: list[Product],  # noqa
+    ):
+        logger.info("Testing false touchscreen filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_touchscreen_filter(stmt, [False])
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == 4
+
+    def test_touchscreen_filter_all(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_with_soldered_ram: list[Product],  # noqa
+    ):
+        logger.info("Testing all touchscreen filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_touchscreen_filter(stmt, [True, False])
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == 8
+
+
+class TestGraphicsFiltering:
+    @fixture(scope="class", autouse=True)
+    def log_info(self):
+        log_test_info("Testing ProductRepository._add_graphics_filter() method")
+        yield
+
+    def test_graphics_filter_true(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_with_soldered_ram: list[Product],  # noqa
+    ):
+        logger.info("Testing true graphics filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_graphics_filter(stmt, [True])
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == 4
+
+    def test_graphics_filter_false(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_with_soldered_ram: list[Product],  # noqa
+    ):
+        logger.info("Testing true graphics filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_graphics_filter(stmt, [False])
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == 4
+
+    def test_graphics_filter_all(
+        self,
+        db: Session,  # noqa
+        product_repo: ProductRepository,  # noqa
+        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_with_soldered_ram: list[Product],  # noqa
+    ):
+        logger.info("Testing true graphics filter")
+        stmt = select(Product)
+
+        updated_stmt = product_repo._add_graphics_filter(stmt, [True, False])
+        all_products = db.execute(updated_stmt).scalars().all()
+
+        assert len(all_products) == 8
+
+
+def test_main_methods_log_info():
+    log_test_info("Testing Product Repository main methods", level=2)
 
 
 class TestGetAll:
@@ -72,7 +419,7 @@ class TestGetAll:
         offset = 0
         products: list[ProductDTO] = []
         while products_page := product_repo.get_all(offset=offset):
-            products.extend(products_page)
+            products += products_page
             offset += 10
 
         return products
@@ -83,7 +430,9 @@ class TestGetAll:
         all_products: list[ProductDTO],  # noqa
     ):
         logger.info("Testing with valid product")
+
         assert len(all_products) > 0, "No products were found"
+        logger.debug(f'{valid_test_product._id = } {all_products[0].id = }')
         assert any(p.id == valid_test_product._id for p in all_products), (
             "Test product was not found"
         )

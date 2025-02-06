@@ -1,7 +1,7 @@
 from typing import Generator
 from fastapi import Depends
 from loguru import logger
-from sqlalchemy import or_, select
+from sqlalchemy import Select, inspect, or_, select
 from sqlalchemy.orm import Query, Session
 
 from db.session import db_dependency, get_db
@@ -24,11 +24,72 @@ class ProductRepository:
         self.db = db
         self._configuration_repository = configuration_repository
 
-    def _add_query_filter(self, stmt: Query[Product], query: str) -> Query[Product]:
+    def _add_query_filter(self, stmt: Select[tuple[Product]], query: str) -> Select[tuple[Product]]:
+        if not query:
+            return stmt
+        query_search_term = f'%{query.replace(" ", "%")}%'
         return stmt.where(or_(
-            Product.name.ilike(f'%{query.replace(" ", "%")}%'),
-            Product.description.ilike(f'%{query.replace(" ", "%")}%')
+            Product.name.ilike(query_search_term),
+            Product.description.ilike(query_search_term)
         ))
+
+    def _add_price_filter(self, stmt: Select[tuple[Product]], price_from: int, price_to: int) -> Select[tuple[Product]]:
+        return stmt.where(Product.price.between(price_from, price_to))
+
+    def _add_ram_filter(self, stmt: Select[tuple[Product]], ram: list[int]) -> Select[tuple[Product]]:
+        if len(ram) == 0:
+            return stmt
+        return (
+            stmt
+            .distinct()
+            .join(AvailableProductConfiguration)
+            .join(ProductConfiguration)
+            .where(ProductConfiguration.ram_amount.in_(ram))
+        )
+
+    def _add_ssd_filter(self, stmt: Select[tuple[Product]], ssd: list[int]) -> Select[tuple[Product]]:
+        if len(ssd) == 0:
+            return stmt
+        return (
+            stmt
+            .distinct()
+            .join(AvailableProductConfiguration)
+            .join(ProductConfiguration)
+            .where(ProductConfiguration.ssd_amount.in_(ssd))
+        )
+
+    def _add_cpu_filter(self, stmt: Select[tuple[Product]], cpu: list[str]) -> Select[tuple[Product]]:
+        if not cpu:
+            return stmt
+
+        conditions = []
+        for cpu_str in cpu:
+            search_term = f'%{cpu_str}%'
+            conditions.append(Product.cpu.ilike(search_term))
+
+        if len(conditions) > 1:
+            combined_condition = or_(*conditions)
+        else:
+            combined_condition = conditions[0]
+        return stmt.where(combined_condition)
+
+    def _add_resolution_filter(self, stmt: Select[tuple[Product]], resolution: list[str]) -> Select[tuple[Product]]:
+        if len(resolution) == 0:
+            return stmt
+        return stmt.where(Product.resolution_name.in_(resolution))
+
+    def _add_touchscreen_filter(self, stmt: Select[tuple[Product]], touchscreen: list[bool]) -> Select[tuple[Product]]:
+        if len(touchscreen) == 0:
+            return stmt
+        return stmt.where(Product.touch_screen.in_(touchscreen))
+
+    def _add_graphics_filter(self, stmt: Select[tuple[Product]], graphics: list[bool]) -> Select[tuple[Product]]:
+        if len(graphics) == 0 or True in graphics and False in graphics:
+            return stmt
+        elif True in graphics:
+            return stmt.where(Product.gpu != "")
+        else:
+            return stmt.where(Product.gpu == "") # noqa
 
     def get_all(
         self, query: str | None = None, offset: int = 0,
@@ -39,18 +100,35 @@ class ProductRepository:
     ) -> list[ProductDTO]:
         # deciding to or not to filter products with query, applying offset
         if query:
-            stmt = self.db.query(Product).where(or_(
-                Product.name.ilike(f'%{query.replace(" ", "%")}%'),
-                Product.description.ilike(f'%{query.replace(" ", "%")}%')
+            query_search_term = f'%{query.replace(" ", "%")}%'
+            stmt = select(Product).where(or_(
+                Product.name.ilike(query_search_term),
+                Product.description.ilike(query_search_term)
             )).slice(offset, offset + 10)
         else:
             stmt = self.db.query(Product).slice(offset, offset + 10)
 
+        result = self.db.execute(stmt)
+
         # getting products dicts
         orm_product_dicts = list(map(
-            lambda p: p.__dict__ if p else {},
-            stmt.all()
+            lambda obj: {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs},
+            result.scalars().all()
         ))
+
+        # for product_dict in orm_product_dicts:
+        #     product_id = product_dict.get('_id', 0)
+        #     del product_dict['_id']
+        #     product_dict['id'] = product_id
+        #     product_dict['configurations'] = self._configuration_repository.get_configurations_for_product(product_id)
+        #     product_dict['selected_configuration'] = None
+
+        #     product_dto = ProductDTO(**product_dict)
+        #     product_dto_str = '{\n'
+        #     for k, v in product_dto.model_dump().items():
+        #         product_dto_str += f'{k}: {v}\n'
+        #     product_dto_str += '}'
+        #     logger.debug(f'Product DTO:\n{product_dto_str}')
 
         # creating dto list, filtering products, parsing orm dicts
         dto_list: list[ProductDTO] = []

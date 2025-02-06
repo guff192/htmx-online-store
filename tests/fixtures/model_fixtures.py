@@ -6,11 +6,11 @@ from models.product import Product, ProductConfiguration
 
 from tests.fixtures.db_fixtures import db
 from tests.helpers.db_helpers import add_to_db, add_all_to_db
-from tests.helpers.configurations_helpers import create_available_configs_for_product
+from tests.helpers.configurations_helpers import create_available_configs_for_product, get_product_configs_for_ram
 
 
 @fixture(scope="function")
-def valid_test_manufacturer(db: Session): # noqa
+def valid_test_manufacturer(db: Session):  # noqa
     manufacturer = Manufacturer(id=1, name="test", logo_url="test")
     add_to_db(db, manufacturer)
 
@@ -18,7 +18,7 @@ def valid_test_manufacturer(db: Session): # noqa
 
 
 @fixture(scope="function")
-def basic_configs(db: Session) -> list[ProductConfiguration]: # noqa
+def basic_configs(db: Session) -> list[ProductConfiguration]:  # noqa
     return (
         db.query(ProductConfiguration)
         .filter(ProductConfiguration.is_default == True)  # noqa:E712
@@ -27,10 +27,15 @@ def basic_configs(db: Session) -> list[ProductConfiguration]: # noqa
 
 
 @fixture(scope="function")
-def valid_test_config(db: Session): # noqa
+def valid_test_config(db: Session):  # noqa
     config = ProductConfiguration(
-        id=-1, ram_amount=8, ssd_amount=256, additional_price=4000,
-        is_default=False, additional_ram=False, soldered_ram=8
+        id=-1,
+        ram_amount=8,
+        ssd_amount=256,
+        additional_price=4000,
+        is_default=False,
+        additional_ram=False,
+        soldered_ram=8,
     )
     add_to_db(db, config)
 
@@ -40,7 +45,7 @@ def valid_test_config(db: Session): # noqa
 @fixture(scope="function", params=[x + 1 for x in range(3)])
 def valid_test_product(
     request,
-    db: Session, # noqa
+    db: Session,  # noqa
     valid_test_manufacturer: Manufacturer,
     basic_configs: list[ProductConfiguration],
 ) -> Product:
@@ -71,21 +76,50 @@ def valid_test_product(
     return product
 
 
+@fixture(scope="function", params=[x + 1 for x in range(3)])
+def invalid_test_product(request, db: Session, valid_test_manufacturer: Manufacturer):  # noqa
+    product = Product(
+        _id=request.param,
+        name=f"test {request.param}",
+        description="test",
+        price=request.param * (-1**request.param),
+        count=(-1**request.param) * 100 * request.param,
+        manufacturer=valid_test_manufacturer,
+        manufacturer_id=valid_test_manufacturer.id,
+        resolution="1920x1080",
+        resolution_name="FullHD",
+        cpu="i7-1185G7",
+        gpu="test",
+        touch_screen=True,
+        cpu_speed="test",
+        cpu_graphics="test",
+        soldered_ram=2,
+        can_add_ram=False,
+    )
+    add_to_db(db, product)
+
+    product_configs = get_product_configs_for_ram(db, product.soldered_ram, product.can_add_ram)
+    available_configs = create_available_configs_for_product(db, product, product_configs)
+
+    add_all_to_db(db, [product] + available_configs)
+
+    return product
+
+
 @fixture(scope="function")
-def valid_test_products(
-    db: Session, # noqa
+def valid_test_products_without_soldered_ram(
+    db: Session,  # noqa
     valid_test_manufacturer: Manufacturer,
     basic_configs: list[ProductConfiguration],
 ) -> list[Product]:
     products = []
-
-    for _id in range(1, 4):
+    for _id in range(0, 4):
         product = Product(
             _id=_id,
             name=f"Test product {_id}",
             description="test" * _id,
-            price=100000 - 30000 * _id,
-            count= 2 * _id,
+            price=100_000 - 30_000 * _id,
+            count=2 * _id,
             manufacturer=valid_test_manufacturer,
             manufacturer_id=valid_test_manufacturer.id,
             resolution="1920x1080",
@@ -101,34 +135,55 @@ def valid_test_products(
         products.append(product)
     add_all_to_db(db, products)
 
+    available_configs = []
     for product in products:
-        available_configs = create_available_configs_for_product(db, product, basic_configs)
+        configs_for_product = create_available_configs_for_product(
+            db, product, basic_configs
+        )
+        available_configs += configs_for_product
 
-    add_all_to_db(db, [product] + available_configs)
+    add_all_to_db(db, products + available_configs)
 
     return products
 
 
-@fixture(scope="function", params=[x + 1 for x in range(3)])
-def invalid_test_product(request, db: Session, valid_test_manufacturer: Manufacturer): # noqa
-    product = Product(
-        _id=request.param,
-        name="test",
-        description="test",
-        price=request.param * -1**request.param,
-        count=-1**request.param * 100 * request.param,
-        manufacturer=valid_test_manufacturer,
-        manufacturer_id=valid_test_manufacturer.id,
-        resolution="1920x1080",
-        resolution_name="FullHD",
-        cpu="i7-1185G7",
-        gpu="test",
-        touch_screen=True,
-        cpu_speed="test",
-        cpu_graphics="test",
-        soldered_ram=2,
-        can_add_ram=True,
-    )
-    add_to_db(db, product)
+@fixture(scope="function")
+def valid_test_products_with_soldered_ram(
+    db: Session,  # noqa
+    valid_test_manufacturer: Manufacturer,
+) -> list[Product]:
+    products = []
+    for _id in range(0, 4):
+        product = Product(
+            _id=_id + 10,
+            name=f"Test product №{_id}",
+            description="test test" * _id,
+            price=100_000 - 30_000 * _id,
+            count=2 * _id,
+            manufacturer=valid_test_manufacturer,
+            manufacturer_id=valid_test_manufacturer.id,
+            resolution="1366x768",
+            resolution_name="HD",
+            cpu="i5-8350U",
+            gpu="",
+            touch_screen=False,
+            cpu_speed="test",
+            cpu_graphics="test",
+            soldered_ram=8,
+            can_add_ram=True if _id % 2 == 0 else False,
+        )
+        products.append(product)
+    add_all_to_db(db, products)
 
-    return product
+    available_configs = []
+    for product in products:
+        configs = get_product_configs_for_ram(db, product.soldered_ram, product.can_add_ram) 
+        configs_for_product = create_available_configs_for_product(
+            db, product, configs
+        )
+        available_configs += configs_for_product
+
+    add_all_to_db(db, products + available_configs)
+
+    return products
+

@@ -62,7 +62,7 @@ class TestGetById:
 class TestGetConfigurationsForProduct:
     @fixture(scope="class", autouse=True)
     def log_info(self):
-        log_test_info("Testing ConfigurationRepository.get_by_id() method")
+        log_test_info("Testing ConfigurationRepository.get_configurations_for_product() method")
 
     def test_with_valid_product(
         self,
@@ -70,7 +70,6 @@ class TestGetConfigurationsForProduct:
         valid_test_product: Product,  # noqa
     ):
         product_id = valid_test_product._id
-        logger.debug(f"Product ID: {product_id}")
         assert product_id is not None
 
         configs = configuration_repo.get_configurations_for_product(product_id)

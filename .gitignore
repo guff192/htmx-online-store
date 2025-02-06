@@ -25,3 +25,6 @@ static/css/main.css
 # Vim backup files
 *.swp
 *~
+
+# Node.js
+node_modules/

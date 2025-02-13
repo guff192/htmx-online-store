@@ -41,7 +41,9 @@ class ConfigurationRepository:
 
     def get_configurations_for_product(
         self,
-        product_id: int
+        product_id: int,
+        ram: list[int] = [],
+        ssd: list[int] = [],
     ) -> list[ConfigurationDTO]:
         result: list[ConfigurationDTO] = []
 
@@ -56,6 +58,8 @@ class ConfigurationRepository:
             join(AvailableProductConfiguration,
                  AvailableProductConfiguration.configuration_id == ProductConfiguration.id).
             filter(AvailableProductConfiguration.product_id == product_id).
+            filter(ProductConfiguration.ram_amount.in_(ram)).
+            filter(ProductConfiguration.ssd_amount.in_(ssd)).
             order_by(ProductConfiguration.additional_price)
         )
 

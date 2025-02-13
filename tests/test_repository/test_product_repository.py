@@ -432,7 +432,7 @@ class TestGetAll:
         logger.info("Testing with valid product")
 
         assert len(all_products) > 0, "No products were found"
-        logger.debug(f'{valid_test_product._id = } {all_products[0].id = }')
+        logger.debug(f"{valid_test_product._id = } {all_products[0].id = }")
         assert any(p.id == valid_test_product._id for p in all_products), (
             "Test product was not found"
         )

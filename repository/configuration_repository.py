@@ -57,11 +57,13 @@ class ConfigurationRepository:
                    ProductConfiguration.soldered_ram).
             join(AvailableProductConfiguration,
                  AvailableProductConfiguration.configuration_id == ProductConfiguration.id).
-            filter(AvailableProductConfiguration.product_id == product_id).
-            filter(ProductConfiguration.ram_amount.in_(ram)).
-            filter(ProductConfiguration.ssd_amount.in_(ssd)).
-            order_by(ProductConfiguration.additional_price)
+            filter(AvailableProductConfiguration.product_id == product_id)
         )
+        if ram:
+            stmt = stmt.filter(ProductConfiguration.ram_amount.in_(ram))
+        if ssd:
+            stmt = stmt.filter(ProductConfiguration.ssd_amount.in_(ssd))
+        stmt.order_by(ProductConfiguration.additional_price)
 
         for row in self.db.execute(stmt).all():
             id, ram_amount, ssd_amount, additional_price, is_default, additional_ram, soldered_ram = row

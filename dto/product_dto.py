@@ -20,3 +20,11 @@ class ProductDTO(BaseModel):
     gpu: str | None = None
     touch_screen: bool | None = None
 
+    def __str__(self) -> str:
+        self_str = '{\n'
+        for k, v in self.model_dump().items():
+            self_str += f'{k}: {v}\n'
+        self_str += '}'
+
+        return self_str
+

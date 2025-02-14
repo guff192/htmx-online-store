@@ -221,8 +221,6 @@ class TestSsdFiltering:
         updated_stmt = product_repo._add_ssd_filter(stmt, list(possible_ssd_amounts))
 
         all_products = db.execute(updated_stmt).scalars().all()
-        for p in all_products:
-            log_product_short(p)
         assert len(all_products) == 4
 
 
@@ -470,7 +468,6 @@ class TestGetAll:
         logger.info("Testing with valid product")
 
         assert len(all_products) > 0, "No products were found"
-        logger.debug(f"{valid_test_product.id = } {all_products[0].id = }")
         assert any(p.id == valid_test_product.id for p in all_products), (
             "Test product was not found"
         )
@@ -498,7 +495,6 @@ class TestGetAll:
 
         # check that at least one product was found
         assert len(all_products_with_filters) > 0, "No products were found"
-        logger.debug(f"{valid_test_products_without_soldered_ram[0].id = } {all_products_with_filters[0].id = }")
 
         # check that all products were found
         input_ids = [p.id for p in valid_test_products_without_soldered_ram]

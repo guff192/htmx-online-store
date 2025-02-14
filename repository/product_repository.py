@@ -115,7 +115,7 @@ class ProductRepository:
         stmt = self._add_graphics_filter(stmt, graphics)
         stmt = stmt.offset(offset)
         stmt = stmt.limit(10)
-        logger.debug(stmt.compile(compile_kwargs={"literal_binds": True}))
+        # logger.debug(stmt.compile(compile_kwargs={"literal_binds": True}))
 
         result = self.db.execute(stmt)
         model_products = result.scalars().all()

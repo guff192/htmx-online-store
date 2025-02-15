@@ -134,11 +134,12 @@ class ProductRepository:
                 .get_configurations_for_product(product_id, ram, ssd)
             )
             product_dict['selected_configuration'] = None
-            product_dto = ProductDTO(**product_dict)
+            base_product_dto = ProductDTO(**product_dict)
+            logger.debug(f'{product_dict = }')
 
-            for selected_configuration in product_dto.configurations:
-                if price_from <= product_dto.price + selected_configuration.additional_price <= price_to:
-                    dto_copy = product_dto.model_copy(update={
+            for selected_configuration in base_product_dto.configurations:
+                if price_from <= base_product_dto.price + selected_configuration.additional_price <= price_to:
+                    dto_copy = base_product_dto.model_copy(update={
                         'selected_configuration': selected_configuration
                     }, deep=True)
                     dto_list.append(dto_copy)

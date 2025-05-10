@@ -1,8 +1,8 @@
 from typing import Generator
 from fastapi import Depends
 from loguru import logger
-from sqlalchemy import Select, inspect, or_, select
-from sqlalchemy.orm import Query, Session
+from sqlalchemy import Select, or_, select
+from sqlalchemy.orm import Session
 
 from db.session import db_dependency, get_db
 from dto.product_dto import ProductDTO
@@ -24,7 +24,7 @@ class ProductRepository:
         self.db = db
         self._configuration_repository = configuration_repository
 
-    def _add_query_filter(self, stmt: Select[tuple[Product]], query: str) -> Select[tuple[Product]]:
+    def _add_query_filter(self, stmt: Select[tuple[Product]], query: str | None) -> Select[tuple[Product]]:
         if not query:
             return stmt
         query_search_term = f'%{query.replace(" ", "%")}%'
@@ -39,24 +39,30 @@ class ProductRepository:
     def _add_ram_filter(self, stmt: Select[tuple[Product]], ram: list[int]) -> Select[tuple[Product]]:
         if len(ram) == 0:
             return stmt
-        return (
-            stmt
-            .distinct()
-            .join(AvailableProductConfiguration)
-            .join(ProductConfiguration)
-            .where(ProductConfiguration.ram_amount.in_(ram))
-        )
+        compiled_initial_stmt = stmt.compile(compile_kwargs={"literal_binds": True}).string
+        if "product_configurations" not in compiled_initial_stmt:
+            stmt = (
+                stmt
+                .distinct()
+                .join(AvailableProductConfiguration)
+                .join(ProductConfiguration)
+            )
+
+        return stmt.where(ProductConfiguration.ram_amount.in_(ram))
 
     def _add_ssd_filter(self, stmt: Select[tuple[Product]], ssd: list[int]) -> Select[tuple[Product]]:
         if len(ssd) == 0:
             return stmt
-        return (
-            stmt
-            .distinct()
-            .join(AvailableProductConfiguration)
-            .join(ProductConfiguration)
-            .where(ProductConfiguration.ssd_amount.in_(ssd))
-        )
+        compiled_initial_stmt = stmt.compile(compile_kwargs={"literal_binds": True}).string
+        if "product_configurations" not in compiled_initial_stmt:
+            stmt = (
+                stmt
+                .distinct()
+                .join(AvailableProductConfiguration)
+                .join(ProductConfiguration)
+            )
+
+        return stmt.where(ProductConfiguration.ssd_amount.in_(ssd))
 
     def _add_cpu_filter(self, stmt: Select[tuple[Product]], cpu: list[str]) -> Select[tuple[Product]]:
         if not cpu:
@@ -98,145 +104,48 @@ class ProductRepository:
         resolution: list[str] = [], touchscreen: list[bool] = [],
         graphics: list[bool] = []
     ) -> list[ProductDTO]:
-        # deciding to or not to filter products with query, applying offset
-        if query:
-            query_search_term = f'%{query.replace(" ", "%")}%'
-            stmt = select(Product).where(or_(
-                Product.name.ilike(query_search_term),
-                Product.description.ilike(query_search_term)
-            )).slice(offset, offset + 10)
-        else:
-            stmt = self.db.query(Product).slice(offset, offset + 10)
+        stmt = select(Product)
+        stmt = self._add_query_filter(stmt, query)
+        stmt = self._add_price_filter(stmt, price_from, price_to)
+        stmt = self._add_ram_filter(stmt, ram)
+        stmt = self._add_ssd_filter(stmt, ssd)
+        stmt = self._add_cpu_filter(stmt, cpu)
+        stmt = self._add_resolution_filter(stmt, resolution)
+        stmt = self._add_touchscreen_filter(stmt, touchscreen)
+        stmt = self._add_graphics_filter(stmt, graphics)
+        stmt = stmt.offset(offset)
+        stmt = stmt.limit(10)
+        # logger.debug(stmt.compile(compile_kwargs={"literal_binds": True}))
 
         result = self.db.execute(stmt)
+        model_products = result.scalars().all()
 
-        # getting products dicts
-        orm_product_dicts = list(map(
-            lambda obj: {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs},
-            result.scalars().all()
-        ))
-
-        # for product_dict in orm_product_dicts:
-        #     product_id = product_dict.get('_id', 0)
-        #     del product_dict['_id']
-        #     product_dict['id'] = product_id
-        #     product_dict['configurations'] = self._configuration_repository.get_configurations_for_product(product_id)
-        #     product_dict['selected_configuration'] = None
-
-        #     product_dto = ProductDTO(**product_dict)
-        #     product_dto_str = '{\n'
-        #     for k, v in product_dto.model_dump().items():
-        #         product_dto_str += f'{k}: {v}\n'
-        #     product_dto_str += '}'
-        #     logger.debug(f'Product DTO:\n{product_dto_str}')
-
-        # creating dto list, filtering products, parsing orm dicts
+        # creating dto list
         dto_list: list[ProductDTO] = []
-        for product_dict in orm_product_dicts:
+        for product_model in model_products:
+            product_dict = product_model.__dict__
+
             product_id = product_dict.get('_id', 0)
-            product_name = product_dict.get('name', '')
+            del product_dict['_id']
+            product_dict['id'] = product_id
+            product_dict['configurations'] = (
+                self
+                ._configuration_repository
+                .get_configurations_for_product(product_id, ram, ssd)
+            )
+            product_dict['selected_configuration'] = None
+            base_product_dto = ProductDTO(**product_dict)
+            logger.debug(f'{product_dict = }')
 
-            configurations = self._configuration_repository.get_configurations_for_product(product_id)
+            for selected_configuration in base_product_dto.configurations:
+                if price_from <= base_product_dto.price + selected_configuration.additional_price <= price_to:
+                    dto_copy = base_product_dto.model_copy(update={
+                        'selected_configuration': selected_configuration
+                    }, deep=True)
+                    dto_list.append(dto_copy)
 
-            # filtering by price
-            product_price = product_dict.get('price', 0)
-            if product_price < price_from or product_price > price_to:
-                logger.debug(f'skipping product: {product_name} because of price filtering\n\n')
-                continue
-
-            # filtering by ram
-            ram_filtered_configurations = tuple(filter(
-                lambda c: c.ram_amount in ram, configurations,
-            ))
-            if len(ram) > 0 and len(ram_filtered_configurations) == 0:
-                logger.debug(f'skipping product: {product_name} because of ram filtering\n')
-                continue
-
-            # filtering by ssd
-            ssd_filtered_configurations = tuple(filter(
-                lambda c: c.ssd_amount in ssd, configurations
-            ))
-            if len(ssd) > 0 and len(ssd_filtered_configurations) == 0:
-                logger.debug(f'skipping product: {product_name} because of ssd filtering\n\n')
-                continue
-
-            # filtering by cpu
-            product_cpu = product_dict.get('cpu', '')
-            if len(cpu) > 0 and not any(c.lower() in product_cpu.lower() for c in cpu):
-                logger.debug(f'skipping product: {product_name} because of cpu filtering\n\n')
-                continue
-            
-            product_resolution = product_dict.get('resolution', '')
-            # filtering by resolution
-            product_resolution_name = product_dict.get('resolution_name', '')
-            if len(resolution) > 0 and product_resolution_name not in resolution:
-                logger.debug(f'skipping product: {product_name} because of resolution filtering\n\n')
-                continue
-
-            # filtering by touchscreen
-            product_touch_screen = product_dict.get('touch_screen', False)
-            if len(touchscreen) > 0 and product_touch_screen not in touchscreen:
-                logger.debug(f'skipping product: {product_name} because of touchscreen filtering\n\n')
-                continue
-
-            # filtering by graphics
-            product_gpu = product_dict.get('gpu', '')
-            if len(graphics) == 1:
-                if True in graphics and not product_gpu:
-                    logger.debug(f'skipping product: {product_name} because of graphics filtering\n\n')
-                    continue
-                if False in graphics and product_gpu:
-                    logger.debug(f'skipping product: {product_name} because of graphics filtering\n\n')
-                    continue
-
-            product_soldered_ram = product_dict.get('soldered_ram', 0)
-            product_can_add_ram = product_dict.get('can_add_ram', True)
-            
-            manufacturer_id = product_dict.get('manufacturer_id', 0)
-            manufacturer_id = manufacturer_id if manufacturer_id else 0
-
-            filtered_configurations = tuple()
-            if ram_filtered_configurations:
-                if ssd_filtered_configurations:
-                    filtered_configurations = tuple(filter(
-                        lambda c: c in ssd_filtered_configurations,
-                        ram_filtered_configurations
-                    ))
-                else:
-                    filtered_configurations = ram_filtered_configurations
-            elif ssd_filtered_configurations:
-                filtered_configurations = ssd_filtered_configurations
-
-            if filtered_configurations:
-                for selected_configuration in filtered_configurations:
-                    if price_from <= product_price + selected_configuration.additional_price <= price_to:
-                        dto_list.append(
-                            ProductDTO(
-                               id=product_id, name=product_name,
-                               description=product_dict.get('description', ''),
-                               price=product_price, count=product_dict.get('count', 0),
-                               manufacturer_id=manufacturer_id,
-                               configurations=configurations, selected_configuration=selected_configuration,
-                               soldered_ram=product_soldered_ram, can_add_ram=product_can_add_ram,
-                               resolution=product_resolution, cpu=product_cpu, gpu=product_gpu,
-                               touch_screen=product_touch_screen
-                            )
-                        )
-            else:
-                dto_list.append(
-                    ProductDTO(
-                        id=product_id, name=product_name,
-                        description=product_dict.get('description', ''),
-                        price=product_price, count=product_dict.get('count', 0),
-                        manufacturer_id=manufacturer_id,
-                        configurations=configurations, selected_configuration=None,
-                        soldered_ram=product_soldered_ram, can_add_ram=product_can_add_ram,
-                        resolution=product_resolution, cpu=product_cpu, gpu=product_gpu,
-                        touch_screen=product_touch_screen
-                    )
-                )
-
-        if len(dto_list) == 0 and len(orm_product_dicts) > 0:
+        # adding empty product to indicate that there are no more products
+        if len(dto_list) == 0 and len(model_products) > 0:
             dto_list.append(ProductDTO(
                 id=-5, name='', description='', price=0, count=0,
                 manufacturer_id=0, configurations=[],

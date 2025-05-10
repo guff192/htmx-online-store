@@ -221,8 +221,6 @@ class TestSsdFiltering:
         updated_stmt = product_repo._add_ssd_filter(stmt, list(possible_ssd_amounts))
 
         all_products = db.execute(updated_stmt).scalars().all()
-        for p in all_products:
-            log_product_short(p)
         assert len(all_products) == 4
 
 
@@ -409,6 +407,7 @@ def test_main_methods_log_info():
 
 
 class TestGetAll:
+    # Fixtures
     @fixture(scope="class", autouse=True)
     def log_info(self):
         log_test_info("Testing ProductRepository.get_all() method")
@@ -424,6 +423,43 @@ class TestGetAll:
 
         return products
 
+    @fixture(scope="function")
+    def all_products_with_filters(self, product_repo: ProductRepository):
+        offset = 0
+        products: list[ProductDTO] = []
+        
+        products_page = product_repo.get_all(
+            query="test",
+            offset=offset,
+            price_from=0,
+            price_to=150_000,
+            ram=[8],
+            ssd=[256],
+            cpu=["i7"],
+            resolution=["FullHD"],
+            touchscreen=[True, False],
+            graphics=[True, False]
+        )
+
+        while products_page:
+            products += products_page
+            offset += 10
+            products_page = product_repo.get_all(
+                query="test",
+                offset=offset,
+                price_from=0,
+                price_to=150_000,
+                ram=[8],
+                ssd=[256],
+                cpu=["i7"],
+                resolution=["FullHD"],
+                touchscreen=[True, False],
+                graphics=[True, False]
+            )
+
+        return products
+
+    # Tests
     def test_with_valid_product(
         self,
         valid_test_product: Product,  # noqa
@@ -432,8 +468,7 @@ class TestGetAll:
         logger.info("Testing with valid product")
 
         assert len(all_products) > 0, "No products were found"
-        logger.debug(f'{valid_test_product._id = } {all_products[0].id = }')
-        assert any(p.id == valid_test_product._id for p in all_products), (
+        assert any(p.id == valid_test_product.id for p in all_products), (
             "Test product was not found"
         )
 
@@ -450,6 +485,24 @@ class TestGetAll:
     def test_without_products(self, all_products: list[ProductDTO]):
         logger.info("Testing without products")
         assert len(all_products) == 0
+
+    def test_with_multiple_filters_and_valid_products(
+        self,
+        valid_test_products_without_soldered_ram: list[Product],
+        all_products_with_filters: list[ProductDTO],
+    ):
+        logger.info("Testing with multiple filters and valid products")
+
+        # check that at least one product was found
+        assert len(all_products_with_filters) > 0, "No products were found"
+
+        # check that all products were found
+        input_ids = [p.id for p in valid_test_products_without_soldered_ram]
+        result_ids = [p.id for p in all_products_with_filters]
+        assert all(
+            any(input_id == result_id for result_id in result_ids)
+            for input_id in input_ids
+        )
 
 
 class TestGetById:

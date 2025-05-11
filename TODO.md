@@ -9,8 +9,10 @@
 
 ## Smaller plans
 - [ ] Remove dumb DTO layer and replace it with real domain model
-    - [ ] Rename package with sqlalchemy models to db_models
-    - [ ] Add package for domain models (models)
+    - [X] Rename package containing sqlalchemy models to "db_models"
+    - [ ] Create domain models in package "models"
+    - [ ] Rewrite Repositories, Services and ViewModels to use domain models
+    - [ ] Get rid of this dumb "dto" layer
 
 - [ ] Move product configurations to MongoDB (for better customization)
     - [ ] Write tests for product repository to get full coverage

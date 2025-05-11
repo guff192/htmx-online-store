@@ -21,6 +21,8 @@ db.sqlite3
 # Auto-generated files
 __pycache__/
 static/css/main.css
+# coverage db
+.coverage
 
 # Vim backup files
 *.swp

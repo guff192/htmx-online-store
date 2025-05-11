@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 
 from db.session import db_dependency, get_db
 from dto.product_dto import ProductDTO
-from models.product import AvailableProductConfiguration, Product, ProductConfiguration
-from models.manufacturer import Manufacturer
-from models.user import UserProduct
+from db_models.product import AvailableProductConfiguration, Product, ProductConfiguration
+from db_models.manufacturer import Manufacturer
+from db_models.user import UserProduct
 from repository.configuration_repository import (
     ConfigurationRepository,
     configuration_repository_dependency, get_configuration_repository

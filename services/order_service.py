@@ -5,7 +5,7 @@ from typing import Generator
 from loguru import logger
 
 from exceptions.order_exceptions import ErrOrderNotFound, ErrUserOrdersNotFound
-from models.order import Order, OrderProduct
+from db_models.order import Order, OrderProduct
 from repository.cart_repository import CartRepository, cart_repository_dependency
 from repository.configuration_repository import (
     ConfigurationRepository, configuration_repository_dependency

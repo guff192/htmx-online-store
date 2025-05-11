@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from app.config import Settings
 
 from exceptions.auth_exceptions import ErrUserInvalid, ErrWrongCredentials
-from models.user import User
+from db_models.user import User
 from repository.user_repository import (
     UserRepository,
     get_user_repository,

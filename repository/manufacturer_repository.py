@@ -1,7 +1,7 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from db.session import db_dependency
-from models.manufacturer import Manufacturer
+from db_models.manufacturer import Manufacturer
 
 
 class ManufacturerRepository:

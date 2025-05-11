@@ -5,7 +5,7 @@ from sqlalchemy.orm import Query, Session
 
 from db.session import db_dependency
 from exceptions.payment_exceptions import ErrPaymentNotFound
-from models.payment import Payment
+from db_models.payment import Payment
 
 
 class PaymentRepository:

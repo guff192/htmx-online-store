@@ -10,8 +10,8 @@ from exceptions.product_exceptions import (
     ErrProductNotFound,
 )
 from exceptions.product_prices_exceptions import ErrPriceNotFound
-from models.product import Product, ProductConfiguration
-from models.manufacturer import Manufacturer
+from db_models.product import Product, ProductConfiguration
+from db_models.manufacturer import Manufacturer
 from repository.configuration_repository import ConfigurationRepository, configuration_repository_dependency
 from repository.manufacturer_repository import ManufacturerRepository, manufacturer_repository_dependency
 from repository.product_repository import (

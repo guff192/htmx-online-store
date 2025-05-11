@@ -5,7 +5,7 @@ from fastapi import Depends
 from loguru import logger
 from exceptions.auth_exceptions import ErrUserNotFound
 from exceptions.product_exceptions import ErrProductNotFound
-from models.user import User, UserProduct
+from db_models.user import User, UserProduct
 from schema.manufacturer_schema import Manufacturer
 from schema.user_schema import UserResponse
 from services.user_service import UserService, user_service_dependency

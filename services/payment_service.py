@@ -5,7 +5,7 @@ from fastapi import Depends
 from loguru import logger
 
 from exceptions.payment_exceptions import ErrInvalidPaymentData, ErrPaymentNotFound
-from models.payment import Payment
+from db_models.payment import Payment
 from repository.payment_repository import PaymentRepository, payment_repository_dependency
 from schema.order_schema import (
     PaymentSchema, PaymentStatus, OrderWithPaymentSchema, TinkoffWebhookRequest

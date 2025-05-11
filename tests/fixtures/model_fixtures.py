@@ -1,8 +1,8 @@
 from pytest import fixture
 from sqlalchemy.orm import Session
 
-from models.manufacturer import Manufacturer
-from models.product import Product, ProductConfiguration
+from db_models.manufacturer import Manufacturer
+from db_models.product import Product, ProductConfiguration
 
 from tests.fixtures.db_fixtures import db
 from tests.helpers.db_helpers import add_to_db, add_all_to_db

@@ -2,7 +2,7 @@ from typing import Generator
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from db.session import db_dependency
-from models.banner import Banner
+from db_models.banner import Banner
 
 
 class BannerRepository:

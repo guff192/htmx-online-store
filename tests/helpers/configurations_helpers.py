@@ -1,7 +1,7 @@
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from models.product import Product, ProductConfiguration, AvailableProductConfiguration
+from db_models.product import Product, ProductConfiguration, AvailableProductConfiguration
 from tests.helpers.db_helpers import add_all_to_db
 
 

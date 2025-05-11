@@ -6,8 +6,8 @@ from exceptions.auth_exceptions import ErrAccessDenied
 from exceptions.order_exceptions import ErrOrderNotFound
 from fastapi import Depends
 from loguru import logger
-from models.order import Order, OrderProduct
-from models.user import UserProduct
+from db_models.order import Order, OrderProduct
+from db_models.user import UserProduct
 from schema.cart_schema import CookieCartProduct
 from sqlalchemy.orm import Query, Session
 

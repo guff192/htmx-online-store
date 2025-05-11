@@ -2,8 +2,8 @@ from loguru import logger
 from pytest import fixture
 from sqlalchemy.orm import Session
 
-from models.product import Product, ProductConfiguration, AvailableProductConfiguration
-from models.manufacturer import Manufacturer
+from db_models.product import Product, ProductConfiguration, AvailableProductConfiguration
+from db_models.manufacturer import Manufacturer
 from repository.configuration_repository import ConfigurationRepository
 
 from tests.test_repository import log_repository_test_info

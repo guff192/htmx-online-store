@@ -4,8 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from dto.product_dto import ProductDTO
-from models.product import Product, AvailableProductConfiguration
-from models.manufacturer import Manufacturer
+from db_models.product import Product, AvailableProductConfiguration
+from db_models.manufacturer import Manufacturer
 from repository.product_repository import ProductRepository
 
 from tests.fixtures.db_fixtures import db

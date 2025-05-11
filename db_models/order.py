@@ -2,7 +2,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy_utils import UUIDType
 from db.session import Base
-from models.payment import Payment
+from db_models.payment import Payment
 
 
 class Order(Base):

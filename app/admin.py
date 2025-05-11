@@ -12,12 +12,12 @@ from starlette.middleware.base import (
 from starlette.types import ASGIApp
 from wtforms.fields import TextAreaField
 
-from models.banner import Banner
-from models.order import Order
-from models.payment import Payment
-from models.product import AvailableProductConfiguration, Product, ProductConfiguration
-from models.manufacturer import Manufacturer
-from models.user import User, UserProduct
+from db_models.banner import Banner
+from db_models.order import Order
+from db_models.payment import Payment
+from db_models.product import AvailableProductConfiguration, Product, ProductConfiguration
+from db_models.manufacturer import Manufacturer
+from db_models.user import User, UserProduct
 from schema.user_schema import UserBase
 from services.auth_service import AuthService, get_auth_service
 from viewmodels.user_viewmodel import UserViewModel, get_user_viewmodel

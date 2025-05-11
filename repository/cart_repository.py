@@ -6,8 +6,8 @@ from sqlalchemy.orm import Query, Session
 
 from db.session import db_dependency
 from exceptions.product_exceptions import ErrProductNotFound
-from models.product import Product
-from models.user import UserProduct
+from db_models.product import Product
+from db_models.user import UserProduct
 from repository.configuration_repository import ConfigurationRepository
 from repository.product_repository import (
     ProductRepository,

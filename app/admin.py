@@ -12,7 +12,7 @@ from starlette.middleware.base import (
 from starlette.types import ASGIApp
 from wtforms.fields import TextAreaField
 
-from db_models.banner import Banner
+from db_models.banner import BannerDbModel
 from db_models.order import OrderDbModel
 from db_models.payment import PaymentDbModel
 from db_models.product import AvailableProductConfigurationDbModel, ProductDbModel, ProductConfigurationDbModel
@@ -234,7 +234,7 @@ def get_admin_app(session: Session) -> ASGIApp:
     flask_admin.add_view(ManufacturerModelView(ManufacturerDbModel, session))
     flask_admin.add_view(UserModelView(UserDbModel, session))
     flask_admin.add_view(UserProductModelView(UserProductDbModel, session))
-    flask_admin.add_view(BannerModelView(Banner, session))
+    flask_admin.add_view(BannerModelView(BannerDbModel, session))
     flask_admin.add_view(ProductConfigurationModelView(ProductConfigurationDbModel, session))
     flask_admin.add_view(AvailableProductConfigurationModelView(AvailableProductConfigurationDbModel, session))
     flask_admin.add_view(OrderModelView(OrderDbModel, session))

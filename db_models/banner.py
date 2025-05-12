@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String
 from db.session import Base
 
 
-class Banner(Base):
+class BannerDbModel(Base):
     __tablename__ = 'banners'
 
     _id = Column('id', Integer, primary_key=True, index=True, autoincrement=True)

@@ -11,7 +11,7 @@ from exceptions.product_exceptions import (
 )
 from exceptions.product_prices_exceptions import ErrPriceNotFound
 from db_models.product import ProductDbModel, ProductConfigurationDbModel
-from db_models.manufacturer import Manufacturer
+from db_models.manufacturer import ManufacturerDbModel
 from repository.configuration_repository import ConfigurationRepository, configuration_repository_dependency
 from repository.manufacturer_repository import ManufacturerRepository, manufacturer_repository_dependency
 from repository.product_repository import (
@@ -363,7 +363,7 @@ class ProductService:
             raise ErrInvalidProduct()
 
         # searching manufacturer
-        manufacturer: Manufacturer = self._manufacturer_repo.get_by_name(
+        manufacturer: ManufacturerDbModel = self._manufacturer_repo.get_by_name(
             product_update.manufacturer_name
         )
         if not manufacturer:

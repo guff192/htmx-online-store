@@ -1,7 +1,7 @@
 from pytest import fixture
 from sqlalchemy.orm import Session
 
-from db_models.manufacturer import Manufacturer
+from db_models.manufacturer import ManufacturerDbModel
 from db_models.product import ProductDbModel, ProductConfigurationDbModel
 
 from tests.fixtures.db_fixtures import db
@@ -11,7 +11,7 @@ from tests.helpers.configurations_helpers import create_available_configs_for_pr
 
 @fixture(scope="function")
 def valid_test_manufacturer(db: Session):  # noqa
-    manufacturer = Manufacturer(id=1, name="test", logo_url="test")
+    manufacturer = ManufacturerDbModel(id=1, name="test", logo_url="test")
     add_to_db(db, manufacturer)
 
     return manufacturer
@@ -46,7 +46,7 @@ def valid_test_config(db: Session):  # noqa
 def valid_test_product(
     request,
     db: Session,  # noqa
-    valid_test_manufacturer: Manufacturer,
+    valid_test_manufacturer: ManufacturerDbModel,
     basic_configs: list[ProductConfigurationDbModel],
 ) -> ProductDbModel:
     product = ProductDbModel(
@@ -77,7 +77,7 @@ def valid_test_product(
 
 
 @fixture(scope="function", params=[x + 1 for x in range(3)])
-def invalid_test_product(request, db: Session, valid_test_manufacturer: Manufacturer):  # noqa
+def invalid_test_product(request, db: Session, valid_test_manufacturer: ManufacturerDbModel):  # noqa
     product = ProductDbModel(
         _id=request.param,
         name=f"test {request.param}",
@@ -109,7 +109,7 @@ def invalid_test_product(request, db: Session, valid_test_manufacturer: Manufact
 @fixture(scope="function")
 def valid_test_products_without_soldered_ram(
     db: Session,  # noqa
-    valid_test_manufacturer: Manufacturer,
+    valid_test_manufacturer: ManufacturerDbModel,
     basic_configs: list[ProductConfigurationDbModel],
 ) -> list[ProductDbModel]:
     products = []
@@ -150,7 +150,7 @@ def valid_test_products_without_soldered_ram(
 @fixture(scope="function")
 def valid_test_products_with_soldered_ram(
     db: Session,  # noqa
-    valid_test_manufacturer: Manufacturer,
+    valid_test_manufacturer: ManufacturerDbModel,
 ) -> list[ProductDbModel]:
     products = []
     for _id in range(0, 4):

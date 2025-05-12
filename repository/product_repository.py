@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from db.session import db_dependency, get_db
 from dto.product_dto import ProductDTO
 from db_models.product import AvailableProductConfigurationDbModel, ProductDbModel, ProductConfigurationDbModel
-from db_models.manufacturer import Manufacturer
+from db_models.manufacturer import ManufacturerDbModel
 from db_models.user import UserProductDbModel
 from repository.configuration_repository import (
     ConfigurationRepository,
@@ -345,7 +345,7 @@ class ProductRepository:
                description: str,
                price: int,
                count: int = 0,
-               manufacturer: Manufacturer | None = None,
+               manufacturer: ManufacturerDbModel | None = None,
                configurations: list[ProductConfigurationDbModel] = [],
                soldered_ram: int = 0,
                can_add_ram: bool = True,
@@ -396,7 +396,7 @@ class ProductRepository:
                description: str,
                price: int,
                count: int,
-               manufacturer: Manufacturer,
+               manufacturer: ManufacturerDbModel,
                configurations: list[ProductConfigurationDbModel],
                soldered_ram: int = 0,
                can_add_ram: bool = True,

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from dto.product_dto import ProductDTO
 from db_models.product import ProductDbModel, AvailableProductConfigurationDbModel
-from db_models.manufacturer import Manufacturer
+from db_models.manufacturer import ManufacturerDbModel
 from repository.product_repository import ProductRepository
 
 from tests.fixtures.db_fixtures import db
@@ -31,7 +31,7 @@ def test_cleanup(db: Session):  # noqa
     try:
         db.query(AvailableProductConfigurationDbModel).delete()
         db.query(ProductDbModel).delete()
-        db.query(Manufacturer).delete()
+        db.query(ManufacturerDbModel).delete()
         db.commit()
     except Exception as e:
         db.rollback()

@@ -16,7 +16,7 @@ from db_models.banner import Banner
 from db_models.order import Order
 from db_models.payment import Payment
 from db_models.product import AvailableProductConfigurationDbModel, ProductDbModel, ProductConfigurationDbModel
-from db_models.manufacturer import Manufacturer
+from db_models.manufacturer import ManufacturerDbModel
 from db_models.user import UserDbModel, UserProductDbModel
 from schema.user_schema import UserBase
 from services.auth_service import AuthService, get_auth_service
@@ -231,7 +231,7 @@ def get_admin_app(session: Session) -> ASGIApp:
 
     flask_admin = Admin(flask_app, url='/')
     flask_admin.add_view(ProductModelView(ProductDbModel, session))
-    flask_admin.add_view(ManufacturerModelView(Manufacturer, session))
+    flask_admin.add_view(ManufacturerModelView(ManufacturerDbModel, session))
     flask_admin.add_view(UserModelView(UserDbModel, session))
     flask_admin.add_view(UserProductModelView(UserProductDbModel, session))
     flask_admin.add_view(BannerModelView(Banner, session))

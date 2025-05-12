@@ -3,7 +3,7 @@ from pytest import fixture
 from sqlalchemy.orm import Session
 
 from db_models.product import ProductDbModel, ProductConfigurationDbModel, AvailableProductConfigurationDbModel
-from db_models.manufacturer import Manufacturer
+from db_models.manufacturer import ManufacturerDbModel
 from repository.configuration_repository import ConfigurationRepository
 
 from tests.test_repository import log_repository_test_info
@@ -30,7 +30,7 @@ def test_cleanup(db: Session):  # noqa
         db.query(ProductConfigurationDbModel).filter(ProductConfigurationDbModel.id < 0).delete()
         db.query(AvailableProductConfigurationDbModel).delete()
         db.query(ProductDbModel).delete()
-        db.query(Manufacturer).delete()
+        db.query(ManufacturerDbModel).delete()
         db.commit()
     except Exception as e:
         db.rollback()

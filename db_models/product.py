@@ -51,7 +51,7 @@ class ProductDbModel(Base):
     newcomer = Column(Boolean, default=False, nullable=False)
 
     manufacturer_id = Column(Integer, ForeignKey("manufacturers.id"))
-    manufacturer = relationship("Manufacturer", back_populates="products")
+    manufacturer = relationship("ManufacturerDbModel", back_populates="products")
 
     soldered_ram = Column(Integer, default=0, nullable=False)
     can_add_ram = Column(Boolean, default=True, nullable=False)

@@ -4,7 +4,7 @@ from db.session import Base
 
 
 
-class Manufacturer(Base):
+class ManufacturerDbModel(Base):
     __tablename__ = "manufacturers"
 
     id = Column("id", Integer, primary_key=True,

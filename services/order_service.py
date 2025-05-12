@@ -5,7 +5,7 @@ from typing import Generator
 from loguru import logger
 
 from exceptions.order_exceptions import ErrOrderNotFound, ErrUserOrdersNotFound
-from db_models.order import Order, OrderProduct
+from db_models.order import OrderDbModel, OrderProduct
 from repository.cart_repository import CartRepository, cart_repository_dependency
 from repository.configuration_repository import (
     ConfigurationRepository, configuration_repository_dependency
@@ -41,7 +41,7 @@ class OrderService:
         self._user_service = user_service
         self._delivery_service = delivery_service
 
-    def _order_model_to_schema(self, order_model: Order) -> OrderSchema | OrderWithPaymentSchema:
+    def _order_model_to_schema(self, order_model: OrderDbModel) -> OrderSchema | OrderWithPaymentSchema:
         # getting data from model
         order_model_dict = order_model.__dict__
         order_id = order_model_dict.get('id', 0)

@@ -9,7 +9,7 @@ class Payment(Base):
 
     id = Column('id', Integer, primary_key=True, index=True, autoincrement=True)
 
-    order = relationship('Order', back_populates='payment')
+    order = relationship('OrderDbModel', back_populates='payment')
     order_id = mapped_column(Integer, ForeignKey('orders.id'), nullable=False)
 
     status = Column(String(31), index=True, nullable=False)

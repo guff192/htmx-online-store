@@ -6,7 +6,7 @@ from exceptions.auth_exceptions import ErrAccessDenied
 from exceptions.order_exceptions import ErrOrderNotFound
 from fastapi import Depends
 from loguru import logger
-from db_models.order import Order, OrderProduct
+from db_models.order import OrderDbModel, OrderProduct
 from db_models.user import UserProductDbModel
 from schema.cart_schema import CookieCartProduct
 from sqlalchemy.orm import Query, Session
@@ -26,8 +26,8 @@ class OrderRepository:
                             count=user_product.count,
                             selected_configuration_id=user_product.selected_configuration_id)
     
-    def _get_order_query(self, order_id: int) -> Query[Order]:
-        return self._session.query(Order).filter(Order.id == order_id)
+    def _get_order_query(self, order_id: int) -> Query[OrderDbModel]:
+        return self._session.query(OrderDbModel).filter(OrderDbModel.id == order_id)
 
     def _get_order_product_query(self, order_id: int,
                                  product_id: int) -> Query[OrderProduct]:
@@ -36,13 +36,13 @@ class OrderRepository:
             OrderProduct.product_id == product_id
         )
 
-    def get_by_id(self, order_id) -> Order | None:
+    def get_by_id(self, order_id) -> OrderDbModel | None:
         return self._get_order_query(order_id).first()
 
-    def list_user_orders(self, user_id: str) -> list[Order]:
-        return self._session.query(Order).filter(
-            Order.user_id == user_id
-        ).order_by(Order.date.desc()).all()
+    def list_user_orders(self, user_id: str) -> list[OrderDbModel]:
+        return self._session.query(OrderDbModel).filter(
+            OrderDbModel.user_id == user_id
+        ).order_by(OrderDbModel.date.desc()).all()
 
     def get_order_products(self, order_id) -> list[OrderProduct]:
         return self._session.query(OrderProduct).filter(
@@ -51,8 +51,8 @@ class OrderRepository:
 
     def create_with_user_products(self,
                user_id: str | None,
-               user_products: list[UserProductDbModel]) -> Order:
-        order = Order(user_id=user_id, comment='', date=datetime.now(timezone.utc),
+               user_products: list[UserProductDbModel]) -> OrderDbModel:
+        order = OrderDbModel(user_id=user_id, comment='', date=datetime.now(timezone.utc),
                       buyer_name='', buyer_phone='', delivery_address='')
         self._session.add(order)
         self._session.flush([order])
@@ -74,8 +74,8 @@ class OrderRepository:
     def create_with_cookie_products(
         self,
         products: list[CookieCartProduct]
-    ) -> Order:
-        order = Order(user_id=None, comment='', date=datetime.now(timezone.utc),
+    ) -> OrderDbModel:
+        order = OrderDbModel(user_id=None, comment='', date=datetime.now(timezone.utc),
                       buyer_name='', buyer_phone='', delivery_address='')
         self._session.add(order)
         self._session.flush([order])
@@ -105,7 +105,7 @@ class OrderRepository:
         delivery_address: str,
         buyer_phone: str,
         delivery_track_number: str
-    ) -> Order:
+    ) -> OrderDbModel:
         found_order_query = self._get_order_query(order_id)
 
         found_order = found_order_query.first()
@@ -120,20 +120,20 @@ class OrderRepository:
             raise ErrAccessDenied(f'order {order_id}')
 
         update_dict = {
-            Order.comment: comment,
-            Order.buyer_name: buyer_name,
-            Order.region_id: region_id,
-            Order.region_name: region_name,
-            Order.city_id: city_id,
-            Order.city_name: city_name,
-            Order.delivery_address: delivery_address,
-            Order.buyer_phone: buyer_phone,
+            OrderDbModel.comment: comment,
+            OrderDbModel.buyer_name: buyer_name,
+            OrderDbModel.region_id: region_id,
+            OrderDbModel.region_name: region_name,
+            OrderDbModel.city_id: city_id,
+            OrderDbModel.city_name: city_name,
+            OrderDbModel.delivery_address: delivery_address,
+            OrderDbModel.buyer_phone: buyer_phone,
         }
         if not found_order_user_id:
             logger.info('Setting new user id')
-            update_dict[Order.user_id] = user_id
+            update_dict[OrderDbModel.user_id] = user_id
         if delivery_track_number:
-            update_dict[Order.delivery_track_number] = delivery_track_number
+            update_dict[OrderDbModel.delivery_track_number] = delivery_track_number
 
         found_order_query.update(update_dict) # type: ignore
         self._session.commit()

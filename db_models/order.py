@@ -5,7 +5,7 @@ from db.session import Base
 from db_models.payment import Payment
 
 
-class Order(Base):
+class OrderDbModel(Base):
     __tablename__ = 'orders'
 
     id = Column('id', Integer, primary_key=True, index=True, autoincrement=True)
@@ -13,7 +13,7 @@ class Order(Base):
     user = relationship('UserDbModel', back_populates='orders')
     user_id = mapped_column(ForeignKey('users.id'), UUIDType())
 
-    products = relationship('OrderProduct', cascade='all, delete')
+    products = relationship('OrderProductDbModel', cascade='all, delete')
 
     date = Column(DateTime, nullable=False)
 
@@ -34,12 +34,12 @@ class Order(Base):
     payment = relationship(Payment, back_populates='order', uselist=False)
 
 
-class OrderProduct(Base):
+class OrderProductDbModel(Base):
     __tablename__ = 'order_products'
 
     id = Column('id', Integer, primary_key=True, index=True, autoincrement=True)
 
-    order = relationship('Order', back_populates='products')
+    order = relationship('OrderDbModel', back_populates='products')
     order_id = mapped_column(ForeignKey('orders.id'))
 
     product = relationship('ProductDbModel')

@@ -10,6 +10,7 @@
 ## Smaller plans
 - [ ] Remove dumb DTO layer and replace it with real domain model
     - [X] Rename package containing sqlalchemy models to "db_models"
+    - [ ] Rename db models to have appendix "DbModel"
     - [ ] Create domain models in package "models"
     - [ ] Rewrite Repositories, Services and ViewModels to use domain models
     - [ ] Get rid of this dumb "dto" layer

@@ -14,7 +14,7 @@ from wtforms.fields import TextAreaField
 
 from db_models.banner import Banner
 from db_models.order import OrderDbModel
-from db_models.payment import Payment
+from db_models.payment import PaymentDbModel
 from db_models.product import AvailableProductConfigurationDbModel, ProductDbModel, ProductConfigurationDbModel
 from db_models.manufacturer import ManufacturerDbModel
 from db_models.user import UserDbModel, UserProductDbModel
@@ -238,7 +238,7 @@ def get_admin_app(session: Session) -> ASGIApp:
     flask_admin.add_view(ProductConfigurationModelView(ProductConfigurationDbModel, session))
     flask_admin.add_view(AvailableProductConfigurationModelView(AvailableProductConfigurationDbModel, session))
     flask_admin.add_view(OrderModelView(OrderDbModel, session))
-    flask_admin.add_view(PaymentModelView(Payment, session))
+    flask_admin.add_view(PaymentModelView(PaymentDbModel, session))
 
     return WSGIMiddleware(flask_app)
 

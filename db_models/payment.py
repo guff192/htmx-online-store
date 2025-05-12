@@ -4,7 +4,7 @@ from sqlalchemy.orm import mapped_column, relationship
 from db.session import Base
 
 
-class Payment(Base):
+class PaymentDbModel(Base):
     __tablename__ = 'payments'
 
     id = Column('id', Integer, primary_key=True, index=True, autoincrement=True)

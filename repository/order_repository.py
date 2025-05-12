@@ -6,7 +6,7 @@ from exceptions.auth_exceptions import ErrAccessDenied
 from exceptions.order_exceptions import ErrOrderNotFound
 from fastapi import Depends
 from loguru import logger
-from db_models.order import OrderDbModel, OrderProduct
+from db_models.order import OrderDbModel, OrderProductDbModel
 from db_models.user import UserProductDbModel
 from schema.cart_schema import CookieCartProduct
 from sqlalchemy.orm import Query, Session
@@ -20,8 +20,8 @@ class OrderRepository:
         self,
         order_id,
         user_product: UserProductDbModel
-    ) -> OrderProduct:
-        return OrderProduct(order_id=order_id,
+    ) -> OrderProductDbModel:
+        return OrderProductDbModel(order_id=order_id,
                             product_id=user_product.product_id,
                             count=user_product.count,
                             selected_configuration_id=user_product.selected_configuration_id)
@@ -30,10 +30,10 @@ class OrderRepository:
         return self._session.query(OrderDbModel).filter(OrderDbModel.id == order_id)
 
     def _get_order_product_query(self, order_id: int,
-                                 product_id: int) -> Query[OrderProduct]:
-        return self._session.query(OrderProduct).filter(
-            OrderProduct.order_id == order_id,
-            OrderProduct.product_id == product_id
+                                 product_id: int) -> Query[OrderProductDbModel]:
+        return self._session.query(OrderProductDbModel).filter(
+            OrderProductDbModel.order_id == order_id,
+            OrderProductDbModel.product_id == product_id
         )
 
     def get_by_id(self, order_id) -> OrderDbModel | None:
@@ -44,9 +44,9 @@ class OrderRepository:
             OrderDbModel.user_id == user_id
         ).order_by(OrderDbModel.date.desc()).all()
 
-    def get_order_products(self, order_id) -> list[OrderProduct]:
-        return self._session.query(OrderProduct).filter(
-            OrderProduct.order_id == order_id
+    def get_order_products(self, order_id) -> list[OrderProductDbModel]:
+        return self._session.query(OrderProductDbModel).filter(
+            OrderProductDbModel.order_id == order_id
         ).all()
 
     def create_with_user_products(self,
@@ -57,7 +57,7 @@ class OrderRepository:
         self._session.add(order)
         self._session.flush([order])
 
-        order_products: list[OrderProduct] = []
+        order_products: list[OrderProductDbModel] = []
         for user_product in user_products:
             order_product = self._user_product_to_order_product(order.id,
                                                                  user_product)
@@ -80,9 +80,9 @@ class OrderRepository:
         self._session.add(order)
         self._session.flush([order])
 
-        order_products: list[OrderProduct] = []
+        order_products: list[OrderProductDbModel] = []
         for product in products:
-            order_product = OrderProduct(
+            order_product = OrderProductDbModel(
                 order_id=order.id,
                 product_id=product.product_id,
                 count=product.count,

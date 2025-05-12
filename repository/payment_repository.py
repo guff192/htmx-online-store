@@ -5,25 +5,25 @@ from sqlalchemy.orm import Query, Session
 
 from db.session import db_dependency
 from exceptions.payment_exceptions import ErrPaymentNotFound
-from db_models.payment import Payment
+from db_models.payment import PaymentDbModel
 
 
 class PaymentRepository:
     def __init__(self, session: Session) -> None:
         self._session = session
 
-    def _get_payment_by_id_query(self, id) -> Query[Payment]:
-        return self._session.query(Payment).filter(
-            Payment.id == id
+    def _get_payment_by_id_query(self, id) -> Query[PaymentDbModel]:
+        return self._session.query(PaymentDbModel).filter(
+            PaymentDbModel.id == id
         )
 
-    def _get_payment_by_orderid_query(self, order_id: int) -> Query[Payment]:
-        return self._session.query(Payment).filter(
-            Payment.order_id == order_id,
+    def _get_payment_by_orderid_query(self, order_id: int) -> Query[PaymentDbModel]:
+        return self._session.query(PaymentDbModel).filter(
+            PaymentDbModel.order_id == order_id,
         )
 
-    def create(self, order_id: int) -> Payment | None:
-        payment = Payment(
+    def create(self, order_id: int) -> PaymentDbModel | None:
+        payment = PaymentDbModel(
             order_id=order_id,
             status='pending',
         )
@@ -36,7 +36,7 @@ class PaymentRepository:
 
         return payment
 
-    def get_by_order_id(self, order_id: int) -> Payment | None:
+    def get_by_order_id(self, order_id: int) -> PaymentDbModel | None:
         return self._get_payment_by_orderid_query(order_id).first()
 
     def update_status_by_id(self, id: int, status: str) -> None:
@@ -45,7 +45,7 @@ class PaymentRepository:
         if found_payment is None:
             raise ErrPaymentNotFound()
 
-        payment_query.update({Payment.status: status})
+        payment_query.update({PaymentDbModel.status: status})
         self._session.commit()
         self._session.flush([found_payment])
 

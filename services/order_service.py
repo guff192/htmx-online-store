@@ -5,7 +5,7 @@ from typing import Generator
 from loguru import logger
 
 from exceptions.order_exceptions import ErrOrderNotFound, ErrUserOrdersNotFound
-from db_models.order import OrderDbModel, OrderProduct
+from db_models.order import OrderDbModel, OrderProductDbModel
 from repository.cart_repository import CartRepository, cart_repository_dependency
 from repository.configuration_repository import (
     ConfigurationRepository, configuration_repository_dependency
@@ -70,7 +70,7 @@ class OrderService:
         )
 
         # creating order products schema
-        order_products_model: list[OrderProduct] = self.get_order_products(order_model.id)
+        order_products_model: list[OrderProductDbModel] = self.get_order_products(order_model.id)
         order_products_schema: list[OrderProductSchema] = []
         sum = 0
         for order_product in order_products_model:
@@ -225,7 +225,7 @@ class OrderService:
 
         return user_orders_schema
 
-    def get_order_products(self, order_id) -> list[OrderProduct]:
+    def get_order_products(self, order_id) -> list[OrderProductDbModel]:
         return self._repo.get_order_products(order_id)
 
     def create_from_cart(self, user_id: str) -> OrderSchema:

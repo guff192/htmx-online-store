@@ -64,7 +64,7 @@ class ProductDbModel(Base):
     cpu_speed = Column(String(12), nullable=True)
     cpu_graphics = Column(String(32), nullable=True)
 
-    users = relationship("UserProduct", back_populates="product")
+    users = relationship("UserProductDbModel", back_populates="product")
 
     configurations = relationship(
         "AvailableProductConfigurationDbModel",

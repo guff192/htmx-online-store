@@ -6,7 +6,7 @@ from db.session import Base
 from db_models.order import Order
 
 
-class User(Base):
+class UserDbModel(Base):
     __tablename__ = 'users'
 
     id = Column('id', UUIDType(binary=False), primary_key=True, index=True)
@@ -21,17 +21,17 @@ class User(Base):
 
     is_admin = Column(Boolean, default=False, nullable=False)
 
-    products = relationship('UserProduct', back_populates='user')
+    products = relationship('UserProductDbModel', back_populates='user')
 
     orders = relationship(Order, back_populates='user')
 
 
-class UserProduct(Base):
+class UserProductDbModel(Base):
     __tablename__ = 'user_products'
 
     id = Column('id', Integer, primary_key=True, index=True)
 
-    user = relationship('User', back_populates='products')
+    user = relationship('UserDbModel', back_populates='products')
     user_id = mapped_column(ForeignKey('users.id'))
 
     product = relationship('ProductDbModel', back_populates='users')

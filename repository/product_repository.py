@@ -8,7 +8,7 @@ from db.session import db_dependency, get_db
 from dto.product_dto import ProductDTO
 from db_models.product import AvailableProductConfigurationDbModel, ProductDbModel, ProductConfigurationDbModel
 from db_models.manufacturer import Manufacturer
-from db_models.user import UserProduct
+from db_models.user import UserProductDbModel
 from repository.configuration_repository import (
     ConfigurationRepository,
     configuration_repository_dependency, get_configuration_repository
@@ -175,17 +175,17 @@ class ProductRepository:
                        ProductDbModel.soldered_ram, ProductDbModel.can_add_ram,
                        ProductDbModel.resolution, ProductDbModel.resolution_name, ProductDbModel.cpu,
                        ProductDbModel.gpu, ProductDbModel.touch_screen,
-                       UserProduct.count, UserProduct.selected_configuration_id).
-                join(UserProduct,  # joining for getting count from user_product
-                     ProductDbModel._id == UserProduct.product_id,
+                       UserProductDbModel.count, UserProductDbModel.selected_configuration_id).
+                join(UserProductDbModel,  # joining for getting count from user_product
+                     ProductDbModel._id == UserProductDbModel.product_id,
                      isouter=True).
                 where(or_(
                     ProductDbModel.name.ilike(f'%{query.replace(" ", "%")}%'),
                     ProductDbModel.description.ilike(f'%{query.replace(" ", "%")}%')
                 )).
                 where(  # filtering products in cart and products without user
-                    or_(UserProduct.user_id == user_id,
-                        UserProduct.user_id == None)).  # noqa: E711
+                    or_(UserProductDbModel.user_id == user_id,
+                        UserProductDbModel.user_id == None)).  # noqa: E711
                 where(ProductDbModel.count > 0).
                 order_by(ProductDbModel.name).
                 slice(offset, offset + 10)
@@ -197,13 +197,13 @@ class ProductRepository:
                        ProductDbModel.soldered_ram, ProductDbModel.can_add_ram,
                        ProductDbModel.resolution, ProductDbModel.resolution_name, ProductDbModel.cpu,
                        ProductDbModel.gpu, ProductDbModel.touch_screen,
-                       UserProduct.count, UserProduct.selected_configuration_id).
-                join(UserProduct,  # joining for getting count from user_product
-                     ProductDbModel._id == UserProduct.product_id,
+                       UserProductDbModel.count, UserProductDbModel.selected_configuration_id).
+                join(UserProductDbModel,  # joining for getting count from user_product
+                     ProductDbModel._id == UserProductDbModel.product_id,
                      isouter=True).
                 where(  # filtering products in cart and products without user
-                    or_(UserProduct.user_id == user_id,
-                        UserProduct.user_id == None)).  # noqa: E711
+                    or_(UserProductDbModel.user_id == user_id,
+                        UserProductDbModel.user_id == None)).  # noqa: E711
                 where(ProductDbModel.count > 0).
                 slice(offset, offset + 10)
             )

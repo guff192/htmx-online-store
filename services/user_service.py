@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from app.config import Settings
 
 from exceptions.auth_exceptions import ErrUserInvalid, ErrWrongCredentials
-from db_models.user import User
+from db_models.user import UserDbModel
 from repository.user_repository import (
     UserRepository,
     get_user_repository,
@@ -27,7 +27,7 @@ class UserService:
         self._shop_url = settings.shop_public_url.host
 
     def user_model_to_userresponse_schema(
-        self, user_model: User
+        self, user_model: UserDbModel
     ) -> UserResponse:
         user_model_dict = user_model.__dict__
         user_id = user_model_dict.get("id", 0)
@@ -43,10 +43,10 @@ class UserService:
             google_id=google_id, yandex_id=yandex_id,
         )
 
-    def _get_by_google_id(self, google_id: str) -> User | None:
+    def _get_by_google_id(self, google_id: str) -> UserDbModel | None:
         return self.repo.get_by_google_id(google_id)
 
-    def _get_by_yandex_id(self, yandex_id: int) -> User | None:
+    def _get_by_yandex_id(self, yandex_id: int) -> UserDbModel | None:
         return self.repo.get_by_yandex_id(yandex_id)
 
     def _parse_user_create_phone_schema(
@@ -120,7 +120,7 @@ class UserService:
             return None
         return self.user_model_to_userresponse_schema(user_model)
 
-    def get_by_id(self, user_id: str) -> User | None:
+    def get_by_id(self, user_id: str) -> UserDbModel | None:
         return self.repo.get_by_id(user_id)
 
     def get_or_create_by_phone(
@@ -148,9 +148,9 @@ class UserService:
             raise ErrWrongCredentials()
         user_schema.profile_img_url = user_schema.profile_img_url if user_schema.profile_img_url else ''
 
-        user: User | None = self._get_by_yandex_id(user_schema.yandex_id)
+        user: UserDbModel | None = self._get_by_yandex_id(user_schema.yandex_id)
         if not user:
-            user: User | None = self.repo.create(
+            user: UserDbModel | None = self.repo.create(
                 name=user_schema.name,
                 email=user_schema.email,
                 profile_img_url=user_schema.profile_img_url,
@@ -168,9 +168,9 @@ class UserService:
         if not user_schema or not user_schema.verify():
             raise ErrWrongCredentials()
 
-        user: User | None = self._get_by_google_id(user_schema.google_id)
+        user: UserDbModel | None = self._get_by_google_id(user_schema.google_id)
         if user is None:
-            user: User | None = self.repo.create(
+            user: UserDbModel | None = self.repo.create(
                 name=user_schema.name,
                 email=user_schema.email,
                 profile_img_url=user_schema.profile_img_url,

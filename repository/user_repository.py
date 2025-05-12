@@ -5,28 +5,28 @@ from sqlalchemy.orm import Session
 
 from db.session import db_dependency, get_db
 from exceptions.auth_exceptions import ErrUserNotFound
-from db_models.user import User
+from db_models.user import UserDbModel
 
 
 class UserRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_by_id(self, user_id: str) -> User | None:
+    def get_by_id(self, user_id: str) -> UserDbModel | None:
         user_uuid = UUID(user_id)
-        return self.db.query(User).get(user_uuid)
+        return self.db.query(UserDbModel).get(user_uuid)
 
-    def get_by_phone(self, phone: str) -> User | None:
-        return self.db.query(User).filter_by(phone=phone).first()
+    def get_by_phone(self, phone: str) -> UserDbModel | None:
+        return self.db.query(UserDbModel).filter_by(phone=phone).first()
 
-    def get_by_email(self, email: str) -> User | None:
-        return self.db.query(User).filter_by(email=email).first()
+    def get_by_email(self, email: str) -> UserDbModel | None:
+        return self.db.query(UserDbModel).filter_by(email=email).first()
 
-    def get_by_google_id(self, google_id: str) -> User | None:
-        return self.db.query(User).filter_by(google_id=google_id).first()
+    def get_by_google_id(self, google_id: str) -> UserDbModel | None:
+        return self.db.query(UserDbModel).filter_by(google_id=google_id).first()
 
-    def get_by_yandex_id(self, yandex_id: int) -> User | None:
-        return self.db.query(User).filter_by(yandex_id=yandex_id).first()
+    def get_by_yandex_id(self, yandex_id: int) -> UserDbModel | None:
+        return self.db.query(UserDbModel).filter_by(yandex_id=yandex_id).first()
 
     def create(self,
                name: str,
@@ -34,10 +34,10 @@ class UserRepository:
                profile_img_url: str = '',
                google_id: str | None = None,
                yandex_id: int | None = None,
-               phone: str | None = None) -> User:
+               phone: str | None = None) -> UserDbModel:
         # Create user using given data
         if google_id:
-            user = User(
+            user = UserDbModel(
                 id=uuid4(),
                 email=email,
                 name=name,
@@ -48,7 +48,7 @@ class UserRepository:
             self.db.commit()
             self.db.refresh(user)
         elif yandex_id:
-            user = User(
+            user = UserDbModel(
                 id=uuid4(),
                 email=email,
                 name=name,
@@ -59,7 +59,7 @@ class UserRepository:
             self.db.commit()
             self.db.refresh(user)
         elif phone:
-            user = User(
+            user = UserDbModel(
                 id=uuid4(),
                 email=email,
                 name=name,
@@ -69,7 +69,7 @@ class UserRepository:
             self.db.commit()
             self.db.refresh(user)
         else:
-            user = User(
+            user = UserDbModel(
                 id=uuid4(),
                 email=email,
                 name=name
@@ -80,8 +80,8 @@ class UserRepository:
 
         return user
 
-    def update(self, user_uuid: UUID, name: str, email: str) -> User:
-        user_query = self.db.query(User).filter(User.id == user_uuid)
+    def update(self, user_uuid: UUID, name: str, email: str) -> UserDbModel:
+        user_query = self.db.query(UserDbModel).filter(UserDbModel.id == user_uuid)
         found_user = user_query.first()
         if not found_user:
             raise ErrUserNotFound()
@@ -89,8 +89,8 @@ class UserRepository:
         logger.debug(found_user.__dict__)
 
         user_update_dict = {
-            User.name: name,
-            User.email: email,
+            UserDbModel.name: name,
+            UserDbModel.email: email,
         }
         user_query.update(user_update_dict)
 

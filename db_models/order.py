@@ -10,7 +10,7 @@ class Order(Base):
 
     id = Column('id', Integer, primary_key=True, index=True, autoincrement=True)
 
-    user = relationship('User', back_populates='orders')
+    user = relationship('UserDbModel', back_populates='orders')
     user_id = mapped_column(ForeignKey('users.id'), UUIDType())
 
     products = relationship('OrderProduct', cascade='all, delete')

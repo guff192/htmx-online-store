@@ -4,21 +4,21 @@ from sqlalchemy.orm import relationship
 from db.session import Base
 
 
-class AvailableProductConfiguration(Base):
+class AvailableProductConfigurationDbModel(Base):
     __tablename__ = "available_product_configurations"
 
     id = Column("id", Integer, primary_key=True,
                 index=True, autoincrement=True)
 
     product_id = Column(Integer, ForeignKey("products.id"))
-    product = relationship("Product", back_populates="configurations")
+    product = relationship("ProductDbModel", back_populates="configurations")
 
     configuration_id = Column(Integer, ForeignKey("product_configurations.id"))
     configuration = relationship(
-        "ProductConfiguration", back_populates="products")
+        "ProductConfigurationDbModel", back_populates="products")
 
 
-class ProductConfiguration(Base):
+class ProductConfigurationDbModel(Base):
     __tablename__ = "product_configurations"
 
     id = Column("id", Integer, primary_key=True,
@@ -33,11 +33,11 @@ class ProductConfiguration(Base):
     soldered_ram = Column(Integer, default=0, nullable=False)
 
     products = relationship(
-        "AvailableProductConfiguration", back_populates="configuration"
+        "AvailableProductConfigurationDbModel", back_populates="configuration"
     )
 
 
-class Product(Base):
+class ProductDbModel(Base):
     __tablename__ = "products"
 
     _id = Column("id", Integer, primary_key=True,
@@ -67,11 +67,11 @@ class Product(Base):
     users = relationship("UserProduct", back_populates="product")
 
     configurations = relationship(
-        "AvailableProductConfiguration",
+        "AvailableProductConfigurationDbModel",
         back_populates="product",
     )
 
     default_configuration_id = Column(
         Integer, ForeignKey("product_configurations.id"))
-    default_configuration = relationship("ProductConfiguration")
+    default_configuration = relationship("ProductConfigurationDbModel")
 

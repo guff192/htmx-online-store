@@ -42,11 +42,11 @@ class OrderProduct(Base):
     order = relationship('Order', back_populates='products')
     order_id = mapped_column(ForeignKey('orders.id'))
 
-    product = relationship('Product')
+    product = relationship('ProductDbModel')
     product_id = mapped_column(ForeignKey('products.id'))
 
     selected_configuration = relationship(
-        'ProductConfiguration'
+        'ProductConfigurationDbModel'
     )
     selected_configuration_id = mapped_column(
         ForeignKey('product_configurations.id'), nullable=False

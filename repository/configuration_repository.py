@@ -5,16 +5,16 @@ from sqlalchemy.orm import Session
 
 from db.session import db_dependency, get_db
 from dto.configuration_dto import ConfigurationDTO
-from db_models.product import AvailableProductConfiguration, ProductConfiguration
+from db_models.product import AvailableProductConfigurationDbModel, ProductConfigurationDbModel
 
 
 class ConfigurationRepository:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_by_id(self, id: int) -> ProductConfiguration:
-        return self.db.query(ProductConfiguration).filter(
-            ProductConfiguration.id == id
+    def get_by_id(self, id: int) -> ProductConfigurationDbModel:
+        return self.db.query(ProductConfigurationDbModel).filter(
+            ProductConfigurationDbModel.id == id
         ).first()
 
     def get_available_configurations(
@@ -23,20 +23,20 @@ class ConfigurationRepository:
         soldered_ram: int = 0,
         ram_amount: int | None = None,
         ssd_amount: int | None = None
-    ) -> list[ProductConfiguration]:
-        filters = [ProductConfiguration.additional_ram == additional_ram, 
-                   ProductConfiguration.soldered_ram == soldered_ram]
+    ) -> list[ProductConfigurationDbModel]:
+        filters = [ProductConfigurationDbModel.additional_ram == additional_ram, 
+                   ProductConfigurationDbModel.soldered_ram == soldered_ram]
 
         if ram_amount is not None:
-            filters.append(ProductConfiguration.ram_amount == ram_amount)
+            filters.append(ProductConfigurationDbModel.ram_amount == ram_amount)
         if ssd_amount is not None:
-            filters.append(ProductConfiguration.ssd_amount == ssd_amount)
+            filters.append(ProductConfigurationDbModel.ssd_amount == ssd_amount)
 
-        return self.db.query(ProductConfiguration).filter(*filters).all()
+        return self.db.query(ProductConfigurationDbModel).filter(*filters).all()
 
     def get_default_configurations(self):
-        return self.db.query(ProductConfiguration).filter(
-            ProductConfiguration.is_default == True  # noqa: E712
+        return self.db.query(ProductConfigurationDbModel).filter(
+            ProductConfigurationDbModel.is_default == True  # noqa: E712
         ).all()
 
     def get_configurations_for_product(
@@ -48,22 +48,22 @@ class ConfigurationRepository:
         result: list[ConfigurationDTO] = []
 
         stmt = (
-            select(ProductConfiguration.id,
-                   ProductConfiguration.ram_amount,
-                   ProductConfiguration.ssd_amount,
-                   ProductConfiguration.additional_price,
-                   ProductConfiguration.is_default,
-                   ProductConfiguration.additional_ram,
-                   ProductConfiguration.soldered_ram).
-            join(AvailableProductConfiguration,
-                 AvailableProductConfiguration.configuration_id == ProductConfiguration.id).
-            filter(AvailableProductConfiguration.product_id == product_id)
+            select(ProductConfigurationDbModel.id,
+                   ProductConfigurationDbModel.ram_amount,
+                   ProductConfigurationDbModel.ssd_amount,
+                   ProductConfigurationDbModel.additional_price,
+                   ProductConfigurationDbModel.is_default,
+                   ProductConfigurationDbModel.additional_ram,
+                   ProductConfigurationDbModel.soldered_ram).
+            join(AvailableProductConfigurationDbModel,
+                 AvailableProductConfigurationDbModel.configuration_id == ProductConfigurationDbModel.id).
+            filter(AvailableProductConfigurationDbModel.product_id == product_id)
         )
         if ram:
-            stmt = stmt.filter(ProductConfiguration.ram_amount.in_(ram))
+            stmt = stmt.filter(ProductConfigurationDbModel.ram_amount.in_(ram))
         if ssd:
-            stmt = stmt.filter(ProductConfiguration.ssd_amount.in_(ssd))
-        stmt.order_by(ProductConfiguration.additional_price)
+            stmt = stmt.filter(ProductConfigurationDbModel.ssd_amount.in_(ssd))
+        stmt.order_by(ProductConfigurationDbModel.additional_price)
 
         for row in self.db.execute(stmt).all():
             id, ram_amount, ssd_amount, additional_price, is_default, additional_ram, soldered_ram = row

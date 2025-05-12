@@ -2,10 +2,10 @@ from loguru import logger
 
 from app.config import Settings
 from dto.product_dto import ProductDTO
-from db_models.product import Product
+from db_models.product import ProductDbModel
 
 
-def log_product_short(product: Product | ProductDTO):
+def log_product_short(product: ProductDbModel | ProductDTO):
     if isinstance(product, ProductDTO):
         product_id = product.id
     elif hasattr(product, "_id"):

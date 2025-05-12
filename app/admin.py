@@ -15,7 +15,7 @@ from wtforms.fields import TextAreaField
 from db_models.banner import Banner
 from db_models.order import Order
 from db_models.payment import Payment
-from db_models.product import AvailableProductConfiguration, Product, ProductConfiguration
+from db_models.product import AvailableProductConfigurationDbModel, ProductDbModel, ProductConfigurationDbModel
 from db_models.manufacturer import Manufacturer
 from db_models.user import User, UserProduct
 from schema.user_schema import UserBase
@@ -230,13 +230,13 @@ def get_admin_app(session: Session) -> ASGIApp:
     flask_app.config['SECRET_KEY'] = 'secret_key'
 
     flask_admin = Admin(flask_app, url='/')
-    flask_admin.add_view(ProductModelView(Product, session))
+    flask_admin.add_view(ProductModelView(ProductDbModel, session))
     flask_admin.add_view(ManufacturerModelView(Manufacturer, session))
     flask_admin.add_view(UserModelView(User, session))
     flask_admin.add_view(UserProductModelView(UserProduct, session))
     flask_admin.add_view(BannerModelView(Banner, session))
-    flask_admin.add_view(ProductConfigurationModelView(ProductConfiguration, session))
-    flask_admin.add_view(AvailableProductConfigurationModelView(AvailableProductConfiguration, session))
+    flask_admin.add_view(ProductConfigurationModelView(ProductConfigurationDbModel, session))
+    flask_admin.add_view(AvailableProductConfigurationModelView(AvailableProductConfigurationDbModel, session))
     flask_admin.add_view(OrderModelView(Order, session))
     flask_admin.add_view(PaymentModelView(Payment, session))
 

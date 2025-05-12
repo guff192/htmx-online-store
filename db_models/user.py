@@ -34,11 +34,11 @@ class UserProduct(Base):
     user = relationship('User', back_populates='products')
     user_id = mapped_column(ForeignKey('users.id'))
 
-    product = relationship('Product', back_populates='users')
+    product = relationship('ProductDbModel', back_populates='users')
     product_id = mapped_column(ForeignKey('products.id'))
 
     selected_configuration = relationship(
-        'ProductConfiguration',
+        'ProductConfigurationDbModel',
     )
     selected_configuration_id = mapped_column(
         ForeignKey('product_configurations.id'), nullable=False

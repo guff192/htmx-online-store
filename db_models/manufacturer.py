@@ -12,6 +12,6 @@ class Manufacturer(Base):
     name = Column(String(255), nullable=False, unique=True)
     logo_url = Column(String(255), nullable=True)
 
-    products = relationship("Product", back_populates="manufacturer")
+    products = relationship("ProductDbModel", back_populates="manufacturer")
 
 

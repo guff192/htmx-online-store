@@ -2,7 +2,7 @@ from pytest import fixture
 from sqlalchemy.orm import Session
 
 from db_models.manufacturer import Manufacturer
-from db_models.product import Product, ProductConfiguration
+from db_models.product import ProductDbModel, ProductConfigurationDbModel
 
 from tests.fixtures.db_fixtures import db
 from tests.helpers.db_helpers import add_to_db, add_all_to_db
@@ -18,17 +18,17 @@ def valid_test_manufacturer(db: Session):  # noqa
 
 
 @fixture(scope="function")
-def basic_configs(db: Session) -> list[ProductConfiguration]:  # noqa
+def basic_configs(db: Session) -> list[ProductConfigurationDbModel]:  # noqa
     return (
-        db.query(ProductConfiguration)
-        .filter(ProductConfiguration.is_default == True)  # noqa:E712
+        db.query(ProductConfigurationDbModel)
+        .filter(ProductConfigurationDbModel.is_default == True)  # noqa:E712
         .all()
     )
 
 
 @fixture(scope="function")
 def valid_test_config(db: Session):  # noqa
-    config = ProductConfiguration(
+    config = ProductConfigurationDbModel(
         id=-1,
         ram_amount=8,
         ssd_amount=256,
@@ -47,9 +47,9 @@ def valid_test_product(
     request,
     db: Session,  # noqa
     valid_test_manufacturer: Manufacturer,
-    basic_configs: list[ProductConfiguration],
-) -> Product:
-    product = Product(
+    basic_configs: list[ProductConfigurationDbModel],
+) -> ProductDbModel:
+    product = ProductDbModel(
         _id=request.param,
         name="test",
         description="test" * request.param,
@@ -78,7 +78,7 @@ def valid_test_product(
 
 @fixture(scope="function", params=[x + 1 for x in range(3)])
 def invalid_test_product(request, db: Session, valid_test_manufacturer: Manufacturer):  # noqa
-    product = Product(
+    product = ProductDbModel(
         _id=request.param,
         name=f"test {request.param}",
         description="test",
@@ -110,11 +110,11 @@ def invalid_test_product(request, db: Session, valid_test_manufacturer: Manufact
 def valid_test_products_without_soldered_ram(
     db: Session,  # noqa
     valid_test_manufacturer: Manufacturer,
-    basic_configs: list[ProductConfiguration],
-) -> list[Product]:
+    basic_configs: list[ProductConfigurationDbModel],
+) -> list[ProductDbModel]:
     products = []
     for _id in range(0, 4):
-        product = Product(
+        product = ProductDbModel(
             _id=_id,
             name=f"Test product {_id}",
             description="test" * _id,
@@ -151,10 +151,10 @@ def valid_test_products_without_soldered_ram(
 def valid_test_products_with_soldered_ram(
     db: Session,  # noqa
     valid_test_manufacturer: Manufacturer,
-) -> list[Product]:
+) -> list[ProductDbModel]:
     products = []
     for _id in range(0, 4):
-        product = Product(
+        product = ProductDbModel(
             _id=_id + 10,
             name=f"Test product №{_id}",
             description="test test" * _id,

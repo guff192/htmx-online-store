@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from db.session import db_dependency, get_db
 from dto.product_dto import ProductDTO
-from db_models.product import AvailableProductConfiguration, Product, ProductConfiguration
+from db_models.product import AvailableProductConfigurationDbModel, ProductDbModel, ProductConfigurationDbModel
 from db_models.manufacturer import Manufacturer
 from db_models.user import UserProduct
 from repository.configuration_repository import (
@@ -24,19 +24,19 @@ class ProductRepository:
         self.db = db
         self._configuration_repository = configuration_repository
 
-    def _add_query_filter(self, stmt: Select[tuple[Product]], query: str | None) -> Select[tuple[Product]]:
+    def _add_query_filter(self, stmt: Select[tuple[ProductDbModel]], query: str | None) -> Select[tuple[ProductDbModel]]:
         if not query:
             return stmt
         query_search_term = f'%{query.replace(" ", "%")}%'
         return stmt.where(or_(
-            Product.name.ilike(query_search_term),
-            Product.description.ilike(query_search_term)
+            ProductDbModel.name.ilike(query_search_term),
+            ProductDbModel.description.ilike(query_search_term)
         ))
 
-    def _add_price_filter(self, stmt: Select[tuple[Product]], price_from: int, price_to: int) -> Select[tuple[Product]]:
-        return stmt.where(Product.price.between(price_from, price_to))
+    def _add_price_filter(self, stmt: Select[tuple[ProductDbModel]], price_from: int, price_to: int) -> Select[tuple[ProductDbModel]]:
+        return stmt.where(ProductDbModel.price.between(price_from, price_to))
 
-    def _add_ram_filter(self, stmt: Select[tuple[Product]], ram: list[int]) -> Select[tuple[Product]]:
+    def _add_ram_filter(self, stmt: Select[tuple[ProductDbModel]], ram: list[int]) -> Select[tuple[ProductDbModel]]:
         if len(ram) == 0:
             return stmt
         compiled_initial_stmt = stmt.compile(compile_kwargs={"literal_binds": True}).string
@@ -44,13 +44,13 @@ class ProductRepository:
             stmt = (
                 stmt
                 .distinct()
-                .join(AvailableProductConfiguration)
-                .join(ProductConfiguration)
+                .join(AvailableProductConfigurationDbModel)
+                .join(ProductConfigurationDbModel)
             )
 
-        return stmt.where(ProductConfiguration.ram_amount.in_(ram))
+        return stmt.where(ProductConfigurationDbModel.ram_amount.in_(ram))
 
-    def _add_ssd_filter(self, stmt: Select[tuple[Product]], ssd: list[int]) -> Select[tuple[Product]]:
+    def _add_ssd_filter(self, stmt: Select[tuple[ProductDbModel]], ssd: list[int]) -> Select[tuple[ProductDbModel]]:
         if len(ssd) == 0:
             return stmt
         compiled_initial_stmt = stmt.compile(compile_kwargs={"literal_binds": True}).string
@@ -58,20 +58,20 @@ class ProductRepository:
             stmt = (
                 stmt
                 .distinct()
-                .join(AvailableProductConfiguration)
-                .join(ProductConfiguration)
+                .join(AvailableProductConfigurationDbModel)
+                .join(ProductConfigurationDbModel)
             )
 
-        return stmt.where(ProductConfiguration.ssd_amount.in_(ssd))
+        return stmt.where(ProductConfigurationDbModel.ssd_amount.in_(ssd))
 
-    def _add_cpu_filter(self, stmt: Select[tuple[Product]], cpu: list[str]) -> Select[tuple[Product]]:
+    def _add_cpu_filter(self, stmt: Select[tuple[ProductDbModel]], cpu: list[str]) -> Select[tuple[ProductDbModel]]:
         if not cpu:
             return stmt
 
         conditions = []
         for cpu_str in cpu:
             search_term = f'%{cpu_str}%'
-            conditions.append(Product.cpu.ilike(search_term))
+            conditions.append(ProductDbModel.cpu.ilike(search_term))
 
         if len(conditions) > 1:
             combined_condition = or_(*conditions)
@@ -79,23 +79,23 @@ class ProductRepository:
             combined_condition = conditions[0]
         return stmt.where(combined_condition)
 
-    def _add_resolution_filter(self, stmt: Select[tuple[Product]], resolution: list[str]) -> Select[tuple[Product]]:
+    def _add_resolution_filter(self, stmt: Select[tuple[ProductDbModel]], resolution: list[str]) -> Select[tuple[ProductDbModel]]:
         if len(resolution) == 0:
             return stmt
-        return stmt.where(Product.resolution_name.in_(resolution))
+        return stmt.where(ProductDbModel.resolution_name.in_(resolution))
 
-    def _add_touchscreen_filter(self, stmt: Select[tuple[Product]], touchscreen: list[bool]) -> Select[tuple[Product]]:
+    def _add_touchscreen_filter(self, stmt: Select[tuple[ProductDbModel]], touchscreen: list[bool]) -> Select[tuple[ProductDbModel]]:
         if len(touchscreen) == 0:
             return stmt
-        return stmt.where(Product.touch_screen.in_(touchscreen))
+        return stmt.where(ProductDbModel.touch_screen.in_(touchscreen))
 
-    def _add_graphics_filter(self, stmt: Select[tuple[Product]], graphics: list[bool]) -> Select[tuple[Product]]:
+    def _add_graphics_filter(self, stmt: Select[tuple[ProductDbModel]], graphics: list[bool]) -> Select[tuple[ProductDbModel]]:
         if len(graphics) == 0 or True in graphics and False in graphics:
             return stmt
         elif True in graphics:
-            return stmt.where(Product.gpu != "")
+            return stmt.where(ProductDbModel.gpu != "")
         else:
-            return stmt.where(Product.gpu == "") # noqa
+            return stmt.where(ProductDbModel.gpu == "") # noqa
 
     def get_all(
         self, query: str | None = None, offset: int = 0,
@@ -104,7 +104,7 @@ class ProductRepository:
         resolution: list[str] = [], touchscreen: list[bool] = [],
         graphics: list[bool] = []
     ) -> list[ProductDTO]:
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
         stmt = self._add_query_filter(stmt, query)
         stmt = self._add_price_filter(stmt, price_from, price_to)
         stmt = self._add_ram_filter(stmt, ram)
@@ -170,41 +170,41 @@ class ProductRepository:
         # Create query
         if query:
             stmt = (
-                select(Product._id, Product.name, Product.description,
-                       Product.price, Product.manufacturer_id,
-                       Product.soldered_ram, Product.can_add_ram,
-                       Product.resolution, Product.resolution_name, Product.cpu,
-                       Product.gpu, Product.touch_screen,
+                select(ProductDbModel._id, ProductDbModel.name, ProductDbModel.description,
+                       ProductDbModel.price, ProductDbModel.manufacturer_id,
+                       ProductDbModel.soldered_ram, ProductDbModel.can_add_ram,
+                       ProductDbModel.resolution, ProductDbModel.resolution_name, ProductDbModel.cpu,
+                       ProductDbModel.gpu, ProductDbModel.touch_screen,
                        UserProduct.count, UserProduct.selected_configuration_id).
                 join(UserProduct,  # joining for getting count from user_product
-                     Product._id == UserProduct.product_id,
+                     ProductDbModel._id == UserProduct.product_id,
                      isouter=True).
                 where(or_(
-                    Product.name.ilike(f'%{query.replace(" ", "%")}%'),
-                    Product.description.ilike(f'%{query.replace(" ", "%")}%')
+                    ProductDbModel.name.ilike(f'%{query.replace(" ", "%")}%'),
+                    ProductDbModel.description.ilike(f'%{query.replace(" ", "%")}%')
                 )).
                 where(  # filtering products in cart and products without user
                     or_(UserProduct.user_id == user_id,
                         UserProduct.user_id == None)).  # noqa: E711
-                where(Product.count > 0).
-                order_by(Product.name).
+                where(ProductDbModel.count > 0).
+                order_by(ProductDbModel.name).
                 slice(offset, offset + 10)
             )
         else:
             stmt = (
-                select(Product._id, Product.name, Product.description,
-                       Product.price, Product.manufacturer_id,
-                       Product.soldered_ram, Product.can_add_ram,
-                       Product.resolution, Product.resolution_name, Product.cpu,
-                       Product.gpu, Product.touch_screen,
+                select(ProductDbModel._id, ProductDbModel.name, ProductDbModel.description,
+                       ProductDbModel.price, ProductDbModel.manufacturer_id,
+                       ProductDbModel.soldered_ram, ProductDbModel.can_add_ram,
+                       ProductDbModel.resolution, ProductDbModel.resolution_name, ProductDbModel.cpu,
+                       ProductDbModel.gpu, ProductDbModel.touch_screen,
                        UserProduct.count, UserProduct.selected_configuration_id).
                 join(UserProduct,  # joining for getting count from user_product
-                     Product._id == UserProduct.product_id,
+                     ProductDbModel._id == UserProduct.product_id,
                      isouter=True).
                 where(  # filtering products in cart and products without user
                     or_(UserProduct.user_id == user_id,
                         UserProduct.user_id == None)).  # noqa: E711
-                where(Product.count > 0).
+                where(ProductDbModel.count > 0).
                 slice(offset, offset + 10)
             )
 
@@ -318,26 +318,26 @@ class ProductRepository:
 
         return result
 
-    def get_newcomers(self, offset: int) -> list[Product]:
+    def get_newcomers(self, offset: int) -> list[ProductDbModel]:
         product_list = (
-            self.db.query(Product).
-            filter(Product.newcomer == True).  # noqa: E712
+            self.db.query(ProductDbModel).
+            filter(ProductDbModel.newcomer == True).  # noqa: E712
             slice(offset, offset + 10).all()
         )
 
         return product_list
 
-    def get_by_id(self, product_id) -> Product | None:
-        return self.db.query(Product).get(product_id)
+    def get_by_id(self, product_id) -> ProductDbModel | None:
+        return self.db.query(ProductDbModel).get(product_id)
 
-    def get_by_name(self, name: str) -> Product :
-        return self.db.query(Product).filter(Product.name == name).first()
+    def get_by_name(self, name: str) -> ProductDbModel :
+        return self.db.query(ProductDbModel).filter(ProductDbModel.name == name).first()
 
-    def search(self, query: str, offset: int) -> list[Product]:
-        return self.db.query(Product).\
+    def search(self, query: str, offset: int) -> list[ProductDbModel]:
+        return self.db.query(ProductDbModel).\
             where(or_(
-                Product.name.ilike(f'%{query.replace(" ", "%")}%'),
-                Product.description.ilike(f'%{query.replace(" ", "%")}%')
+                ProductDbModel.name.ilike(f'%{query.replace(" ", "%")}%'),
+                ProductDbModel.description.ilike(f'%{query.replace(" ", "%")}%')
             )).slice(offset, offset + 10).all()
 
     def create(self,
@@ -346,7 +346,7 @@ class ProductRepository:
                price: int,
                count: int = 0,
                manufacturer: Manufacturer | None = None,
-               configurations: list[ProductConfiguration] = [],
+               configurations: list[ProductConfigurationDbModel] = [],
                soldered_ram: int = 0,
                can_add_ram: bool = True,
                resolution: str = '',
@@ -356,8 +356,8 @@ class ProductRepository:
                touch_screen: bool = False,
                cpu_speed: str = '',
                cpu_graphics: str = '',
-            ) -> Product:  # noqa: E125
-        product = Product(
+            ) -> ProductDbModel:  # noqa: E125
+        product = ProductDbModel(
             name=name,
             description=description,
             price=price,
@@ -376,9 +376,9 @@ class ProductRepository:
         self.db.add(product)
         self.db.flush([product])
 
-        configs: list[AvailableProductConfiguration] = []
+        configs: list[AvailableProductConfigurationDbModel] = []
         for config in configurations:
-            available_configuration = AvailableProductConfiguration(
+            available_configuration = AvailableProductConfigurationDbModel(
                 product_id=product._id,
                 configuration=config
             )
@@ -397,7 +397,7 @@ class ProductRepository:
                price: int,
                count: int,
                manufacturer: Manufacturer,
-               configurations: list[ProductConfiguration],
+               configurations: list[ProductConfigurationDbModel],
                soldered_ram: int = 0,
                can_add_ram: bool = True,
                resolution: str = '',
@@ -408,8 +408,8 @@ class ProductRepository:
                cpu_speed: str = '',
                cpu_graphics: str = '') -> int:
 
-        updated_product_query = self.db.query(Product).filter(
-            Product._id == id
+        updated_product_query = self.db.query(ProductDbModel).filter(
+            ProductDbModel._id == id
         )
         found_product = updated_product_query.first()
         if not found_product:
@@ -418,20 +418,20 @@ class ProductRepository:
         logger.debug(f'Found product to update (in repo): {found_product_dict = }')
 
         updated_products_count = updated_product_query.update({
-            Product.name: name,
-            Product.description: description,
-            Product.price: price,
-            Product.count: count,
-            Product.manufacturer_id: manufacturer.id,
-            Product.soldered_ram: soldered_ram,
-            Product.can_add_ram: can_add_ram,
-            Product.resolution: resolution,
-            Product.resolution_name: resolution_name,
-            Product.cpu: cpu,
-            Product.gpu: gpu,
-            Product.touch_screen: touch_screen,
-            Product.cpu_speed: cpu_speed,
-            Product.cpu_graphics: cpu_graphics
+            ProductDbModel.name: name,
+            ProductDbModel.description: description,
+            ProductDbModel.price: price,
+            ProductDbModel.count: count,
+            ProductDbModel.manufacturer_id: manufacturer.id,
+            ProductDbModel.soldered_ram: soldered_ram,
+            ProductDbModel.can_add_ram: can_add_ram,
+            ProductDbModel.resolution: resolution,
+            ProductDbModel.resolution_name: resolution_name,
+            ProductDbModel.cpu: cpu,
+            ProductDbModel.gpu: gpu,
+            ProductDbModel.touch_screen: touch_screen,
+            ProductDbModel.cpu_speed: cpu_speed,
+            ProductDbModel.cpu_graphics: cpu_graphics
         })
         self.db.commit()
         logger.debug('Updated product, flushing...')
@@ -439,8 +439,8 @@ class ProductRepository:
         found_product = updated_product_query.first()
         logger.debug(f'Updated product (in repo): {found_product.__dict__ = }')
 
-        product_configs_query = self.db.query(AvailableProductConfiguration).\
-            filter(AvailableProductConfiguration.product_id == id)
+        product_configs_query = self.db.query(AvailableProductConfigurationDbModel).\
+            filter(AvailableProductConfigurationDbModel.product_id == id)
         found_configs = product_configs_query.all()
         found_config_ids = set(map(
             lambda found_config: found_config.__dict__.get('configuration_id'),
@@ -455,7 +455,7 @@ class ProductRepository:
         if found_config_ids != update_config_ids:
             product_configs_query.delete()
             for config in configurations:
-                available_configuration = AvailableProductConfiguration(
+                available_configuration = AvailableProductConfigurationDbModel(
                     product=found_product, configuration=config
                 )
                 new_available_configs.append(available_configuration)

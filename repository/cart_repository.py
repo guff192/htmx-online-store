@@ -6,7 +6,7 @@ from sqlalchemy.orm import Query, Session
 
 from db.session import db_dependency
 from exceptions.product_exceptions import ErrProductNotFound
-from db_models.product import Product
+from db_models.product import ProductDbModel
 from db_models.user import UserProduct
 from repository.configuration_repository import ConfigurationRepository
 from repository.product_repository import (
@@ -53,7 +53,7 @@ class CartRepository:
     def get_user_products(self, user_id: str) -> list[UserProduct]:
         user_products = (
             self._db.query(UserProduct).
-            join(Product).
+            join(ProductDbModel).
             filter(UserProduct.user_id == user_id).all()
         )
 

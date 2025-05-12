@@ -10,7 +10,7 @@ from exceptions.product_exceptions import (
     ErrProductNotFound,
 )
 from exceptions.product_prices_exceptions import ErrPriceNotFound
-from db_models.product import Product, ProductConfiguration
+from db_models.product import ProductDbModel, ProductConfigurationDbModel
 from db_models.manufacturer import Manufacturer
 from repository.configuration_repository import ConfigurationRepository, configuration_repository_dependency
 from repository.manufacturer_repository import ManufacturerRepository, manufacturer_repository_dependency
@@ -50,7 +50,7 @@ class ProductService:
         self.config_repo = configuration_repo
         self.photo_storage = photo_storage
 
-    def _orm_configuration_to_config_schema(self, orm_config: ProductConfiguration) -> ProductConfigurationSchema:
+    def _orm_configuration_to_config_schema(self, orm_config: ProductConfigurationDbModel) -> ProductConfigurationSchema:
         config_dict = orm_config.__dict__
         id = config_dict.get('id', 0)
         ram_amount = config_dict.get('ram_amount', 0)
@@ -70,7 +70,7 @@ class ProductService:
             soldered_ram=soldered_ram
         )
 
-    def _orm_product_to_product_schema(self, orm_product: Product) -> ProductSchema:
+    def _orm_product_to_product_schema(self, orm_product: ProductDbModel) -> ProductSchema:
         product_dict = orm_product.__dict__
         manufacturer_dict = orm_product.manufacturer.__dict__
         manufacturer_schema = ManufacturerSchema(
@@ -144,7 +144,7 @@ class ProductService:
             )
             return product_in_cart
 
-    def get_config_by_id(self, config_id: int) -> ProductConfiguration:
+    def get_config_by_id(self, config_id: int) -> ProductConfigurationDbModel:
         return self.config_repo.get_by_id(config_id)
     
     def get_available_configurations(
@@ -313,7 +313,7 @@ class ProductService:
 
         return product_schema
 
-    def get_by_name(self, name: str) -> Product:
+    def get_by_name(self, name: str) -> ProductDbModel:
         return self.repo.get_by_name(name)
 
     def get_url_by_photo_path(
@@ -346,7 +346,7 @@ class ProductService:
             logger.debug(f'Invalid product - no information about soldered RAM: {product_update}')
             raise ErrInvalidProduct()
 
-        update_model_configurations: list[ProductConfiguration] = self.config_repo.get_available_configurations(
+        update_model_configurations: list[ProductConfigurationDbModel] = self.config_repo.get_available_configurations(
             additional_ram=product_update.can_add_ram,
             soldered_ram=product_update.soldered_ram
         )
@@ -386,7 +386,7 @@ class ProductService:
         cpu_graphics = product_update.cpu_graphics if product_update.cpu_graphics else ''
 
         # searching product
-        found_product: Product | None = self.repo.get_by_name(product_update.name)
+        found_product: ProductDbModel | None = self.repo.get_by_name(product_update.name)
         if not found_product:
             # creating new product
             logger.debug(f'Creating new product: {product_update}')

@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from dto.product_dto import ProductDTO
-from db_models.product import Product, AvailableProductConfiguration
+from db_models.product import ProductDbModel, AvailableProductConfigurationDbModel
 from db_models.manufacturer import Manufacturer
 from repository.product_repository import ProductRepository
 
@@ -29,8 +29,8 @@ def test_cleanup(db: Session):  # noqa
     yield
 
     try:
-        db.query(AvailableProductConfiguration).delete()
-        db.query(Product).delete()
+        db.query(AvailableProductConfigurationDbModel).delete()
+        db.query(ProductDbModel).delete()
         db.query(Manufacturer).delete()
         db.commit()
     except Exception as e:
@@ -55,10 +55,10 @@ class TestQueryFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing query filter with valid product")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_query_filter(
             stmt, valid_test_products_without_soldered_ram[0].name
@@ -80,10 +80,10 @@ class TestPriceFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
     ):  # noqa
         logger.info("Testing narrow price filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_price_filter(stmt, 10_000, 15_000)
         all_products = db.execute(updated_stmt).scalars().all()
@@ -94,10 +94,10 @@ class TestPriceFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
     ):  # noqa
         logger.info("Testing wide price filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_price_filter(stmt, 5_000, 150_000)
         all_products = db.execute(updated_stmt).scalars().all()
@@ -114,10 +114,10 @@ class TestPriceFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
     ):  # noqa
         logger.info("Testing invalid price filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_price_filter(stmt, 50_000, 5_000)
         all_products = db.execute(updated_stmt).scalars().all()
@@ -135,10 +135,10 @@ class TestRamFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing narrow ram filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_ram_filter(stmt, [16])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -148,11 +148,11 @@ class TestRamFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
         basic_configs,
     ):
         logger.info("Testing wide ram filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         possible_ram_amounts = set(int(c.ram_amount) for c in basic_configs)
         updated_stmt = product_repo._add_ram_filter(stmt, list(possible_ram_amounts))
@@ -164,10 +164,10 @@ class TestRamFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_with_soldered_ram: list[Product],  # noqa
+        valid_test_products_with_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing narrow ram filter with soldered ram")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_ram_filter(stmt, [16])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -177,10 +177,10 @@ class TestRamFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_with_soldered_ram: list[Product],  # noqa
+        valid_test_products_with_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing wide ram filter with soldered ram")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_ram_filter(stmt, [8, 24])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -197,10 +197,10 @@ class TestSsdFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing narrow ssd filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_ssd_filter(stmt, [512])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -211,11 +211,11 @@ class TestSsdFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
         basic_configs,
     ):
         logger.info("Testing wide ssd filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         possible_ssd_amounts = set(int(c.ssd_amount) for c in basic_configs)
         updated_stmt = product_repo._add_ssd_filter(stmt, list(possible_ssd_amounts))
@@ -234,11 +234,11 @@ class TestCpuFiltering:
         self,
         db: Session,
         product_repo: ProductRepository,
-        valid_test_products_without_soldered_ram: list[Product],
-        valid_test_products_with_soldered_ram: list[Product],
+        valid_test_products_without_soldered_ram: list[ProductDbModel],
+        valid_test_products_with_soldered_ram: list[ProductDbModel],
     ):
         logger.info("Testing wide cpu filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_cpu_filter(stmt, ["i7", "i5"])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -249,11 +249,11 @@ class TestCpuFiltering:
         self,
         db: Session,
         product_repo: ProductRepository,
-        valid_test_products_without_soldered_ram: list[Product],
-        valid_test_products_with_soldered_ram: list[Product],
+        valid_test_products_without_soldered_ram: list[ProductDbModel],
+        valid_test_products_with_soldered_ram: list[ProductDbModel],
     ):
         logger.info("Testing narrow cpu filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_cpu_filter(stmt, ["i7"])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -271,11 +271,11 @@ class TestResolutionFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
-        valid_test_products_with_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
+        valid_test_products_with_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing narrow resolution filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_resolution_filter(stmt, ["FullHD"])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -286,11 +286,11 @@ class TestResolutionFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
-        valid_test_products_with_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
+        valid_test_products_with_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing wide resolution filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_resolution_filter(stmt, ["FullHD", "HD"])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -308,11 +308,11 @@ class TestTouchscreenFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
-        valid_test_products_with_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
+        valid_test_products_with_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing true touchscreen filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_touchscreen_filter(stmt, [True])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -323,11 +323,11 @@ class TestTouchscreenFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
-        valid_test_products_with_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
+        valid_test_products_with_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing false touchscreen filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_touchscreen_filter(stmt, [False])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -338,11 +338,11 @@ class TestTouchscreenFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
-        valid_test_products_with_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
+        valid_test_products_with_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing all touchscreen filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_touchscreen_filter(stmt, [True, False])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -360,11 +360,11 @@ class TestGraphicsFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
-        valid_test_products_with_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
+        valid_test_products_with_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing true graphics filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_graphics_filter(stmt, [True])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -375,11 +375,11 @@ class TestGraphicsFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
-        valid_test_products_with_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
+        valid_test_products_with_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing true graphics filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_graphics_filter(stmt, [False])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -390,11 +390,11 @@ class TestGraphicsFiltering:
         self,
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
-        valid_test_products_without_soldered_ram: list[Product],  # noqa
-        valid_test_products_with_soldered_ram: list[Product],  # noqa
+        valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
+        valid_test_products_with_soldered_ram: list[ProductDbModel],  # noqa
     ):
         logger.info("Testing true graphics filter")
-        stmt = select(Product)
+        stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_graphics_filter(stmt, [True, False])
         all_products = db.execute(updated_stmt).scalars().all()
@@ -462,7 +462,7 @@ class TestGetAll:
     # Tests
     def test_with_valid_product(
         self,
-        valid_test_product: Product,  # noqa
+        valid_test_product: ProductDbModel,  # noqa
         all_products: list[ProductDTO],  # noqa
     ):
         logger.info("Testing with valid product")
@@ -474,7 +474,7 @@ class TestGetAll:
 
     def test_with_invalid_product(
         self,
-        invalid_test_product: Product,  # noqa
+        invalid_test_product: ProductDbModel,  # noqa
         all_products: list[ProductDTO],  # noqa
     ):
         logger.info("Testing with invalid product")
@@ -488,7 +488,7 @@ class TestGetAll:
 
     def test_with_multiple_filters_and_valid_products(
         self,
-        valid_test_products_without_soldered_ram: list[Product],
+        valid_test_products_without_soldered_ram: list[ProductDbModel],
         all_products_with_filters: list[ProductDTO],
     ):
         logger.info("Testing with multiple filters and valid products")
@@ -514,7 +514,7 @@ class TestGetById:
     def test_with_valid_product(
         self,
         product_repo: ProductRepository,  # noqa
-        valid_test_product: Product,  # noqa
+        valid_test_product: ProductDbModel,  # noqa
     ):
         logger.info("Testing with valid product")
         product = product_repo.get_by_id(valid_test_product._id)

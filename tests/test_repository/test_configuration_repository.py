@@ -2,7 +2,7 @@ from loguru import logger
 from pytest import fixture
 from sqlalchemy.orm import Session
 
-from db_models.product import Product, ProductConfiguration, AvailableProductConfiguration
+from db_models.product import ProductDbModel, ProductConfigurationDbModel, AvailableProductConfigurationDbModel
 from db_models.manufacturer import Manufacturer
 from repository.configuration_repository import ConfigurationRepository
 
@@ -27,9 +27,9 @@ def test_cleanup(db: Session):  # noqa
     yield
 
     try:
-        db.query(ProductConfiguration).filter(ProductConfiguration.id < 0).delete()
-        db.query(AvailableProductConfiguration).delete()
-        db.query(Product).delete()
+        db.query(ProductConfigurationDbModel).filter(ProductConfigurationDbModel.id < 0).delete()
+        db.query(AvailableProductConfigurationDbModel).delete()
+        db.query(ProductDbModel).delete()
         db.query(Manufacturer).delete()
         db.commit()
     except Exception as e:
@@ -52,7 +52,7 @@ class TestGetById:
     def test_with_valid_config(
         self,
         configuration_repo: ConfigurationRepository,  # noqa
-        valid_test_config: ProductConfiguration,  # noqa
+        valid_test_config: ProductConfigurationDbModel,  # noqa
     ):
         config = configuration_repo.get_by_id(valid_test_config.id)
         assert config is not None
@@ -67,7 +67,7 @@ class TestGetConfigurationsForProduct:
     def test_with_valid_product(
         self,
         configuration_repo: ConfigurationRepository,  # noqa
-        valid_test_product: Product,  # noqa
+        valid_test_product: ProductDbModel,  # noqa
     ):
         product_id = valid_test_product._id
         assert product_id is not None
@@ -81,7 +81,7 @@ class TestGetConfigurationsForProduct:
     def test_with_invalid_product(
         self,
         configuration_repo: ConfigurationRepository,  # noqa
-        invalid_test_product: Product,  # noqa
+        invalid_test_product: ProductDbModel,  # noqa
     ):
         product_id = invalid_test_product._id
         assert product_id is not None

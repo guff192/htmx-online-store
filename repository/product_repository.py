@@ -9,6 +9,7 @@ from dto.product_dto import ProductDTO
 from db_models.product import AvailableProductConfigurationDbModel, ProductDbModel, ProductConfigurationDbModel
 from db_models.manufacturer import ManufacturerDbModel
 from db_models.user import UserProductDbModel
+from models.product import Product
 from repository.configuration_repository import (
     ConfigurationRepository,
     configuration_repository_dependency, get_configuration_repository
@@ -103,7 +104,7 @@ class ProductRepository:
         ram: list[int] = [], ssd: list[int] = [], cpu: list[str] = [],
         resolution: list[str] = [], touchscreen: list[bool] = [],
         graphics: list[bool] = []
-    ) -> list[ProductDTO]:
+    ) -> list[Product]:
         stmt = select(ProductDbModel)
         stmt = self._add_query_filter(stmt, query)
         stmt = self._add_price_filter(stmt, price_from, price_to)
@@ -115,45 +116,19 @@ class ProductRepository:
         stmt = self._add_graphics_filter(stmt, graphics)
         stmt = stmt.offset(offset)
         stmt = stmt.limit(10)
-        # logger.debug(stmt.compile(compile_kwargs={"literal_binds": True}))
 
         result = self.db.execute(stmt)
         model_products = result.scalars().all()
 
-        # creating dto list
-        dto_list: list[ProductDTO] = []
-        for product_model in model_products:
-            product_dict = product_model.__dict__
+        domain_model_list: list[Product] = [
+            Product.model_validate(orm_model) for orm_model in model_products
+        ]
 
-            product_id = product_dict.get('_id', 0)
-            del product_dict['_id']
-            product_dict['id'] = product_id
-            product_dict['configurations'] = (
-                self
-                ._configuration_repository
-                .get_configurations_for_product(product_id, ram, ssd)
-            )
-            product_dict['selected_configuration'] = None
-            base_product_dto = ProductDTO(**product_dict)
-            logger.debug(f'{product_dict = }')
+        # need empty product to indicate that there are no more products
+        if len(domain_model_list) == 0 and len(model_products) > 0:
+            domain_model_list.append(Product())
 
-            for selected_configuration in base_product_dto.configurations:
-                if price_from <= base_product_dto.price + selected_configuration.additional_price <= price_to:
-                    dto_copy = base_product_dto.model_copy(update={
-                        'selected_configuration': selected_configuration
-                    }, deep=True)
-                    dto_list.append(dto_copy)
-
-        # adding empty product to indicate that there are no more products
-        if len(dto_list) == 0 and len(model_products) > 0:
-            dto_list.append(ProductDTO(
-                id=-5, name='', description='', price=0, count=0,
-                manufacturer_id=0, configurations=[],
-                selected_configuration=None, soldered_ram=0, can_add_ram=True,
-                resolution='', cpu='', gpu='', touch_screen=False
-            ))
-
-        return dto_list
+        return domain_model_list
 
     def get_all_with_cart_info(
         self,

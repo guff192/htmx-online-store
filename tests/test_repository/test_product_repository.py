@@ -3,7 +3,7 @@ from pytest import fixture
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from dto.product_dto import ProductDTO
+from models.product import Product
 from db_models.product import ProductDbModel, AvailableProductConfigurationDbModel
 from db_models.manufacturer import ManufacturerDbModel
 from repository.product_repository import ProductRepository
@@ -416,9 +416,9 @@ class TestGetAll:
     def all_products(
         self,
         product_repo: ProductRepository,  # noqa F811
-    ):
+    ) -> list[Product]:
         offset = 0
-        products: list[ProductDTO] = []
+        products: list[Product] = []
         while products_page := product_repo.get_all(offset=offset):
             products += products_page
             offset += 10
@@ -431,7 +431,7 @@ class TestGetAll:
         product_repo: ProductRepository,  # noqa F811
     ):
         offset = 0
-        products: list[ProductDTO] = []
+        products: list[Product] = []
 
         product_repository_get_all_params = {
             "query": "test",
@@ -460,7 +460,7 @@ class TestGetAll:
     def test_with_valid_product(
         self,
         valid_test_product: ProductDbModel,  # noqa F811
-        all_products: list[ProductDTO],  # noqa F811
+        all_products: list[Product],  # noqa F811
     ):
         logger.info("Testing with valid product")
 
@@ -472,21 +472,21 @@ class TestGetAll:
     def test_with_invalid_product(
         self,
         invalid_test_product: ProductDbModel,  # noqa F811
-        all_products: list[ProductDTO],  # noqa F811
+        all_products: list[Product],  # noqa F811
     ):
         logger.info("Testing with invalid product")
 
         for product in all_products:
             assert product.id != invalid_test_product._id, "Invalid product was found"
 
-    def test_without_products(self, all_products: list[ProductDTO]):
+    def test_without_products(self, all_products: list[Product]):
         logger.info("Testing without products")
         assert len(all_products) == 0
 
     def test_with_multiple_filters_and_valid_products(
         self,
         valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa F811
-        all_products_with_filters: list[ProductDTO],
+        all_products_with_filters: list[Product],
     ):
         logger.info("Testing with multiple filters and valid products")
 

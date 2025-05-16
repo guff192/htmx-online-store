@@ -54,7 +54,7 @@ def valid_test_product(
         name="test",
         description="test" * request.param,
         price=100000 - 30000 * request.param,
-        count=100 - 40 * request.param,
+        count=100 - 30 * request.param,
         manufacturer=valid_test_manufacturer,
         manufacturer_id=valid_test_manufacturer.id,
         resolution="1920x1080",

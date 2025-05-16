@@ -2,7 +2,11 @@ from loguru import logger
 from pytest import fixture
 from sqlalchemy.orm import Session
 
-from db_models.product import ProductDbModel, ProductConfigurationDbModel, AvailableProductConfigurationDbModel
+from db_models.product import (
+    ProductDbModel,
+    ProductConfigurationDbModel,
+    AvailableProductConfigurationDbModel,
+)
 from db_models.manufacturer import ManufacturerDbModel
 from repository.configuration_repository import ConfigurationRepository
 
@@ -10,9 +14,9 @@ from tests.test_repository import log_repository_test_info
 
 from tests.fixtures.db_fixtures import db
 from tests.fixtures.model_fixtures import (
-    basic_configs, # noqa F401
+    basic_configs,  # noqa F401
     valid_test_config,
-    valid_test_product, # noqa F401
+    valid_test_product,  # noqa F401
     invalid_test_product,
     valid_test_manufacturer,
 )
@@ -23,11 +27,13 @@ from tests.helpers.logging_helpers import log_test_info
 
 # Fixtures
 @fixture(scope="function", autouse=True)
-def test_cleanup(db: Session): # noqa F811
+def test_cleanup(db: Session):  # noqa F811
     yield
 
     try:
-        db.query(ProductConfigurationDbModel).filter(ProductConfigurationDbModel.id < 0).delete()
+        db.query(ProductConfigurationDbModel).filter(
+            ProductConfigurationDbModel.id < 0
+        ).delete()
         db.query(AvailableProductConfigurationDbModel).delete()
         db.query(ProductDbModel).delete()
         db.query(ManufacturerDbModel).delete()
@@ -51,8 +57,8 @@ class TestGetById:
 
     def test_with_valid_config(
         self,
-        configuration_repo: ConfigurationRepository, # noqa F811
-        valid_test_config: ProductConfigurationDbModel, # noqa F811
+        configuration_repo: ConfigurationRepository,  # noqa F811
+        valid_test_config: ProductConfigurationDbModel,  # noqa F811
     ):
         id_to_search = int(str(valid_test_config.id))
         config = configuration_repo.get_by_id(id_to_search)
@@ -66,14 +72,18 @@ class TestGetById:
 class TestGetConfigurationsForProduct:
     @fixture(scope="class", autouse=True)
     def log_info(self):
-        log_test_info("Testing ConfigurationRepository.get_configurations_for_product() method")
+        log_test_info(
+            "Testing ConfigurationRepository.get_configurations_for_product() method"
+        )
 
     def test_with_valid_product(
         self,
-        configuration_repo: ConfigurationRepository, # noqa F811
-        valid_test_product: ProductDbModel, # noqa F811
+        configuration_repo: ConfigurationRepository,  # noqa F811
+        valid_test_product: ProductDbModel,  # noqa F811
     ):
-        product_id = int(str(valid_test_product._id)) if str(valid_test_product._id) else None
+        product_id = (
+            int(str(valid_test_product._id)) if str(valid_test_product._id) else None
+        )
         assert product_id is not None
 
         configs = configuration_repo.get_configurations_for_product(product_id)
@@ -84,10 +94,14 @@ class TestGetConfigurationsForProduct:
 
     def test_with_invalid_product(
         self,
-        configuration_repo: ConfigurationRepository, # noqa F811
-        invalid_test_product: ProductDbModel, # noqa F811
+        configuration_repo: ConfigurationRepository,  # noqa F811
+        invalid_test_product: ProductDbModel,  # noqa F811
     ):
-        product_id = int(str(invalid_test_product._id)) if str(invalid_test_product._id) else None
+        product_id = (
+            int(str(invalid_test_product._id))
+            if str(invalid_test_product._id)
+            else None
+        )
         assert product_id is not None
         configs = configuration_repo.get_configurations_for_product(product_id)
         assert len(configs) == 0

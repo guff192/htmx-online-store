@@ -60,8 +60,9 @@ class TestQueryFiltering:
         logger.info("Testing query filter with valid product")
         stmt = select(ProductDbModel)
 
+        query = str(valid_test_products_without_soldered_ram[0].name)
         updated_stmt = product_repo._add_query_filter(
-            stmt, valid_test_products_without_soldered_ram[0].name
+            stmt, query
         )
         all_products = db.execute(stmt).scalars().all()
 
@@ -149,7 +150,7 @@ class TestRamFiltering:
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
         valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
-        basic_configs,
+        basic_configs, # noqa F811
     ):
         logger.info("Testing wide ram filter")
         stmt = select(ProductDbModel)
@@ -212,7 +213,7 @@ class TestSsdFiltering:
         db: Session,  # noqa
         product_repo: ProductRepository,  # noqa
         valid_test_products_without_soldered_ram: list[ProductDbModel],  # noqa
-        basic_configs,
+        basic_configs, # noqa F811
     ):
         logger.info("Testing wide ssd filter")
         stmt = select(ProductDbModel)
@@ -232,8 +233,8 @@ class TestCpuFiltering:
     
     def test_cpu_filter_wide(
         self,
-        db: Session,
-        product_repo: ProductRepository,
+        db: Session, # noqa F811
+        product_repo: ProductRepository, # noqa F811
         valid_test_products_without_soldered_ram: list[ProductDbModel],
         valid_test_products_with_soldered_ram: list[ProductDbModel],
     ):
@@ -247,8 +248,8 @@ class TestCpuFiltering:
 
     def test_cpu_filter_narrow(
         self,
-        db: Session,
-        product_repo: ProductRepository,
+        db: Session, # noqa F811
+        product_repo: ProductRepository, # noqa F811
         valid_test_products_without_soldered_ram: list[ProductDbModel],
         valid_test_products_with_soldered_ram: list[ProductDbModel],
     ):
@@ -488,7 +489,7 @@ class TestGetAll:
 
     def test_with_multiple_filters_and_valid_products(
         self,
-        valid_test_products_without_soldered_ram: list[ProductDbModel],
+        valid_test_products_without_soldered_ram: list[ProductDbModel], # noqa F811
         all_products_with_filters: list[ProductDTO],
     ):
         logger.info("Testing with multiple filters and valid products")

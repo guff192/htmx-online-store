@@ -10,9 +10,9 @@ from tests.test_repository import log_repository_test_info
 
 from tests.fixtures.db_fixtures import db
 from tests.fixtures.model_fixtures import (
-    basic_configs,
+    basic_configs, # noqa F401
     valid_test_config,
-    valid_test_product,
+    valid_test_product, # noqa F401
     invalid_test_product,
     valid_test_manufacturer,
 )
@@ -54,9 +54,13 @@ class TestGetById:
         configuration_repo: ConfigurationRepository,  # noqa
         valid_test_config: ProductConfigurationDbModel,  # noqa
     ):
-        config = configuration_repo.get_by_id(valid_test_config.id)
+        id_to_search = int(str(valid_test_config.id))
+        config = configuration_repo.get_by_id(id_to_search)
+
         assert config is not None
-        assert config.id == valid_test_config.id
+
+        found_config_id = int(str(config.id))
+        assert found_config_id == id_to_search
 
 
 class TestGetConfigurationsForProduct:
@@ -69,7 +73,7 @@ class TestGetConfigurationsForProduct:
         configuration_repo: ConfigurationRepository,  # noqa
         valid_test_product: ProductDbModel,  # noqa
     ):
-        product_id = valid_test_product._id
+        product_id = int(str(valid_test_product._id)) if str(valid_test_product._id) else None
         assert product_id is not None
 
         configs = configuration_repo.get_configurations_for_product(product_id)
@@ -83,7 +87,7 @@ class TestGetConfigurationsForProduct:
         configuration_repo: ConfigurationRepository,  # noqa
         invalid_test_product: ProductDbModel,  # noqa
     ):
-        product_id = invalid_test_product._id
+        product_id = int(str(invalid_test_product._id)) if str(invalid_test_product._id) else None
         assert product_id is not None
         configs = configuration_repo.get_configurations_for_product(product_id)
         assert len(configs) == 0

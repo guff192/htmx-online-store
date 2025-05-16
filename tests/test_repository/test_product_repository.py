@@ -463,9 +463,11 @@ class TestGetAll:
         all_products: list[Product],  # noqa F811
     ):
         logger.info("Testing with valid product")
+        
+        valid_test_product_id = int(str(valid_test_product._id))
 
         assert len(all_products) > 0, "No products were found"
-        assert any(p.id == valid_test_product.id for p in all_products), (
+        assert any(p.id == valid_test_product_id for p in all_products), (
             "Test product was not found"
         )
 
@@ -476,8 +478,10 @@ class TestGetAll:
     ):
         logger.info("Testing with invalid product")
 
+        invalid_test_product_id = int(str(invalid_test_product._id))
+
         for product in all_products:
-            assert product.id != invalid_test_product._id, "Invalid product was found"
+            assert product.id != invalid_test_product_id, "Invalid product was found"
 
     def test_without_products(self, all_products: list[Product]):
         logger.info("Testing without products")
@@ -494,7 +498,7 @@ class TestGetAll:
         assert len(all_products_with_filters) > 0, "No products were found"
 
         # check that all products were found
-        input_ids = [p.id for p in valid_test_products_without_soldered_ram]
+        input_ids = [int(str(p._id)) for p in valid_test_products_without_soldered_ram]
         result_ids = [p.id for p in all_products_with_filters]
         assert all(
             any(input_id == result_id for result_id in result_ids)

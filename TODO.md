@@ -12,6 +12,7 @@
     - [X] Rename package containing sqlalchemy models to "db_models"
     - [X] Rename db models to have appendix "DbModel"
     - [X] Create domain models in package "models"
+    - [ ] Rewrite repository tests to use domain models
     - [ ] Rewrite Repositories, Services and ViewModels to use domain models
     - [ ] Get rid of this dumb "dto" layer
 

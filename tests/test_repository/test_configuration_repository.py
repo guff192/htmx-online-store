@@ -23,7 +23,7 @@ from tests.helpers.logging_helpers import log_test_info
 
 # Fixtures
 @fixture(scope="function", autouse=True)
-def test_cleanup(db: Session):  # noqa
+def test_cleanup(db: Session): # noqa F811
     yield
 
     try:
@@ -51,8 +51,8 @@ class TestGetById:
 
     def test_with_valid_config(
         self,
-        configuration_repo: ConfigurationRepository,  # noqa
-        valid_test_config: ProductConfigurationDbModel,  # noqa
+        configuration_repo: ConfigurationRepository, # noqa F811
+        valid_test_config: ProductConfigurationDbModel, # noqa F811
     ):
         id_to_search = int(str(valid_test_config.id))
         config = configuration_repo.get_by_id(id_to_search)
@@ -70,8 +70,8 @@ class TestGetConfigurationsForProduct:
 
     def test_with_valid_product(
         self,
-        configuration_repo: ConfigurationRepository,  # noqa
-        valid_test_product: ProductDbModel,  # noqa
+        configuration_repo: ConfigurationRepository, # noqa F811
+        valid_test_product: ProductDbModel, # noqa F811
     ):
         product_id = int(str(valid_test_product._id)) if str(valid_test_product._id) else None
         assert product_id is not None
@@ -84,8 +84,8 @@ class TestGetConfigurationsForProduct:
 
     def test_with_invalid_product(
         self,
-        configuration_repo: ConfigurationRepository,  # noqa
-        invalid_test_product: ProductDbModel,  # noqa
+        configuration_repo: ConfigurationRepository, # noqa F811
+        invalid_test_product: ProductDbModel, # noqa F811
     ):
         product_id = int(str(invalid_test_product._id)) if str(invalid_test_product._id) else None
         assert product_id is not None

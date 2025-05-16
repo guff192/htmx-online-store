@@ -2,7 +2,7 @@
 
 ## Bigger plans
 - [ ] Remove dumb DTO layer and replace it with real domain model
-- [ ] Move product configurations to MongoDB (for better customization)
+- [ ] Restructure product configurations db model
 - [ ] Move product specifications to MongoDB (for better customization)
 - [ ] Add caching for delivery data (Redis or Valkey)
 
@@ -15,11 +15,10 @@
     - [ ] Rewrite Repositories, Services and ViewModels to use domain models
     - [ ] Get rid of this dumb "dto" layer
 
-- [ ] Move product configurations to MongoDB (for better customization)
+- [ ] Restructure product configurations db model
     - [ ] Write tests for product repository to get full coverage
     - [ ] Write tests for configuration repository to get full coverage
-    - [ ] Create MongoDB structure for product configurations
-    - [ ] Create MongoDB structure for product specifications
-    - [ ] Rewrite product configurations repository to use MongoDB
-    - [ ] Rewrite product configurations repository to use MongoDB
+    - [ ] Create new db model for category types
+    - [ ] Change all relations to configuration model according to new db schema
+    - [ ] Rewrite product configurations and product repositories to use new db models
 

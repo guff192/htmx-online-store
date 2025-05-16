@@ -1,8 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class Manufacturer(BaseModel):
-    id: int | None
-    name: str
-    logo_url: str | None
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int | None = None
+    name: str = ''
+    logo_url: str | None = None
 

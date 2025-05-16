@@ -1,23 +1,25 @@
 from typing import Mapping
-from pydantic import BaseModel, NonNegativeInt
+from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
-from manufacturer import Manufacturer
-from product_configuration import ProductConfiguration
+from models.manufacturer import Manufacturer
+from models.product_configuration import ProductConfiguration
 
 
 ProductSpecifications = Mapping[str, int | float | str | bool] | None
 
 
 class Product(BaseModel):
-    id: int
-    name: str
+    model_config = ConfigDict(from_attributes=True)
 
-    description: str
-    specifications: ProductSpecifications
+    id: int = Field(default=-1)
+    name: str = ''
 
-    count: NonNegativeInt
-    newcomer: bool
+    description: str = ''
+    specifications: ProductSpecifications = None
 
-    manufacturer: Manufacturer
+    count: NonNegativeInt = 0
+    newcomer: bool = False
 
-    available_configurations: list[ProductConfiguration]
+    manufacturer: Manufacturer = Manufacturer()
+
+    available_configurations: list[ProductConfiguration] = []

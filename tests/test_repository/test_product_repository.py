@@ -433,20 +433,25 @@ class TestGetAll:
         offset = 0
         products: list[ProductDTO] = []
 
-        while products_page := product_repo.get_all(offset=offset):
+        product_repository_get_all_params = {
+            "query": "test",
+            "price_from": 0,
+            "price_to": 150_000,
+            "ram": [8],
+            "ssd": [256],
+            "cpu": ["i7"],
+            "resolution": ["FullHD"],
+            "touchscreen": [True, False],
+            "graphics": [True, False],
+        }
+
+        while products_page := product_repo.get_all(
+            offset=offset, **product_repository_get_all_params
+        ):
             products += products_page
             offset += 10
             products_page = product_repo.get_all(
-                query="test",
-                offset=offset,
-                price_from=0,
-                price_to=150_000,
-                ram=[8],
-                ssd=[256],
-                cpu=["i7"],
-                resolution=["FullHD"],
-                touchscreen=[True, False],
-                graphics=[True, False],
+                offset=offset, **product_repository_get_all_params
             )
 
         return products

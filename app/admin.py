@@ -4,7 +4,6 @@ from fastapi.responses import RedirectResponse
 from flask.app import Flask
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-from loguru import logger
 from sqlalchemy.orm import Session
 from starlette.middleware.base import (
     BaseHTTPMiddleware, RequestResponseEndpoint

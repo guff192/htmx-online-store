@@ -44,9 +44,7 @@ class AvailableProductConfigurationDbModel(Base):
     id = Column("id", Integer, primary_key=True, index=True, autoincrement=True)
 
     product_id = Column(Integer, ForeignKey("products.id"))
-    product = relationship("ProductDbModel", back_populates="configurations")
+    product = relationship("ProductDbModel", back_populates="available_configurations")
 
     configuration_id = Column(Integer, ForeignKey("product_configurations.id"))
-    configuration = relationship(
-        "ProductConfigurationDbModel", back_populates="products"
-    )
+    configuration = relationship("ProductConfigurationDbModel")

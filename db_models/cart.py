@@ -1,5 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.orm import relationship
+from sqlalchemy_utils import UUIDType
 
 from db.session import Base
 
@@ -9,10 +10,10 @@ class CartProductDbModel(Base):
 
     id = Column("id", Integer, primary_key=True, index=True)
 
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(UUIDType(binary=False), ForeignKey("users.id"))
     user = relationship("UserDbModel", back_populates="products")
 
-    product = relationship("ProductDbModel", back_populates="users")
+    product = relationship("ProductDbModel")
     product_id = Column(Integer, ForeignKey("products.id"))
 
     configurations = relationship(

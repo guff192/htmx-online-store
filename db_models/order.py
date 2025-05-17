@@ -47,9 +47,20 @@ class OrderProductDbModel(Base):
     product = relationship("ProductDbModel")
     product_id = mapped_column(ForeignKey("products.id"))
 
-    selected_configuration = relationship("ProductConfigurationDbModel")
-    selected_configuration_id = mapped_column(
-        ForeignKey("product_configurations.id"), nullable=False
+    configurations = relationship(
+        "OrderProductConfigurationDbModel", back_populates="order_product"
     )
 
     count = Column(Integer, nullable=False, default=1)
+
+
+class OrderProductConfigurationDbModel(Base):
+    __tablename__ = "order_product_configurations"
+
+    id = Column("id", Integer, primary_key=True, index=True, autoincrement=True)
+
+    order_product_id = Column(Integer, ForeignKey("order_products.id"), nullable=False)
+    order_product = relationship("OrderProductDbModel", back_populates="configurations")
+
+    configuration_id = Column(Integer, ForeignKey("product_configurations.id"), nullable=False)
+    configuration = relationship("ProductConfigurationDbModel")

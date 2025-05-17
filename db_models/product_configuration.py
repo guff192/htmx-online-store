@@ -12,7 +12,9 @@ class ConfigurationTypeDbModel(Base):
 
     img_url = Column(String(255), nullable=True)
 
-    configurations = relationship("ProductConfigurationDbModel", back_populates="type")
+    configurations = relationship(
+        "ProductConfigurationDbModel", back_populates="configuration_type"
+    )
 
 
 class ProductConfigurationDbModel(Base):
@@ -20,7 +22,7 @@ class ProductConfigurationDbModel(Base):
 
     id = Column("id", Integer, primary_key=True, index=True, autoincrement=True)
 
-    configuration_type_id = Column(Integer, ForeignKey("configuration_types"))
+    configuration_type_id = Column(Integer, ForeignKey("configuration_types.id"))
     configuration_type = relationship(
         "ConfigurationTypeDbModel", back_populates="configurations"
     )

@@ -62,7 +62,7 @@ class TestQueryFiltering:
 
         query = str(valid_test_products_without_soldered_ram[0].name)
         updated_stmt = product_repo._add_query_filter(stmt, query)
-        all_products = db.execute(stmt).scalars().all()
+        all_products = db.execute(updated_stmt).scalars().all()
 
         assert len(all_products) == 4
         assert all(p in all_products for p in valid_test_products_without_soldered_ram)

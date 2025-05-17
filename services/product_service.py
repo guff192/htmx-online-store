@@ -1,5 +1,3 @@
-from boto3.exceptions import Boto3Error
-from botocore.exceptions import EndpointConnectionError
 from fastapi import Depends
 from loguru import logger
 from pydantic_core import Url

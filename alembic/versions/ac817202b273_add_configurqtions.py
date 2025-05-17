@@ -8,7 +8,6 @@ Create Date: 2024-12-16 22:38:17.782579
 from typing import Sequence, Union
 
 from alembic import op
-import sqlalchemy as sa
 
 from app.config import Settings
 

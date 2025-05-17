@@ -1,4 +1,3 @@
-from typing import Sequence
 from uuid import UUID
 from pydantic import BaseModel
 from pydantic_core import Url

@@ -9,15 +9,11 @@ class ConfigurationType(BaseModel):
     image_url: Url | None = None
 
 
-class ConfigurationValue(BaseModel):
-    type: ConfigurationType
-    value: int | float | str | bool
-
-
 class ProductConfiguration(BaseModel):
     id: UUID
 
     additional_price: int | None = None
     short_name: str | None = None
 
-    value: ConfigurationValue
+    type: ConfigurationType
+    value: int | float | str | bool

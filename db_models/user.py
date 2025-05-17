@@ -26,8 +26,8 @@ class UserDbModel(Base):
     orders = relationship(OrderDbModel, back_populates='user')
 
 
-class UserProductDbModel(Base):
-    __tablename__ = 'user_products'
+class CartProductDbModel(Base):
+    __tablename__ = 'cart_products'
 
     id = Column('id', Integer, primary_key=True, index=True)
 

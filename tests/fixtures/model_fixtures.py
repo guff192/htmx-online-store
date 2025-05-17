@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from db_models.manufacturer import ManufacturerDbModel
 from db_models.product import ProductDbModel, ProductConfigurationDbModel
 
-from tests.fixtures.db_fixtures import db
 from tests.helpers.db_helpers import add_to_db, add_all_to_db
 from tests.helpers.configurations_helpers import create_available_configs_for_product, get_product_configs_for_ram
 

@@ -4,44 +4,10 @@ from sqlalchemy.orm import relationship
 from db.session import Base
 
 
-class AvailableProductConfigurationDbModel(Base):
-    __tablename__ = "available_product_configurations"
-
-    id = Column("id", Integer, primary_key=True,
-                index=True, autoincrement=True)
-
-    product_id = Column(Integer, ForeignKey("products.id"))
-    product = relationship("ProductDbModel", back_populates="configurations")
-
-    configuration_id = Column(Integer, ForeignKey("product_configurations.id"))
-    configuration = relationship(
-        "ProductConfigurationDbModel", back_populates="products")
-
-
-class ProductConfigurationDbModel(Base):
-    __tablename__ = "product_configurations"
-
-    id = Column("id", Integer, primary_key=True,
-                index=True, autoincrement=True)
-    ram_amount = Column(Integer, nullable=False, default=0)
-    ssd_amount = Column(Integer, nullable=False, default=0)
-
-    additional_price = Column(Integer, nullable=False, default=0)
-
-    is_default = Column(Boolean, default=False, nullable=False)
-    additional_ram = Column(Boolean, default=False, nullable=False)
-    soldered_ram = Column(Integer, default=0, nullable=False)
-
-    products = relationship(
-        "AvailableProductConfigurationDbModel", back_populates="configuration"
-    )
-
-
 class ProductDbModel(Base):
     __tablename__ = "products"
 
-    _id = Column("id", Integer, primary_key=True,
-                 index=True, autoincrement=True)
+    _id = Column("id", Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String(255), index=True, nullable=False, unique=True)
 
     description = Column(String(1000))
@@ -60,18 +26,27 @@ class ProductDbModel(Base):
     cpu = Column(String(12), nullable=False)
     gpu = Column(String(12), nullable=False)
     touch_screen = Column(Boolean, default=False, nullable=False)
-
     cpu_speed = Column(String(12), nullable=True)
     cpu_graphics = Column(String(32), nullable=True)
 
-    users = relationship("UserProductDbModel", back_populates="product")
-
-    configurations = relationship(
+    available_configurations = relationship(
         "AvailableProductConfigurationDbModel",
         back_populates="product",
     )
 
-    default_configuration_id = Column(
-        Integer, ForeignKey("product_configurations.id"))
+    default_configuration_id = Column(Integer, ForeignKey("product_configurations.id"))
     default_configuration = relationship("ProductConfigurationDbModel")
 
+
+class AvailableProductConfigurationDbModel(Base):
+    __tablename__ = "available_product_configurations"
+
+    id = Column("id", Integer, primary_key=True, index=True, autoincrement=True)
+
+    product_id = Column(Integer, ForeignKey("products.id"))
+    product = relationship("ProductDbModel", back_populates="configurations")
+
+    configuration_id = Column(Integer, ForeignKey("product_configurations.id"))
+    configuration = relationship(
+        "ProductConfigurationDbModel", back_populates="products"
+    )

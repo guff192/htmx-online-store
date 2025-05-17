@@ -6,52 +6,50 @@ from db_models.payment import PaymentDbModel
 
 
 class OrderDbModel(Base):
-    __tablename__ = 'orders'
+    __tablename__ = "orders"
 
-    id = Column('id', Integer, primary_key=True, index=True, autoincrement=True)
+    id = Column("id", Integer, primary_key=True, index=True, autoincrement=True)
 
-    user = relationship('UserDbModel', back_populates='orders')
-    user_id = mapped_column(ForeignKey('users.id'), UUIDType())
+    user = relationship("UserDbModel", back_populates="orders")
+    user_id = mapped_column(ForeignKey("users.id"), UUIDType())
 
-    products = relationship('OrderProductDbModel', cascade='all, delete')
+    products = relationship("OrderProductDbModel", cascade="all, delete")
 
     date = Column(DateTime, nullable=False)
 
-    comment = Column('comment', String(255), nullable=False, default='')
+    comment = Column("comment", String(255), nullable=False, default="")
 
-    buyer_name = Column('buyer_name', String(255), nullable=False, default='')
-    buyer_phone = Column('buyer_phone', String(255), nullable=False, default='')
+    buyer_name = Column("buyer_name", String(255), nullable=False, default="")
+    buyer_phone = Column("buyer_phone", String(255), nullable=False, default="")
 
-    region_id = Column('region_id', Integer)
-    region_name = Column('region_name', String(255), default='')
+    region_id = Column("region_id", Integer)
+    region_name = Column("region_name", String(255), default="")
 
-    city_id = Column('city_id', Integer)
-    city_name = Column('city_name', String(255), default='')
-    delivery_address = Column('delivery_address', String(255), nullable=False, default='')
+    city_id = Column("city_id", Integer)
+    city_name = Column("city_name", String(255), default="")
+    delivery_address = Column(
+        "delivery_address", String(255), nullable=False, default=""
+    )
 
-    delivery_track_number = Column('delivery_track_number', String(255), default='')
+    delivery_track_number = Column("delivery_track_number", String(255), default="")
 
-    payment = relationship(PaymentDbModel, back_populates='order', uselist=False)
+    payment = relationship(PaymentDbModel, back_populates="order", uselist=False)
 
 
 class OrderProductDbModel(Base):
-    __tablename__ = 'order_products'
+    __tablename__ = "order_products"
 
-    id = Column('id', Integer, primary_key=True, index=True, autoincrement=True)
+    id = Column("id", Integer, primary_key=True, index=True, autoincrement=True)
 
-    order = relationship('OrderDbModel', back_populates='products')
-    order_id = mapped_column(ForeignKey('orders.id'))
+    order = relationship("OrderDbModel", back_populates="products")
+    order_id = mapped_column(ForeignKey("orders.id"))
 
-    product = relationship('ProductDbModel')
-    product_id = mapped_column(ForeignKey('products.id'))
+    product = relationship("ProductDbModel")
+    product_id = mapped_column(ForeignKey("products.id"))
 
-    selected_configuration = relationship(
-        'ProductConfigurationDbModel'
-    )
+    selected_configuration = relationship("ProductConfigurationDbModel")
     selected_configuration_id = mapped_column(
-        ForeignKey('product_configurations.id'), nullable=False
+        ForeignKey("product_configurations.id"), nullable=False
     )
 
     count = Column(Integer, nullable=False, default=1)
-
-

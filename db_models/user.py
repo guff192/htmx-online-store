@@ -1,5 +1,5 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import mapped_column, relationship
+from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy.orm import relationship
 from sqlalchemy_utils import EmailType, UUIDType
 
 from db.session import Base
@@ -21,28 +21,6 @@ class UserDbModel(Base):
 
     is_admin = Column(Boolean, default=False, nullable=False)
 
-    products = relationship('UserProductDbModel', back_populates='user')
+    products = relationship('CartProductDbModel', back_populates='user')
 
     orders = relationship(OrderDbModel, back_populates='user')
-
-
-class CartProductDbModel(Base):
-    __tablename__ = 'cart_products'
-
-    id = Column('id', Integer, primary_key=True, index=True)
-
-    user = relationship('UserDbModel', back_populates='products')
-    user_id = mapped_column(ForeignKey('users.id'))
-
-    product = relationship('ProductDbModel', back_populates='users')
-    product_id = mapped_column(ForeignKey('products.id'))
-
-    selected_configuration = relationship(
-        'ProductConfigurationDbModel',
-    )
-    selected_configuration_id = mapped_column(
-        ForeignKey('product_configurations.id'), nullable=False
-    )
-
-    count = Column(Integer, nullable=False, default=1)
-

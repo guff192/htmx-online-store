@@ -7,7 +7,7 @@ from sqlalchemy.orm import Query, Session
 from db.session import db_dependency
 from exceptions.product_exceptions import ErrProductNotFound
 from db_models.product import ProductDbModel
-from db_models.user import UserProductDbModel
+from db_models.cart import CartProductDbModel
 from repository.configuration_repository import ConfigurationRepository
 from repository.product_repository import (
     ProductRepository,
@@ -34,32 +34,32 @@ class CartRepository:
             user_id: str,
             product_id: int,
             configuration_id: int = 0
-    ) -> Query[UserProductDbModel]:
+    ) -> Query[CartProductDbModel]:
         query_without_configuration = (
             self._db
-            .query(UserProductDbModel)
-            .filter(UserProductDbModel.user_id == user_id)
-            .filter(UserProductDbModel.product_id == product_id)
-            .filter(UserProductDbModel.selected_configuration_id == configuration_id)
+            .query(CartProductDbModel)
+            .filter(CartProductDbModel.user_id == user_id)
+            .filter(CartProductDbModel.product_id == product_id)
+            .filter(CartProductDbModel.selected_configuration_id == configuration_id)
         )
 
         if not configuration_id:
             return query_without_configuration
         return (
             query_without_configuration
-            .filter(UserProductDbModel.selected_configuration_id == configuration_id)
+            .filter(CartProductDbModel.selected_configuration_id == configuration_id)
         )
 
-    def get_user_products(self, user_id: str) -> list[UserProductDbModel]:
+    def get_user_products(self, user_id: str) -> list[CartProductDbModel]:
         user_products = (
-            self._db.query(UserProductDbModel).
+            self._db.query(CartProductDbModel).
             join(ProductDbModel).
-            filter(UserProductDbModel.user_id == user_id).all()
+            filter(CartProductDbModel.user_id == user_id).all()
         )
 
         return user_products
 
-    def get_product_in_cart(self, user_id: str, product_id: int) -> UserProductDbModel | None:
+    def get_product_in_cart(self, user_id: str, product_id: int) -> CartProductDbModel | None:
         return (
             self
             ._get_user_product_query(user_id, product_id)
@@ -68,24 +68,24 @@ class CartRepository:
 
     def add_to_cart(
         self, user_id: str, product_id: int, configuration_id: int
-    ) -> UserProductDbModel | None:
+    ) -> CartProductDbModel | None:
         found_userproduct_query = self._get_user_product_query(user_id,
                                                      product_id,
                                                      configuration_id)
 
         # Check if product is not already in cart
         if not found_userproduct_query.first():
-            user_product = UserProductDbModel(
+            user_product = CartProductDbModel(
                 user_id=user_id, product_id=product_id,
                 selected_configuration_id=configuration_id, count=1
             )
             self._db.add(user_product)
         else:
             # Increment product count
-            found_userproduct_query.update({UserProductDbModel.count: UserProductDbModel.count + 1})
+            found_userproduct_query.update({CartProductDbModel.count: CartProductDbModel.count + 1})
 
         self._db.commit()
-        updated_product: UserProductDbModel | None = (
+        updated_product: CartProductDbModel | None = (
             self
             ._get_user_product_query(user_id, product_id, configuration_id)
             .first()
@@ -98,8 +98,8 @@ class CartRepository:
             user_id: str,
             configuration_id: int,
             product_id: int
-    ) -> UserProductDbModel:
-        found_userproduct_query: Query[UserProductDbModel] = (
+    ) -> CartProductDbModel:
+        found_userproduct_query: Query[CartProductDbModel] = (
             self._get_user_product_query(user_id, product_id, configuration_id)
         )
         if not found_userproduct_query.first():
@@ -116,16 +116,16 @@ class CartRepository:
         if found_userproduct.__dict__.get('count', 0) == 1:
             found_userproduct_query.delete()
         else:
-            found_userproduct_query.update({UserProductDbModel.count: UserProductDbModel.count - 1})
+            found_userproduct_query.update({CartProductDbModel.count: CartProductDbModel.count - 1})
 
         self._db.flush((found_userproduct_query, ))
         self._db.commit()
 
-        updated_product: UserProductDbModel | None = (
+        updated_product: CartProductDbModel | None = (
             found_userproduct_query.first()
         )
         if not updated_product:
-            updated_product = UserProductDbModel(
+            updated_product = CartProductDbModel(
                 user_id=user_id, product_id=product_id,
                 selected_configuration_id=configuration_id, count=0,
                 product=product, selected_configuration=selected_configuration

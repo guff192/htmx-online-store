@@ -5,7 +5,8 @@ from fastapi import Depends
 from loguru import logger
 from exceptions.auth_exceptions import ErrUserNotFound
 from exceptions.product_exceptions import ErrProductNotFound
-from db_models.user import UserDbModel, UserProductDbModel
+from db_models.user import UserDbModel
+from db_models.cart import CartProductDbModel
 from schema.manufacturer_schema import Manufacturer
 from schema.user_schema import UserResponse
 from services.user_service import UserService, user_service_dependency
@@ -33,7 +34,7 @@ class CartService:
 
     def _userproduct_model_to_productincart_schema(
         self,
-        userproduct: UserProductDbModel,
+        userproduct: CartProductDbModel,
         product_id: int = 0
     ) -> ProductInCart:
         if not userproduct:
@@ -184,7 +185,7 @@ class CartService:
         )
 
     def get_product_in_cart(self, user_id: str, product_id: int) -> ProductInCart:
-        orm_product: UserProductDbModel | None = self._repo.get_product_in_cart(
+        orm_product: CartProductDbModel | None = self._repo.get_product_in_cart(
             user_id, product_id
         )
         product_schema: ProductInCart = (
@@ -195,7 +196,7 @@ class CartService:
 
     def add_to_cart(self, user_id: str,
                     product_id: int, configuration_id: int) -> ProductInCart:
-        orm_product: UserProductDbModel | None = (
+        orm_product: CartProductDbModel | None = (
             self._repo.add_to_cart(user_id, product_id, configuration_id)
         )
         product_schema: ProductInCart = (
@@ -208,7 +209,7 @@ class CartService:
     def remove_from_cart(self, user_id,
                          configuration_id: int,
                          product_id: int) -> ProductInCart:
-        orm_product: UserProductDbModel = (
+        orm_product: CartProductDbModel = (
             self._repo.remove_from_cart(user_id, configuration_id, product_id)
         )
         product_schema: ProductInCart = (

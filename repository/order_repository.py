@@ -7,7 +7,7 @@ from exceptions.order_exceptions import ErrOrderNotFound
 from fastapi import Depends
 from loguru import logger
 from db_models.order import OrderDbModel, OrderProductDbModel
-from db_models.user import UserProductDbModel
+from db_models.cart import CartProductDbModel
 from schema.cart_schema import CookieCartProduct
 from sqlalchemy.orm import Query, Session
 
@@ -19,7 +19,7 @@ class OrderRepository:
     def _user_product_to_order_product(
         self,
         order_id,
-        user_product: UserProductDbModel
+        user_product: CartProductDbModel
     ) -> OrderProductDbModel:
         return OrderProductDbModel(order_id=order_id,
                             product_id=user_product.product_id,
@@ -51,7 +51,7 @@ class OrderRepository:
 
     def create_with_user_products(self,
                user_id: str | None,
-               user_products: list[UserProductDbModel]) -> OrderDbModel:
+               user_products: list[CartProductDbModel]) -> OrderDbModel:
         order = OrderDbModel(user_id=user_id, comment='', date=datetime.now(timezone.utc),
                       buyer_name='', buyer_phone='', delivery_address='')
         self._session.add(order)

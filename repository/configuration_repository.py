@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from db.session import db_dependency, get_db
 from dto.configuration_dto import ConfigurationDTO
-from db_models.product import AvailableProductConfigurationDbModel, ProductConfigurationDbModel
+from db_models.product import AvailableProductConfigurationDbModel
+from db_models.product_configuration import ProductConfigurationDbModel
 
 
 class ConfigurationRepository:

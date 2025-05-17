@@ -14,9 +14,11 @@ from wtforms.fields import TextAreaField
 from db_models.banner import BannerDbModel
 from db_models.order import OrderDbModel
 from db_models.payment import PaymentDbModel
-from db_models.product import AvailableProductConfigurationDbModel, ProductDbModel, ProductConfigurationDbModel
+from db_models.product import AvailableProductConfigurationDbModel, ProductDbModel
+from db_models.product_configuration import ProductConfigurationDbModel
 from db_models.manufacturer import ManufacturerDbModel
-from db_models.user import UserDbModel, UserProductDbModel
+from db_models.user import UserDbModel
+from db_models.cart import CartProductDbModel
 from schema.user_schema import UserBase
 from services.auth_service import AuthService, get_auth_service
 from viewmodels.user_viewmodel import UserViewModel, get_user_viewmodel
@@ -80,7 +82,7 @@ class UserModelView(ModelView):
     form_columns: list[str] = ['name', 'google_id', 'profile_img_url', 'is_admin']
 
 
-class UserProductModelView(ModelView):
+class CartProductModelView(ModelView):
     can_view_details = True
     can_edit = True
     can_delete = True
@@ -232,7 +234,7 @@ def get_admin_app(session: Session) -> ASGIApp:
     flask_admin.add_view(ProductModelView(ProductDbModel, session))
     flask_admin.add_view(ManufacturerModelView(ManufacturerDbModel, session))
     flask_admin.add_view(UserModelView(UserDbModel, session))
-    flask_admin.add_view(UserProductModelView(UserProductDbModel, session))
+    flask_admin.add_view(CartProductModelView(CartProductDbModel, session))
     flask_admin.add_view(BannerModelView(BannerDbModel, session))
     flask_admin.add_view(ProductConfigurationModelView(ProductConfigurationDbModel, session))
     flask_admin.add_view(AvailableProductConfigurationModelView(AvailableProductConfigurationDbModel, session))

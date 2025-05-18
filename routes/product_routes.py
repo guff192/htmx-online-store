@@ -55,7 +55,6 @@ def get_product_list(
     product_vm: ProductViewModel = Depends(product_viewmodel_dependency),
     user: LoggedUser | None = Depends(oauth_user_dependency),
 ):
-    logger.debug(request.headers.get('hx-request'))
     if not request.headers.get('hx-request') == 'true' and not any([query, ram, ssd, cpu, resolution, touchscreen, graphics]):
         return RedirectResponse('/products/catalog')
 

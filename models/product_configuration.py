@@ -1,4 +1,3 @@
-from uuid import UUID
 from pydantic import BaseModel
 from pydantic_core import Url
 
@@ -10,7 +9,7 @@ class ConfigurationType(BaseModel):
 
 
 class ProductConfiguration(BaseModel):
-    id: UUID
+    id: int | None = None
 
     additional_price: int | None = None
     short_name: str | None = None

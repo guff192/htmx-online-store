@@ -89,8 +89,7 @@ def get_app() -> FastAPI:
     # ============
     # Mounted apps
     # ============
-    if not settings.testing:
-        app.mount('/admin', get_admin_app(get_db()), name='admin')
+    app.mount('/admin', get_admin_app(get_db()), name='admin')
 
     app.mount('/static', StaticFiles(directory=settings.static_dir), name='static')
 

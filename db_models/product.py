@@ -19,16 +19,6 @@ class ProductDbModel(Base):
     manufacturer_id = Column(Integer, ForeignKey("manufacturers.id"))
     manufacturer = relationship("ManufacturerDbModel", back_populates="products")
 
-    soldered_ram = Column(Integer, default=0, nullable=False)
-    can_add_ram = Column(Boolean, default=True, nullable=False)
-    resolution = Column(String(10), nullable=False)
-    resolution_name = Column(String(12), nullable=False, default="")
-    cpu = Column(String(12), nullable=False)
-    gpu = Column(String(12), nullable=False)
-    touch_screen = Column(Boolean, default=False, nullable=False)
-    cpu_speed = Column(String(12), nullable=True)
-    cpu_graphics = Column(String(32), nullable=True)
-
     available_configurations = relationship(
         "AvailableProductConfigurationDbModel",
         back_populates="product",

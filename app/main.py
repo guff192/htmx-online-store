@@ -34,7 +34,8 @@ async def lifecycle(app: FastAPI):
     logger.remove()  # remove default logger
     if settings.testing:
         logger.add('app.test.log', level='DEBUG', colorize=True,
-                   format='[{time:HH:mm:ss}] <level>{level}</level> <cyan>{message}</cyan>')
+                   format='[{time:HH:mm:ss}] <level>{level}</level> <green>{function}</green> <cyan>{message}</cyan>')
+        log_settings()
     elif settings.debug:
         logger.add('app.debug.log', level='DEBUG', colorize=True,
                    format='[{time:HH:mm:ss}] <level>{level}</level> <cyan>{message}</cyan>')

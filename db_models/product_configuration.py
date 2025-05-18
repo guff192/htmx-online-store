@@ -21,6 +21,8 @@ class ProductConfigurationDbModel(Base):
     __tablename__ = "product_configurations"
 
     id = Column("id", Integer, primary_key=True, index=True, autoincrement=True)
+    additional_price = Column(Integer, nullable=False, default=0)
+    short_name = Column(String(255), nullable=True)
 
     configuration_type_id = Column(Integer, ForeignKey("configuration_types.id"))
     configuration_type = relationship(

@@ -34,16 +34,15 @@ class ProductModelView(ModelView):
     can_create = True
 
     column_details_list: list[str] = ['name', 'price', 'count',
-                                      'newcomer', 'manufacturer', 'resolution_name']
+                                      'newcomer', 'manufacturer']
 
     column_editable_list: list[str] = ['price', 'count',
-                                       'newcomer', 'manufacturer_id', 'resolution_name']
+                                       'newcomer', 'manufacturer_id']
 
-    column_searchable_list = ('name', 'manufacturer_id', 'resolution_name')
+    column_searchable_list = ('name', 'manufacturer_id')
 
     form_columns: list[str] = ['name', 'description', 'price', 'manufacturer_id',
-                               'newcomer', 'resolution', 'resolution_name', 'cpu',
-                               'soldered_ram', 'can_add_ram', 'touch_screen']
+                               'newcomer']
 
     form_overrides = dict(
         description=TextAreaField,
@@ -89,8 +88,8 @@ class CartProductModelView(ModelView):
     can_create = True
 
     column_list: list[str] = ['user.name', 'product.name', 'count']
-    form_columns: list[str] = ['user_id', 'product_id', 'count', 'selected_configuration_id']
-    column_details_list: list[str] = ['user.name', 'product.name', 'count', 'selected_configuration']
+    form_columns: list[str] = ['user_id', 'product_id', 'count']
+    column_details_list: list[str] = ['user.name', 'product.name', 'count']
 
     # form_overrides = dict(
     #     user=Select2Field,

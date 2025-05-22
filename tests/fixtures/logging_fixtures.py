@@ -6,5 +6,5 @@ from pytest import fixture
 def setup_logger():
     logger.remove()
     logger.add('app.test.log', level='DEBUG', colorize=True,
-        format='[{time:HH:mm:ss}] <level>{level}</level> <magenta>{message}</magenta>')
+        format='[{time:HH:mm:ss}] <level>{level}</level> <green>{function}</green> <cyan>{message}</cyan>')
 

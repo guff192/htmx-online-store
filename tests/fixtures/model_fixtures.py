@@ -11,7 +11,9 @@ from tests.helpers.configurations_helpers import create_available_configs_for_pr
 
 @fixture(scope="function")
 def valid_test_manufacturer(db: Session):  # noqa
-    manufacturer = ManufacturerDbModel(id=1, name="test", logo_url="test")
+    manufacturer = ManufacturerDbModel(
+        id=1, name="test manufacturer", logo_url="http://example.com"
+    )
     add_to_db(db, manufacturer)
 
     return manufacturer

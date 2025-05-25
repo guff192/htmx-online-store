@@ -7,9 +7,9 @@ from db_models.order import OrderDbModel
 
 
 class UserDbModel(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
-    id = Column('id', UUIDType(binary=False), primary_key=True, index=True)
+    id = Column("id", UUIDType(binary=False), primary_key=True, index=True)
     google_id = Column(String(21), unique=True)
     yandex_id = Column(Integer, unique=True)
 
@@ -21,6 +21,6 @@ class UserDbModel(Base):
 
     is_admin = Column(Boolean, default=False, nullable=False)
 
-    products = relationship('CartProductDbModel', back_populates='user')
+    products = relationship("CartProductDbModel", back_populates="user")
 
-    orders = relationship(OrderDbModel, back_populates='user')
+    orders = relationship(OrderDbModel, back_populates="user")

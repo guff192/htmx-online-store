@@ -10,8 +10,9 @@ from repository.product_repository import ProductRepository
 
 from tests.fixtures.db_fixtures import db  # noqa F411
 from tests.fixtures.logging_fixtures import setup_logger  # noqa F411
-from tests.fixtures.model_fixtures import (
-    basic_configs,  # noqa F411
+from tests.fixtures.db_model_fixtures import (
+    valid_test_config_type,  # noqa F411
+    valid_test_configs,  # noqa F411
     valid_test_product,  # noqa F411
     valid_test_products_without_soldered_ram,  # noqa F411
     valid_test_products_with_soldered_ram,  # noqa F411

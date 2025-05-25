@@ -13,9 +13,9 @@ from repository.configuration_repository import ConfigurationRepository
 from tests.test_repository import log_repository_test_info
 
 from tests.fixtures.db_fixtures import db
-from tests.fixtures.model_fixtures import (
     basic_configs,  # noqa F401
     valid_test_config,
+from tests.fixtures.db_model_fixtures import (
     valid_test_product,  # noqa F401
     invalid_test_product,
     valid_test_manufacturer,

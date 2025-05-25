@@ -3,7 +3,10 @@ from sqlalchemy.orm import Session
 
 from db_models.manufacturer import ManufacturerDbModel
 from db_models.product import ProductDbModel
-from db_models.product_configuration import ProductConfigurationDbModel
+from db_models.product_configuration import (
+    ConfigurationTypeDbModel,
+    ProductConfigurationDbModel,
+)
 
 from tests.helpers.db_helpers import add_to_db, add_all_to_db
 from tests.helpers.configurations_helpers import create_available_configs_for_product, get_product_configs_for_ram
@@ -20,28 +23,49 @@ def valid_test_manufacturer(db: Session):  # noqa
 
 
 @fixture(scope="function")
-def basic_configs(db: Session) -> list[ProductConfigurationDbModel]:  # noqa
-    return (
-        db.query(ProductConfigurationDbModel)
-        .filter(ProductConfigurationDbModel.is_default == True)  # noqa:E712
-        .all()
-    )
-
-
-@fixture(scope="function")
-def valid_test_config(db: Session):  # noqa
-    config = ProductConfigurationDbModel(
-        id=-1,
-        ram_amount=8,
-        ssd_amount=256,
-        additional_price=4000,
-        is_default=False,
-        additional_ram=False,
-        soldered_ram=8,
+def valid_test_config_type(db: Session):  # noqa F411
+    config = ConfigurationTypeDbModel(
+        id=0,
+        name="test",
     )
     add_to_db(db, config)
 
     return config
+
+
+@fixture(scope="function")
+def valid_test_config(db: Session, valid_test_config_type: ConfigurationTypeDbModel):  # noqa
+    config = ProductConfigurationDbModel(
+        id=0,
+        additional_price=1000,
+        short_name="test",
+        configuration_type_id=valid_test_config_type.id,
+        configuration_type=valid_test_config_type,
+        value="test value",
+    )
+    add_to_db(db, config)
+
+    return config
+
+
+@fixture(scope="function")
+def valid_test_configs(
+    db: Session, valid_test_config_type: ConfigurationTypeDbModel
+) -> list[ProductConfigurationDbModel]:  # noqa
+    configs: list[ProductConfigurationDbModel] = []
+    for i in range(1, 4):
+        config = ProductConfigurationDbModel(
+            id=i,
+            additional_price=1000 * i,
+            short_name="test" * i,
+            configuration_type_id=valid_test_config_type.id,
+            configuration_type=valid_test_config_type,
+            value="test value" * i,
+        )
+        configs.append(config)
+    add_all_to_db(db, configs)
+
+    return configs
 
 
 @fixture(scope="function", params=[x + 1 for x in range(3)])

@@ -8,6 +8,13 @@ from models.product_configuration import ProductConfiguration
 ProductSpecifications = Mapping[str, int | float | str | bool] | None
 
 
+class AvailableProductConfiguration(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int | None = Field(validation_alias='id', default=None)
+    configuration: ProductConfiguration
+
+
 class Product(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -22,4 +29,4 @@ class Product(BaseModel):
 
     manufacturer: Manufacturer = Manufacturer()
 
-    available_configurations: list[ProductConfiguration] = []
+    available_configurations: list[AvailableProductConfiguration] = []

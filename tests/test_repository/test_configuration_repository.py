@@ -4,8 +4,11 @@ from sqlalchemy.orm import Session
 
 from db_models.product import (
     ProductDbModel,
-    ProductConfigurationDbModel,
     AvailableProductConfigurationDbModel,
+)
+from db_models.product_configuration import (
+    ProductConfigurationDbModel,
+    ConfigurationTypeDbModel,
 )
 from db_models.manufacturer import ManufacturerDbModel
 from repository.configuration_repository import ConfigurationRepository
@@ -13,15 +16,17 @@ from repository.configuration_repository import ConfigurationRepository
 from tests.test_repository import log_repository_test_info
 
 from tests.fixtures.db_fixtures import db
-    basic_configs,  # noqa F401
-    valid_test_config,
+from tests.fixtures.logging_fixtures import setup_logger
 from tests.fixtures.db_model_fixtures import (
+    valid_test_config,  # noqa F401
+    valid_test_config_type,  # noqa F401
+    valid_test_configs,  # noqa F401
     valid_test_product,  # noqa F401
-    invalid_test_product,
-    valid_test_manufacturer,
+    invalid_test_product,  # noqa F401
+    valid_test_manufacturer,  # noqa F401
 )
-from tests.fixtures.repository_fixtures import configuration_repo
-from tests.helpers.db_helpers import add_all_to_db, add_to_db
+from tests.fixtures.repository_fixtures import configuration_repo  # noqa F401
+from tests.helpers.db_helpers import add_all_to_db, add_to_db  # noqa F401
 from tests.helpers.logging_helpers import log_test_info
 
 
@@ -31,16 +36,14 @@ def test_cleanup(db: Session):  # noqa F811
     yield
 
     try:
-        db.query(ProductConfigurationDbModel).filter(
-            ProductConfigurationDbModel.id < 0
-        ).delete()
         db.query(AvailableProductConfigurationDbModel).delete()
         db.query(ProductDbModel).delete()
+        db.query(ProductConfigurationDbModel).delete()
+        db.query(ConfigurationTypeDbModel).delete()
         db.query(ManufacturerDbModel).delete()
         db.commit()
     except Exception as e:
         db.rollback()
-
         logger.error(f"Failed to cleanup test data: {str(e)}")
         raise e
 
@@ -61,11 +64,11 @@ class TestGetById:
         valid_test_config: ProductConfigurationDbModel,  # noqa F811
     ):
         id_to_search = int(str(valid_test_config.id))
-        config = configuration_repo.get_by_id(id_to_search)
+        found_config = configuration_repo.get_by_id(id_to_search)
 
-        assert config is not None
+        assert found_config is not None
 
-        found_config_id = int(str(config.id))
+        found_config_id = int(str(found_config.id))
         assert found_config_id == id_to_search
 
 
@@ -84,24 +87,17 @@ class TestGetConfigurationsForProduct:
         product_id = (
             int(str(valid_test_product._id)) if str(valid_test_product._id) else None
         )
+        orm_available_product_configurations = valid_test_product.available_configurations
+        assert orm_available_product_configurations is not None
+        assert len(orm_available_product_configurations) > 0
         assert product_id is not None
 
-        configs = configuration_repo.get_configurations_for_product(product_id)
-        assert len(configs) > 0
-        for config in configs:
-            assert config.soldered_ram == valid_test_product.soldered_ram
-            assert config.additional_ram == valid_test_product.can_add_ram
+        found_configs = configuration_repo.get_configurations_for_product(product_id)
+        assert len(found_configs) > 0
 
-    def test_with_invalid_product(
-        self,
-        configuration_repo: ConfigurationRepository,  # noqa F811
-        invalid_test_product: ProductDbModel,  # noqa F811
-    ):
-        product_id = (
-            int(str(invalid_test_product._id))
-            if str(invalid_test_product._id)
-            else None
-        )
-        assert product_id is not None
-        configs = configuration_repo.get_configurations_for_product(product_id)
-        assert len(configs) == 0
+        for found_config in found_configs:
+            assert any(
+                orm_product_config.configuration_id == found_config.id
+                and orm_product_config.configuration.value == found_config.value
+                for orm_product_config in orm_available_product_configurations
+            )

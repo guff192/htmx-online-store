@@ -119,14 +119,14 @@ class ProductRepository:
         stmt = stmt.limit(10)
 
         result = self.db.execute(stmt)
-        model_products = result.scalars().all()
+        orm_model_products = result.scalars().all()
 
         domain_model_list: list[Product] = [
-            Product.model_validate(orm_model) for orm_model in model_products
+            Product.model_validate(orm_model) for orm_model in orm_model_products
         ]
 
         # need empty product to indicate that there are no more products
-        if len(domain_model_list) == 0 and len(model_products) > 0:
+        if len(domain_model_list) == 0 and len(orm_model_products) > 0:
             domain_model_list.append(Product())
 
         return domain_model_list

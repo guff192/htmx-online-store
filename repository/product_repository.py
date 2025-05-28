@@ -121,13 +121,13 @@ class ProductRepository:
         result = self.db.execute(stmt)
         orm_model_products = result.scalars().all()
 
+        # need empty product to indicate that there are no more products
+        if len(orm_model_products) == 0:
+            return []
+
         domain_model_list: list[Product] = [
             Product.model_validate(orm_model) for orm_model in orm_model_products
         ]
-
-        # need empty product to indicate that there are no more products
-        if len(domain_model_list) == 0 and len(orm_model_products) > 0:
-            domain_model_list.append(Product())
 
         return domain_model_list
 
@@ -294,17 +294,26 @@ class ProductRepository:
 
         return result
 
-    def get_newcomers(self, offset: int) -> list[ProductDbModel]:
-        product_list = (
+    def get_newcomers(self, offset: int) -> list[Product]:
+        orm_product_list = (
             self.db.query(ProductDbModel).
             filter(ProductDbModel.newcomer == True).  # noqa: E712
             slice(offset, offset + 10).all()
         )
+        if not orm_product_list:
+            return []
 
-        return product_list
+        return [
+            Product.model_validate(orm_product)
+            for orm_product in orm_product_list
+        ]
 
-    def get_by_id(self, product_id) -> ProductDbModel | None:
-        return self.db.query(ProductDbModel).get(product_id)
+    def get_by_id(self, product_id) -> Product | None:
+        orm_product = self.db.query(ProductDbModel).get(product_id)
+        if not orm_product:
+            return None
+
+        return Product.model_validate(orm_product)
 
     def get_by_name(self, name: str) -> ProductDbModel :
         return self.db.query(ProductDbModel).filter(ProductDbModel.name == name).first()

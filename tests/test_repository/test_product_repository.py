@@ -3,7 +3,10 @@ from pytest import fixture
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from db_models.product_configuration import ConfigurationTypeDbModel, ProductConfigurationDbModel
+from db_models.product_configuration import (
+    ConfigurationTypeDbModel,
+    ProductConfigurationDbModel,
+)
 from models.product import Product
 from db_models.product import ProductDbModel, AvailableProductConfigurationDbModel
 from db_models.manufacturer import ManufacturerDbModel

@@ -257,6 +257,9 @@ class TestGetById:
             assert isinstance(e, ErrProductNotFound), (
                 f"Expected ErrProductNotFound, got {type(e)}"
             )
+            return
+
+        assert False, "Expected ErrProductNotFound, but no exception was raised"
 
 
 class TestGetNewcomers:

@@ -11,6 +11,7 @@ from db_models.product_configuration import (
     ConfigurationTypeDbModel,
 )
 from db_models.manufacturer import ManufacturerDbModel
+from exceptions.product_configurations_exceptions import ErrProductConfigurationNotFound
 from repository.configuration_repository import ConfigurationRepository
 
 from tests.test_repository import log_repository_test_info
@@ -70,6 +71,43 @@ class TestGetById:
 
         found_config_id = int(str(found_config.id))
         assert found_config_id == id_to_search
+
+    def test_with_invalid_id(
+        self,
+        configuration_repo: ConfigurationRepository,  # noqa F811
+        valid_test_config: ProductConfigurationDbModel,  # noqa F811
+    ):
+        id_to_search = int(str(valid_test_config.id)) + 1
+
+        try:
+            found_config = configuration_repo.get_by_id(id_to_search)
+        except Exception as e:
+            assert isinstance(e, ErrProductConfigurationNotFound), (
+                f"Expected ErrProductConfigurationNotFound, got {type(e)}"
+            )
+            return
+
+        assert False, (
+            "Expected ErrProductConfigurationNotFound, but no exception was raised"
+        )
+
+    def test_without_config(
+        self,
+        configuration_repo: ConfigurationRepository,  # noqa F811
+    ):
+        id_to_search = 1
+
+        try:
+            found_config = configuration_repo.get_by_id(id_to_search)
+        except Exception as e:
+            assert isinstance(e, ErrProductConfigurationNotFound), (
+                f"Expected ErrProductConfigurationNotFound, got {type(e)}"
+            )
+            return
+
+        assert False, (
+            "Expected ErrProductConfigurationNotFound, but no exception was raised"
+        )
 
 
 class TestGetConfigurationsForProduct:

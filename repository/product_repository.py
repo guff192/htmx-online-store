@@ -315,8 +315,12 @@ class ProductRepository:
 
         return Product.model_validate(orm_product)
 
-    def get_by_name(self, name: str) -> ProductDbModel:
-        return self.db.query(ProductDbModel).filter(ProductDbModel.name == name).first()
+    def get_by_name(self, name: str) -> Product | None:
+        orm_product = self.db.query(ProductDbModel).filter(ProductDbModel.name == name).first()
+        if orm_product is None or int(str(orm_product.count)) < 0:
+            return None
+
+        return Product.model_validate(orm_product)
 
     def search(self, query: str, offset: int) -> list[ProductDbModel]:
         return self.db.query(ProductDbModel).\

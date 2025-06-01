@@ -240,7 +240,9 @@ class TestGetById:
         logger.info("Testing with valid product")
         product = product_repo.get_by_id(valid_test_product._id)
         assert product is not None, "Test product was not found"
-        assert product is valid_test_product
+        assert product.id == int(str(valid_test_product._id)), (
+            f"Product id mismatch: {product.id} != {valid_test_product._id}"
+        )
 
     def test_without_products(
         self,

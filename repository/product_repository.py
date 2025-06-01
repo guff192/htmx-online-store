@@ -10,6 +10,7 @@ from db_models.product import AvailableProductConfigurationDbModel, ProductDbMod
 from db_models.product_configuration import ProductConfigurationDbModel
 from db_models.manufacturer import ManufacturerDbModel
 from db_models.cart import CartProductDbModel
+from exceptions.product_exceptions import ErrProductNotFound
 from models.product import Product
 from repository.configuration_repository import (
     ConfigurationRepository,
@@ -308,10 +309,10 @@ class ProductRepository:
             for orm_product in orm_product_list
         ]
 
-    def get_by_id(self, product_id) -> Product | None:
+    def get_by_id(self, product_id) -> Product:
         orm_product = self.db.query(ProductDbModel).get(product_id)
         if not orm_product:
-            return None
+            raise ErrProductNotFound(product_id)
 
         return Product.model_validate(orm_product)
 

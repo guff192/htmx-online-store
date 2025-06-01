@@ -7,6 +7,7 @@ from db_models.product_configuration import (
     ConfigurationTypeDbModel,
     ProductConfigurationDbModel,
 )
+from exceptions.product_exceptions import ErrProductNotFound
 from models.product import Product
 from db_models.product import ProductDbModel, AvailableProductConfigurationDbModel
 from db_models.manufacturer import ManufacturerDbModel
@@ -249,8 +250,13 @@ class TestGetById:
         product_repo: ProductRepository,  # noqa F811
     ):
         logger.info("Testing without products")
-        product = product_repo.get_by_id(-1)
-        assert product is None
+
+        try:
+            product = product_repo.get_by_id(1)
+        except Exception as e:
+            assert isinstance(e, ErrProductNotFound), (
+                f"Expected ErrProductNotFound, got {type(e)}"
+            )
 
 
 class TestGetNewcomers:

@@ -1,6 +1,7 @@
 from typing import Generator
 from fastapi import Depends
 from loguru import logger
+from pydantic import ValidationError
 from sqlalchemy import Select, or_, select
 from sqlalchemy.orm import Session
 
@@ -10,7 +11,7 @@ from db_models.product import AvailableProductConfigurationDbModel, ProductDbMod
 from db_models.product_configuration import ProductConfigurationDbModel
 from db_models.manufacturer import ManufacturerDbModel
 from db_models.cart import CartProductDbModel
-from exceptions.product_exceptions import ErrProductNotFound
+from exceptions.product_exceptions import ErrInvalidProduct, ErrProductNotFound
 from models.product import Product
 from repository.configuration_repository import (
     ConfigurationRepository,
@@ -126,9 +127,14 @@ class ProductRepository:
         if len(orm_model_products) == 0:
             return []
 
-        domain_model_list: list[Product] = [
-            Product.model_validate(orm_model) for orm_model in orm_model_products
-        ]
+        domain_model_list: list[Product] = []
+        for orm_model in orm_model_products:
+            try:
+                product_domain_model = Product.model_validate(orm_model) 
+                domain_model_list.append(product_domain_model)
+            except ValidationError as e:
+                logger.debug(f"Validation error for product {orm_model._id}: {e}")
+                continue
 
         return domain_model_list
 
@@ -314,7 +320,10 @@ class ProductRepository:
         if not orm_product:
             raise ErrProductNotFound(product_id)
 
-        return Product.model_validate(orm_product)
+        try:
+            return Product.model_validate(orm_product)
+        except ValidationError:
+            raise ErrInvalidProduct(product_id)
 
     def get_by_name(self, name: str) -> Product | None:
         orm_product = self.db.query(ProductDbModel).filter(ProductDbModel.name == name).first()

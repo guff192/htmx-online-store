@@ -251,3 +251,56 @@ class TestGetById:
         logger.info("Testing without products")
         product = product_repo.get_by_id(-1)
         assert product is None
+
+
+class TestGetNewcomers:
+    @fixture(scope="class", autouse=True)
+    def log_info(self):
+        log_test_info("Testing ProductRepository.get_newcomers() method")
+        yield
+
+    def _get_all_newcomers(self, repo: ProductRepository) -> list[Product]:
+        offset = 0
+        found_newcomers: list[Product] = []
+        while found_newcomers_page := repo.get_newcomers(offset):
+            if not found_newcomers_page:
+                break
+
+            found_newcomers += found_newcomers_page
+            offset += 10
+
+        return found_newcomers
+
+    def test_with_valid_product(
+        self,
+        product_repo: ProductRepository,  # noqa F811
+        valid_test_product: ProductDbModel,  # noqa F811
+    ):
+        logger.info("Testing with valid product")
+
+        found_newcomers = self._get_all_newcomers(product_repo)
+
+        if bool(valid_test_product.newcomer):
+            assert len(found_newcomers) == 1
+
+            found_newcomer = found_newcomers[0]
+            assert found_newcomer.id == int(str(valid_test_product._id))
+        else:
+            assert len(found_newcomers) == 0
+
+    def test_with_valid_products(
+        self,
+        product_repo: ProductRepository,  # noqa F811
+        valid_test_products: list[ProductDbModel],  # noqa F811
+    ):
+        logger.info("Testing with multiple valid products")
+
+        found_newcomers = self._get_all_newcomers(product_repo)
+        orm_filtered_newcomers = [p for p in valid_test_products if bool(p.newcomer)]
+
+        assert len(found_newcomers) == len(orm_filtered_newcomers)
+
+        found_newcomers_ids = [p.id for p in found_newcomers]
+        orm_newcomers_ids = [int(str(p._id)) for p in orm_filtered_newcomers]
+        assert any(test_id in orm_newcomers_ids for test_id in found_newcomers_ids)
+        assert any(found_id in found_newcomers_ids for found_id in orm_newcomers_ids)

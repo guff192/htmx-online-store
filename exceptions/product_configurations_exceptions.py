@@ -16,4 +16,4 @@ class ErrInvalidProductConfiguration(HTTPException):
         if config_id is not None:
             detailed_msg += f": {config_id}"
 
-        super().__init__(status_code=400, detail="Invalid product configuration data")
+        super().__init__(status_code=400, detail=detailed_msg)

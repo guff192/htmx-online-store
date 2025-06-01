@@ -109,9 +109,7 @@ class TestPriceFiltering:
         assert len(all_products) == len(valid_test_products)
 
         all_products_ids = [id(p) for p in all_products]
-        valid_test_products_ids = [
-            id(p) for p in valid_test_products
-        ]
+        valid_test_products_ids = [id(p) for p in valid_test_products]
         assert all(obj_id in all_products_ids for obj_id in valid_test_products_ids)
 
     def test_price_filter_invalid(

@@ -183,7 +183,7 @@ class TestGetAll:
         all_products: list[Product],  # noqa F811
     ):
         logger.info("Testing with valid product")
-        
+
         valid_test_product_id = int(str(valid_test_product._id))
 
         assert len(all_products) > 0, "No products were found"

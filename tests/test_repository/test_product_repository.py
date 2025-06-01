@@ -304,3 +304,51 @@ class TestGetNewcomers:
         orm_newcomers_ids = [int(str(p._id)) for p in orm_filtered_newcomers]
         assert any(test_id in orm_newcomers_ids for test_id in found_newcomers_ids)
         assert any(found_id in found_newcomers_ids for found_id in orm_newcomers_ids)
+
+
+class TestGetByName:
+    @fixture(scope="class", autouse=True)
+    def log_info(self):
+        log_test_info("Testing ProductRepository.get_by_name() method")
+        yield
+
+    def test_with_valid_product(
+        self,
+        product_repo: ProductRepository,  # noqa F811
+        valid_test_product: ProductDbModel,  # noqa F811
+    ):
+        logger.info("Testing with valid product")
+
+        found_product: Product | None = product_repo.get_by_name(
+            str(valid_test_product.name)
+        )
+
+        assert found_product is not None, "Test product was not found"
+        assert found_product.id == int(str(valid_test_product._id)), (
+            f"Product id mismatch: {found_product.id} != {valid_test_product._id}"
+        )
+        assert found_product.name == str(valid_test_product.name)
+
+    def test_with_invalid_name(
+        self,
+        product_repo: ProductRepository,  # noqa F811
+        valid_test_products: list[ProductDbModel],  # noqa F811
+    ):
+        logger.info("Testing with invalid name")
+
+        found_product: Product | None = product_repo.get_by_name("invalid_name")
+
+        assert found_product is None
+
+    def test_with_invalid_product(
+        self,
+        product_repo: ProductRepository,  # noqa F811
+        invalid_test_product: ProductDbModel,  # noqa F811
+    ):
+        logger.info("Testing with invalid product")
+
+        found_product: Product | None = product_repo.get_by_name(
+            str(invalid_test_product.name)
+        )
+
+        assert found_product is None

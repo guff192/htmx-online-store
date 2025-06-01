@@ -379,23 +379,25 @@ class ProductRepository:
         product = self.get_by_id(product._id)
         return product
 
-    def update(self,
-               id: int,
-               name: str,
-               description: str,
-               price: int,
-               count: int,
-               manufacturer: ManufacturerDbModel,
-               configurations: list[ProductConfigurationDbModel],
-               soldered_ram: int = 0,
-               can_add_ram: bool = True,
-               resolution: str = '',
-               resolution_name: str = '',
-               cpu: str = '',
-               gpu: str = '',
-               touch_screen: bool = False,
-               cpu_speed: str = '',
-               cpu_graphics: str = '') -> int:
+    def update(
+        self,
+       id: int,
+       name: str,
+       description: str,
+       price: int,
+       count: int,
+       manufacturer: ManufacturerDbModel,
+       configurations: list[ProductConfigurationDbModel],
+       soldered_ram: int = 0,
+       can_add_ram: bool = True,
+       resolution: str = '',
+       resolution_name: str = '',
+       cpu: str = '',
+       gpu: str = '',
+       touch_screen: bool = False,
+       cpu_speed: str = '',
+       cpu_graphics: str = ''
+    ) -> int:
 
         updated_product_query = self.db.query(ProductDbModel).filter(
             ProductDbModel._id == id

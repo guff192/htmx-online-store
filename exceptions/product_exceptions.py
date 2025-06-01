@@ -10,10 +10,14 @@ class ErrProductAlreadyExists(HTTPException):
 
 
 class ErrInvalidProduct(HTTPException):
-    def __init__(self):
+    def __init__(self, product_id: int | None = None):
+        detailed_msg = "Invalid product data"
+        if product_id is not None:
+            detailed_msg += f": {product_id}"
+
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Invalid product data'
+            detail=detailed_msg
         )
 
 

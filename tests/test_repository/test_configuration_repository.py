@@ -87,7 +87,9 @@ class TestGetConfigurationsForProduct:
         product_id = (
             int(str(valid_test_product._id)) if str(valid_test_product._id) else None
         )
-        orm_available_product_configurations = valid_test_product.available_configurations
+        orm_available_product_configurations = (
+            valid_test_product.available_configurations
+        )
         assert orm_available_product_configurations is not None
         assert len(orm_available_product_configurations) > 0
         assert product_id is not None

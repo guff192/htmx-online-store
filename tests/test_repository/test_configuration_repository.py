@@ -158,7 +158,7 @@ class TestGetConfigurationsForProduct:
         )
 
         found_configs = configuration_repo.get_configurations_for_product(product_id)
-        assert len(found_configs) > 0
+        assert len(found_configs) > 0, "No configurations found"
 
         for found_config in found_configs:
             assert any(

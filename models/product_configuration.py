@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 from pydantic_core import Url
 
 
@@ -15,7 +15,7 @@ class ProductConfiguration(BaseModel):
 
     id: int | None = None
 
-    additional_price: int | None = None
+    additional_price: NonNegativeInt | None = None
     short_name: str | None = None
 
     type: ConfigurationType = Field(validation_alias='configuration_type')

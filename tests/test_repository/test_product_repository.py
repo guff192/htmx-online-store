@@ -331,6 +331,16 @@ class TestGetNewcomers:
         assert any(test_id in orm_newcomers_ids for test_id in found_newcomers_ids)
         assert any(found_id in found_newcomers_ids for found_id in orm_newcomers_ids)
 
+    def test_with_invalid_product(
+        self,
+        product_repo: ProductRepository,  # noqa F811
+        invalid_test_product,  # noqa F811
+    ):
+        logger.info("Testing with invalid product")
+
+        found_newcomers = self._get_all_newcomers(product_repo)
+        assert len(found_newcomers) == 0, "Found newcomers, but they are invalid"
+
 
 class TestGetByName:
     @fixture(scope="class", autouse=True)

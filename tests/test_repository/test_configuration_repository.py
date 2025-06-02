@@ -65,6 +65,8 @@ class TestGetById:
         configuration_repo: ConfigurationRepository,  # noqa F811
         valid_test_config: ProductConfigurationDbModel,  # noqa F811
     ):
+        logger.info("Testing with valid config")
+
         id_to_search = int(str(valid_test_config.id))
         found_config = configuration_repo.get_by_id(id_to_search)
 
@@ -99,6 +101,8 @@ class TestGetById:
         configuration_repo: ConfigurationRepository,  # noqa F811
         valid_test_config: ProductConfigurationDbModel,  # noqa F811
     ):
+        logger.info("Testing with invalid id")
+
         id_to_search = int(str(valid_test_config.id)) + 1
 
         try:
@@ -117,6 +121,8 @@ class TestGetById:
         self,
         configuration_repo: ConfigurationRepository,  # noqa F811
     ):
+        logger.info("Testing without config")
+
         id_to_search = 1
 
         try:
@@ -144,6 +150,8 @@ class TestGetConfigurationsForProduct:
         configuration_repo: ConfigurationRepository,  # noqa F811
         valid_test_product: ProductDbModel,  # noqa F811
     ):
+        logger.info("Testing with valid product")
+
         product_id = int(str(valid_test_product._id))
         orm_available_product_configurations = (
             valid_test_product.available_configurations

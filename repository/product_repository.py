@@ -341,7 +341,10 @@ class ProductRepository:
         if orm_product is None or int(str(orm_product.count)) < 0:
             raise ErrProductNotFound
 
-        return Product.model_validate(orm_product)
+        try:
+            return Product.model_validate(orm_product)
+        except ValidationError:
+            raise ErrProductNotFound
 
     def search(self, query: str, offset: int) -> list[ProductDbModel]:
         return self.db.query(ProductDbModel).\

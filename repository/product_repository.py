@@ -131,6 +131,9 @@ class ProductRepository:
         for orm_model in orm_model_products:
             try:
                 product_domain_model = Product.model_validate(orm_model) 
+                if product_domain_model.count <= 0:
+                    continue
+
                 domain_model_list.append(product_domain_model)
             except ValidationError as e:
                 logger.debug(f"Validation error for product {orm_model._id}: {e}")

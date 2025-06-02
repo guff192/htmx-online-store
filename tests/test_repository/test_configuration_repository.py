@@ -23,6 +23,7 @@ from tests.fixtures.db_model_fixtures import (
     valid_test_config_type,  # noqa F401
     valid_test_configs,  # noqa F401
     valid_test_product,  # noqa F401
+    invalid_test_config,  # noqa F401
     invalid_test_product,  # noqa F401
     valid_test_manufacturer,  # noqa F401
 )
@@ -71,6 +72,27 @@ class TestGetById:
 
         found_config_id = int(str(found_config.id))
         assert found_config_id == id_to_search
+
+    def test_with_invalid_config(
+        self,
+        configuration_repo: ConfigurationRepository,  # noqa F811
+        invalid_test_config: ProductConfigurationDbModel,  # noqa F811
+    ):
+        logger.info("Testing with invalid config")
+
+        id_to_search = int(str(invalid_test_config.id))
+
+        try:
+            found_config = configuration_repo.get_by_id(id_to_search)
+        except Exception as e:
+            assert isinstance(e, ErrProductConfigurationNotFound), (
+                f"Expected ErrProductConfigurationNotFound, got {type(e)}"
+            )
+            return
+
+        assert False, (
+            "Expected ErrProductConfigurationNotFound, but no exception was raised"
+        )
 
     def test_with_invalid_id(
         self,

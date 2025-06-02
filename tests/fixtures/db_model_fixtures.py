@@ -144,10 +144,10 @@ def invalid_test_product(
         name=f"test {request.param}",
         description="test",
         price=request.param * 1000 * -(1**request.param),
-        count=(-1 ** (request.param + 1)) * 100 * request.param,
+        count=-1,
         manufacturer=valid_test_manufacturer,
         manufacturer_id=valid_test_manufacturer.id,
-        newcomer=False,
+        newcomer=True,
     )
     add_to_db(db, product)
 

@@ -269,7 +269,7 @@ class TestGetById:
         logger.info("Testing without products")
 
         try:
-            product = product_repo.get_by_id(1)
+            product = product_repo.get_by_id(1)  # noqa F841
         except Exception as e:
             assert isinstance(e, ErrProductNotFound), (
                 f"Expected ErrProductNotFound, got {type(e)}"

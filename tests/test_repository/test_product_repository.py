@@ -245,6 +245,23 @@ class TestGetById:
             f"Product id mismatch: {product.id} != {valid_test_product._id}"
         )
 
+    def test_with_invalid_product(
+        self,
+        product_repo: ProductRepository,  # noqa F811
+        invalid_test_product: ProductDbModel,  # noqa F811
+    ):
+        logger.info("Testing with invalid product")
+
+        try:
+            product = product_repo.get_by_id(invalid_test_product._id)
+        except Exception as e:
+            assert isinstance(e, ErrProductNotFound), (
+                f"Expected ErrProductNotFound, got {type(e)}"
+            )
+            return
+
+        assert False, "Expected ErrProductNotFound, but no exception was raised"
+
     def test_without_products(
         self,
         product_repo: ProductRepository,  # noqa F811

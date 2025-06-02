@@ -144,9 +144,7 @@ class TestGetConfigurationsForProduct:
         configuration_repo: ConfigurationRepository,  # noqa F811
         valid_test_product: ProductDbModel,  # noqa F811
     ):
-        product_id = (
-            int(str(valid_test_product._id)) if str(valid_test_product._id) else None
-        )
+        product_id = int(str(valid_test_product._id))
         orm_available_product_configurations = (
             valid_test_product.available_configurations
         )

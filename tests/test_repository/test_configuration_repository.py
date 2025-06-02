@@ -163,4 +163,4 @@ class TestGetConfigurationsForProduct:
                 orm_product_config.configuration_id == found_config.id
                 and orm_product_config.configuration.value == found_config.value
                 for orm_product_config in orm_available_product_configurations
-            )
+            ), f"Config {found_config.id} not found in available configurations"

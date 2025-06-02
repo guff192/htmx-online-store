@@ -334,7 +334,7 @@ class ProductRepository:
         try:
             return Product.model_validate(orm_product)
         except ValidationError:
-            raise ErrInvalidProduct(product_id)
+            raise ErrProductNotFound(product_id)
 
     def get_by_name(self, name: str) -> Product | None:
         orm_product = self.db.query(ProductDbModel).filter(ProductDbModel.name == name).first()

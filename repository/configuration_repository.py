@@ -37,7 +37,7 @@ class ConfigurationRepository:
         try:
             return ProductConfiguration.model_validate(orm_configuration_model)
         except ValidationError:
-            raise ErrInvalidProductConfiguration(config_id=id)
+            raise ErrProductConfigurationNotFound(config_id=id)
 
     def get_available_configurations(
         self,

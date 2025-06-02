@@ -313,10 +313,18 @@ class ProductRepository:
         if not orm_product_list:
             return []
 
-        return [
-            Product.model_validate(orm_product)
-            for orm_product in orm_product_list
-        ]
+        domain_model_newcomers: list[Product] = []
+        for orm_product in orm_product_list:
+            try:
+                newcomer = Product.model_validate(orm_product)
+                if newcomer.count <= 0:
+                    continue
+
+                domain_model_newcomers.append(newcomer)
+            except Exception:
+                continue
+
+        return domain_model_newcomers
 
     def get_by_id(self, product_id) -> Product:
         orm_product = self.db.query(ProductDbModel).get(product_id)

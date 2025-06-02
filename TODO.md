@@ -2,7 +2,7 @@
 
 ## Bigger plans
 - [ ] Remove dumb DTO layer and replace it with real domain model
-- [ ] Restructure product configurations db model
+- [X] Restructure product configurations db model
 - [ ] Move product specifications to MongoDB (for better customization)
 - [ ] Add caching for delivery data (Redis or Valkey)
 

@@ -150,9 +150,12 @@ class TestGetConfigurationsForProduct:
         orm_available_product_configurations = (
             valid_test_product.available_configurations
         )
-        assert orm_available_product_configurations is not None
-        assert len(orm_available_product_configurations) > 0
-        assert product_id is not None
+        assert orm_available_product_configurations is not None, (
+            f"Setup err: No available configurations for product {product_id}"
+        )
+        assert len(orm_available_product_configurations) > 0, (
+            f"Setup err: No available configurations for product {product_id}"
+        )
 
         found_configs = configuration_repo.get_configurations_for_product(product_id)
         assert len(found_configs) > 0

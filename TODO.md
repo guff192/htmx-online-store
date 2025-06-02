@@ -29,6 +29,7 @@
             - [ ] Rewrite order repository
             - [ ] Rewrite payment repository
     - [ ] Get rid of this dumb "dto" layer
+- [ ] Remove unused methods from Repositories, Services, ViewModels and Routes
 
 - [X] Restructure product configurations db model
     - [X] Write tests for product repository to get full coverage

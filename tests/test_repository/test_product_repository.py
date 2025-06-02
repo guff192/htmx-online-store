@@ -389,8 +389,15 @@ class TestGetByName:
     ):
         logger.info("Testing with invalid product")
 
-        found_product: Product | None = product_repo.get_by_name(
-            str(invalid_test_product.name)
-        )
+        try:
+            found_product: Product | None = product_repo.get_by_name(
+                str(invalid_test_product.name)
+            )
+            logger.debug(f"{found_product = }")
+        except Exception as e:
+            assert isinstance(e, ErrProductNotFound), (
+                f"Expected ErrProductNotFound, got {type(e)}"
+            )
+            return
 
-        assert found_product is None
+        assert False, "Expected ErrProductNotFound, but no exception was raised"

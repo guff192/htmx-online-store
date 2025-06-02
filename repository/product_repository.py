@@ -339,7 +339,7 @@ class ProductRepository:
     def get_by_name(self, name: str) -> Product | None:
         orm_product = self.db.query(ProductDbModel).filter(ProductDbModel.name == name).first()
         if orm_product is None or int(str(orm_product.count)) < 0:
-            return None
+            raise ErrProductNotFound
 
         return Product.model_validate(orm_product)
 

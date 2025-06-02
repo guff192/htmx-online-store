@@ -49,6 +49,21 @@ def valid_test_config(db: Session, valid_test_config_type: ConfigurationTypeDbMo
 
 
 @fixture(scope="function")
+def invalid_test_config(db: Session, valid_test_config_type: ConfigurationTypeDbModel):  # noqa
+    config = ProductConfigurationDbModel(
+        id=0,
+        additional_price=-1000,
+        short_name="test",
+        configuration_type_id=valid_test_config_type.id,
+        configuration_type=valid_test_config_type,
+        value="test value",
+    )
+    add_to_db(db, config)
+
+    return config
+
+
+@fixture(scope="function")
 def valid_test_configs(
     db: Session, valid_test_config_type: ConfigurationTypeDbModel
 ) -> list[ProductConfigurationDbModel]:  # noqa

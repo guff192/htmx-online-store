@@ -24,3 +24,19 @@ def valid_test_user(
     add_to_db(db, user)
 
     return user
+
+@fixture(scope="function", params=[x + 1 for x in range(3)])
+def invalid_test_user(
+    request,
+    db: Session  # noqa F811
+) -> UserDbModel:
+    user = UserDbModel(
+        id=uuid4(),
+        name="test",
+        email="test@test.com",
+        profile_img_url="not a url",
+        is_admin=True if request.param % 2 == 0 else False,
+    )
+    add_to_db(db, user)
+
+    return user

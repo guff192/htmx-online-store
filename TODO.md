@@ -16,6 +16,7 @@
         - [X] Rewrite configuration repository tests
         - [X] Rewrite product repository tests
         - [X] Write banner repository tests
+        - [ ] Write user repository tests
         - [ ] Write cart repository tests
         - [ ] Write manufacturer repository tests
         - [ ] Write order repository tests
@@ -25,6 +26,7 @@
             - [X] Rewrite product repository
             - [X] Rewrite configuration repository
             - [X] Rewrite banner repository
+            - [ ] Rewrite user repository
             - [ ] Rewrite cart repository
             - [ ] Rewrite manufacturer repository
             - [ ] Rewrite order repository

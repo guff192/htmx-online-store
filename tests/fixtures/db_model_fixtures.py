@@ -1,6 +1,7 @@
 from pytest import fixture
 from sqlalchemy.orm import Session
 
+from db_models.banner import BannerDbModel
 from db_models.manufacturer import ManufacturerDbModel
 from db_models.product import ProductDbModel
 from db_models.product_configuration import (
@@ -154,3 +155,45 @@ def invalid_test_product(
     create_available_configs_for_product(db, product, valid_test_configs)
 
     return product
+
+
+@fixture(scope="function")
+def valid_test_banner(db: Session):
+    banner = BannerDbModel(
+        _id=1,
+        name="test",
+        description="test banner",
+        img_url="http://example.com",
+    )
+    add_to_db(db, banner)
+
+    return banner
+
+
+@fixture(scope="function")
+def invalid_test_banner(db: Session):
+    banner = BannerDbModel(
+        _id=1,
+        name="test",
+        description="test banner",
+        img_url="not a url",
+    )
+    add_to_db(db, banner)
+
+    return banner
+
+
+@fixture(scope="function")
+def valid_test_banners(db: Session):
+    banners: list[BannerDbModel] = []
+    for i in range(1, 4):
+        banners.append(BannerDbModel(
+            _id=i,
+            name=f"test{i}",
+            description=f"test banner {i}",
+            img_url=f"http://example.com/{i}",
+        ))
+
+    add_all_to_db(db, banners)
+    
+    return banners

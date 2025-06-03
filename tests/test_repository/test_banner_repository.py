@@ -35,7 +35,7 @@ def log_info():
 
 
 class TestGetAll:
-    @fixture(scope="function")
+    @fixture(scope="class")
     def log_info(self):
         log_test_info("Testing BannerRepository.get_all() method")
         yield

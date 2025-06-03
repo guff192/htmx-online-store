@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from typing import TypeVar
 
 from fastapi import Depends
 from loguru import logger
@@ -17,6 +18,9 @@ from repository.user_repository import (
     UserRepository,
     user_repository_dependency
 )
+
+
+QUERY_TYPE = TypeVar("QUERY_TYPE", Select[tuple[CartProductDbModel]], Update)
 
 
 class CartRepository:

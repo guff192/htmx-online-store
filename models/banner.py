@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field
+from pydantic_core import Url
 
 
 class Banner(BaseModel):
@@ -6,5 +7,5 @@ class Banner(BaseModel):
 
     id: int = Field(validation_alias='_id')
     name: str
-    description: str
-    img_url: str
+    description: str | None = None
+    img_url: Url | None = None

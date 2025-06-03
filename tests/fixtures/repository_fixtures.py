@@ -2,10 +2,14 @@ from pytest import fixture
 from sqlalchemy.orm import Session
 
 from repository.banner_repository import get_banner_repository
-from repository.configuration_repository import ConfigurationRepository, get_configuration_repository
+from repository.configuration_repository import (
+    ConfigurationRepository,
+    get_configuration_repository,
+)
 from repository.product_repository import ProductRepository, get_product_repository
 
-from tests.fixtures.db_fixtures import db # noqa
+from repository.user_repository import UserRepository, get_user_repository
+from tests.fixtures.db_fixtures import db  # noqa
 
 
 @fixture(scope="function")
@@ -19,6 +23,12 @@ def configuration_repo(db: Session) -> ConfigurationRepository:  # noqa F811
 
 
 @fixture(scope="function")
-def product_repo(db: Session, configuration_repo: ConfigurationRepository) -> ProductRepository:  # noqa F811
+def product_repo(
+    db: Session, configuration_repo: ConfigurationRepository
+) -> ProductRepository:  # noqa F811
     return get_product_repository(db, configuration_repo)
 
+
+@fixture(scope="function")
+def user_repo(db: Session) -> UserRepository:  # noqa F811
+    return get_user_repository(db)

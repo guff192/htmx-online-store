@@ -108,6 +108,6 @@ def user_repository_dependency(db: Session = Depends(db_dependency)):
     yield repo
 
 
-def get_user_repository() -> UserRepository:
-    return UserRepository(get_db())
+def get_user_repository(db: Session = get_db()) -> UserRepository:
+    return UserRepository(db)
 

@@ -1,5 +1,5 @@
 from uuid import UUID
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from pydantic_core import Url
 
 
@@ -7,6 +7,8 @@ UserId = UUID
 
 
 class User(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UserId
     google_id: str | None
     yandex_id: int | None

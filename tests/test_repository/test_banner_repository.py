@@ -33,6 +33,7 @@ def test_cleanup(db: Session):  # noqa F811
 def log_info():
     log_test_info("Testing BannerRepository methods", level=2)
 
+
 class TestGetAll:
     @fixture(scope="function")
     def log_info(self):

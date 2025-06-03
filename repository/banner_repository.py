@@ -20,7 +20,5 @@ def banner_repository_dependency(
     yield repo
 
 
-def get_banner_repository(
-    db: Session = get_db()
-) -> BannerRepository:
+def get_banner_repository(db: Session = get_db()) -> BannerRepository:
     return BannerRepository(db)

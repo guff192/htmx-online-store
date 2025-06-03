@@ -7,6 +7,7 @@ from .product_configuration import (
 )
 from .banner import valid_test_banner, valid_test_banners, invalid_test_banner
 from .product import valid_test_product, invalid_test_product, valid_test_products
+from .user import valid_test_user
 
 __all__ = [
     "valid_test_banner",
@@ -20,4 +21,5 @@ __all__ = [
     "valid_test_product",
     "invalid_test_product",
     "valid_test_products",
+    "valid_test_user",
 ]

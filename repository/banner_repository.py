@@ -1,7 +1,7 @@
 from typing import Generator
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from db.session import db_dependency
+from db.session import db_dependency, get_db
 from db_models.banner import BannerDbModel
 
 
@@ -19,3 +19,8 @@ def banner_repository_dependency(
     repo = BannerRepository(db)
     yield repo
 
+
+def get_banner_repository(
+    db: Session = get_db()
+) -> BannerRepository:
+    return BannerRepository(db)

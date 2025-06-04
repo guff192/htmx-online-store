@@ -119,57 +119,23 @@ class UserRepository:
 
     def create(
         self,
-        name: str,
-        email: str,
-        profile_img_url: str = "",
-        google_id: str | None = None,
-        yandex_id: int | None = None,
-        phone: str | None = None,
-    ) -> UserDbModel:
+        user_create_model: User,
+    ) -> User:
         # Create user using given data
-        if google_id:
-            user = UserDbModel(
-                id=uuid4(),
-                email=email,
-                name=name,
-                profile_img_url=profile_img_url,
-                google_id=google_id,
-            )
-            self.db.add(user)
-            self.db.commit()
-            self.db.refresh(user)
-        elif yandex_id:
-            user = UserDbModel(
-                id=uuid4(),
-                email=email,
-                name=name,
-                profile_img_url=profile_img_url,
-                yandex_id=yandex_id
-            )
-            self.db.add(user)
-            self.db.commit()
-            self.db.refresh(user)
-        elif phone:
-            user = UserDbModel(
-                id=uuid4(),
-                email=email,
-                name=name,
-                phone=phone
-            )
-            self.db.add(user)
-            self.db.commit()
-            self.db.refresh(user)
-        else:
-            user = UserDbModel(
-                id=uuid4(),
-                email=email,
-                name=name
-            )
-            self.db.add(user)
-            self.db.commit()
-            self.db.refresh(user)
+        user_create_orm_model = UserDbModel(
+            id=user_create_model.id,
+            email=user_create_model.email,
+            name=user_create_model.name,
+            profile_img_url=user_create_model.profile_img_url,
+            google_id=user_create_model.google_id,
+            yandex_id=user_create_model.yandex_id,
+            phone=user_create_model.phone,
+        )
+        self.db.add(user_create_orm_model)
+        self.db.commit()
+        self.db.refresh(user_create_orm_model)
 
-        return user
+        return User.model_validate(user_create_orm_model)
 
     def update(self, user_uuid: UUID, name: str, email: str) -> UserDbModel:
         user_query = self.db.query(UserDbModel).filter(UserDbModel.id == user_uuid)

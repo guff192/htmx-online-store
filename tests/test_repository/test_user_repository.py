@@ -2,14 +2,22 @@ from uuid import uuid4
 
 from loguru import logger
 from pytest import fixture
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from db_models.user import UserDbModel
 from exceptions.auth_exceptions import ErrUserNotFound
+from models.user import User
 from repository.user_repository import UserRepository
 from tests.fixtures.db_fixtures import db  # noqa F401
 from tests.fixtures.db_model_fixtures import valid_test_user  # noqa F401
 from tests.fixtures.db_model_fixtures.user import invalid_test_user  # noqa F401
+from tests.fixtures.model_fixtures.user import (
+    test_user_model_with_basic_data,  # noqa F401
+    test_user_model_with_google_id,  # noqa F401
+    test_user_model_with_phone,  # noqa F401
+    test_user_model_with_yandex_id,  # noqa F401
+)
 from tests.fixtures.repository_fixtures import user_repo  # noqa F401
 from tests.helpers.logging_helpers import log_test_info
 
@@ -277,3 +285,108 @@ class TestGetByYandexId:
             return
 
         assert False, "Expected ErrUserNotFound, but no exception was raised"
+
+
+class TestCreate:
+    @fixture(scope="function")
+    def log_info(self):
+        log_test_info("Testing UserRepository.create() method")
+        yield
+
+    def test_create_with_google_id(
+        self,
+        db: Session,  # noqa F811
+        user_repo: UserRepository,  # noqa F811
+        test_user_model_with_google_id: User,  # noqa F811
+    ):
+        logger.info("Testing creating with google id")
+
+        created_user = user_repo.create(test_user_model_with_google_id)
+
+        query = select(UserDbModel).filter(
+            UserDbModel.id == test_user_model_with_google_id.id
+        )
+        found_user = db.execute(query).scalar_one()
+
+        assert str(found_user.id) == str(test_user_model_with_google_id.id)
+        assert str(found_user.google_id) == test_user_model_with_google_id.google_id
+        assert str(found_user.name) == test_user_model_with_google_id.name
+        assert str(found_user.email) == test_user_model_with_google_id.email
+
+        assert created_user.id == test_user_model_with_google_id.id
+        assert created_user.google_id == test_user_model_with_google_id.google_id
+        assert created_user.name == test_user_model_with_google_id.name
+        assert created_user.email == test_user_model_with_google_id.email
+
+    def test_create_with_yandex_id(
+        self,
+        db: Session,  # noqa F811
+        user_repo: UserRepository,  # noqa F811
+        test_user_model_with_yandex_id: User,  # noqa F811
+    ):
+        logger.info("Testing creating with yandex id")
+
+        created_user = user_repo.create(test_user_model_with_yandex_id)
+
+        query = select(UserDbModel).filter(
+            UserDbModel.id == test_user_model_with_yandex_id.id
+        )
+        found_user = db.execute(query).scalar_one()
+
+        assert str(found_user.id) == str(test_user_model_with_yandex_id.id)
+        assert str(found_user.phone) == test_user_model_with_yandex_id.phone
+        assert str(found_user.name) == test_user_model_with_yandex_id.name
+        assert str(found_user.email) == test_user_model_with_yandex_id.email
+
+        assert created_user.id == test_user_model_with_yandex_id.id
+        assert created_user.yandex_id == test_user_model_with_yandex_id.yandex_id
+        assert created_user.name == test_user_model_with_yandex_id.name
+        assert created_user.email == test_user_model_with_yandex_id.email
+
+    def test_create_with_phone(
+        self,
+        db: Session,  # noqa F811
+        user_repo: UserRepository,  # noqa F811
+        test_user_model_with_phone: User,  # noqa F811
+    ):
+        logger.info("Testing creating with phone")
+
+        created_user = user_repo.create(test_user_model_with_phone)
+
+        query = select(UserDbModel).filter(
+            UserDbModel.id == test_user_model_with_phone.id
+        )
+        found_user = db.execute(query).scalar_one()
+
+        assert str(found_user.id) == str(test_user_model_with_phone.id)
+        assert str(found_user.phone) == test_user_model_with_phone.phone
+        assert str(found_user.name) == test_user_model_with_phone.name
+        assert str(found_user.email) == test_user_model_with_phone.email
+
+        assert created_user.id == test_user_model_with_phone.id
+        assert created_user.phone == test_user_model_with_phone.phone
+        assert created_user.name == test_user_model_with_phone.name
+        assert created_user.email == test_user_model_with_phone.email
+
+    def test_create_with_basic_data(
+        self,
+        db: Session,  # noqa F811
+        user_repo: UserRepository,  # noqa F811
+        test_user_model_with_basic_data: User,  # noqa F811
+    ):
+        logger.info("Testing creating with basic data")
+
+        created_user = user_repo.create(test_user_model_with_basic_data)
+
+        query = select(UserDbModel).filter(
+            UserDbModel.id == test_user_model_with_basic_data.id
+        )
+        found_user = db.execute(query).scalar_one()
+
+        assert str(found_user.id) == str(test_user_model_with_basic_data.id)
+        assert str(found_user.name) == str(test_user_model_with_basic_data.name)
+        assert str(found_user.email) == str(test_user_model_with_basic_data.email)
+
+        assert created_user.id == test_user_model_with_basic_data.id
+        assert created_user.name == test_user_model_with_basic_data.name
+        assert created_user.email == test_user_model_with_basic_data.email

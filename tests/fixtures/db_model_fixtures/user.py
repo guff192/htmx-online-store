@@ -15,6 +15,7 @@ def valid_test_user(
     user = UserDbModel(
         id=uuid4(),
         google_id="test" * 5 + str(request.param),
+        yandex_id=124532151325,
         name="test",
         email="test@test.com",
         phone='79991234567',
@@ -32,8 +33,11 @@ def invalid_test_user(
 ) -> UserDbModel:
     user = UserDbModel(
         id=uuid4(),
+        google_id="test" * 5 + str(request.param),
+        yandex_id=124532151325,
         name="test",
         email="test@test.com",
+        phone='79991234567',
         profile_img_url="not a url",
         is_admin=True if request.param % 2 == 0 else False,
     )

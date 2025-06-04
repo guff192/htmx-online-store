@@ -1,8 +1,9 @@
+from typing import TypeVar
 from uuid import UUID, uuid4
 from fastapi import Depends
 from loguru import logger
 from pydantic import ValidationError
-from sqlalchemy import Select, select
+from sqlalchemy import Select, Update, select, update
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
@@ -12,6 +13,9 @@ from db_models.user import UserDbModel
 from models.user import User
 
 
+USER_QUERY_TYPE = TypeVar("USER_QUERY_TYPE", Select[tuple[UserDbModel]], Update)
+
+
 class UserRepository:
     def __init__(self, db: Session):
         self.db = db
@@ -19,30 +23,33 @@ class UserRepository:
     def _get_user_select_query(self) -> Select[tuple[UserDbModel]]:
         return select(UserDbModel)
 
+    def _get_user_update_query(self) -> Update:
+        return update(UserDbModel)
+
     def _add_email_to_query(
-        self, query: Select[tuple[UserDbModel]], email: str
-    ) -> Select[tuple[UserDbModel]]:
+        self, query: USER_QUERY_TYPE, email: str
+    ) -> USER_QUERY_TYPE:
         return query.filter(UserDbModel.email == email)
 
     def _add_user_id_to_query(
-        self, query: Select[tuple[UserDbModel]], user_id: str
-    ) -> Select[tuple[UserDbModel]]:
+        self, query: USER_QUERY_TYPE, user_id: str
+    ) -> USER_QUERY_TYPE:
         user_uuid = UUID(user_id)
         return query.filter(UserDbModel.id == user_uuid)
 
     def _add_phone_to_query(
-        self, query: Select[tuple[UserDbModel]], phone: str
-    ) -> Select[tuple[UserDbModel]]:
+        self, query: USER_QUERY_TYPE, phone: str
+    ) -> USER_QUERY_TYPE:
         return query.filter(UserDbModel.phone == phone)
 
     def _add_google_id_to_query(
-        self, query: Select[tuple[UserDbModel]], google_id: str
-    ) -> Select[tuple[UserDbModel]]:
+        self, query: USER_QUERY_TYPE, google_id: str
+    ) -> USER_QUERY_TYPE:
         return query.filter(UserDbModel.google_id == google_id)
 
     def _add_yandex_id_to_query(
-        self, query: Select[tuple[UserDbModel]], yandex_id: int
-    ) -> Select[tuple[UserDbModel]]:
+        self, query: USER_QUERY_TYPE, yandex_id: int
+    ) -> USER_QUERY_TYPE:
         return query.filter(UserDbModel.yandex_id == yandex_id)
 
     def get_by_id(self, user_id: str) -> User:

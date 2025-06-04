@@ -1,40 +1,124 @@
 from uuid import UUID, uuid4
 from fastapi import Depends
 from loguru import logger
+from pydantic import ValidationError
+from sqlalchemy import Select, select
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from db.session import db_dependency, get_db
 from exceptions.auth_exceptions import ErrUserNotFound
 from db_models.user import UserDbModel
+from models.user import User
 
 
 class UserRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_by_id(self, user_id: str) -> UserDbModel | None:
+    def _get_user_select_query(self) -> Select[tuple[UserDbModel]]:
+        return select(UserDbModel)
+
+    def _add_email_to_query(
+        self, query: Select[tuple[UserDbModel]], email: str
+    ) -> Select[tuple[UserDbModel]]:
+        return query.filter(UserDbModel.email == email)
+
+    def _add_user_id_to_query(
+        self, query: Select[tuple[UserDbModel]], user_id: str
+    ) -> Select[tuple[UserDbModel]]:
         user_uuid = UUID(user_id)
-        return self.db.query(UserDbModel).get(user_uuid)
+        return query.filter(UserDbModel.id == user_uuid)
 
-    def get_by_phone(self, phone: str) -> UserDbModel | None:
-        return self.db.query(UserDbModel).filter_by(phone=phone).first()
+    def _add_phone_to_query(
+        self, query: Select[tuple[UserDbModel]], phone: str
+    ) -> Select[tuple[UserDbModel]]:
+        return query.filter(UserDbModel.phone == phone)
 
-    def get_by_email(self, email: str) -> UserDbModel | None:
-        return self.db.query(UserDbModel).filter_by(email=email).first()
+    def _add_google_id_to_query(
+        self, query: Select[tuple[UserDbModel]], google_id: str
+    ) -> Select[tuple[UserDbModel]]:
+        return query.filter(UserDbModel.google_id == google_id)
 
-    def get_by_google_id(self, google_id: str) -> UserDbModel | None:
-        return self.db.query(UserDbModel).filter_by(google_id=google_id).first()
+    def _add_yandex_id_to_query(
+        self, query: Select[tuple[UserDbModel]], yandex_id: int
+    ) -> Select[tuple[UserDbModel]]:
+        return query.filter(UserDbModel.yandex_id == yandex_id)
 
-    def get_by_yandex_id(self, yandex_id: int) -> UserDbModel | None:
-        return self.db.query(UserDbModel).filter_by(yandex_id=yandex_id).first()
+    def get_by_id(self, user_id: str) -> User:
+        query = self._get_user_select_query()
+        query = self._add_user_id_to_query(query, user_id)
+        result = self.db.execute(query)
 
-    def create(self,
-               name: str,
-               email: str,
-               profile_img_url: str = '',
-               google_id: str | None = None,
-               yandex_id: int | None = None,
-               phone: str | None = None) -> UserDbModel:
+        try:
+            orm_user = result.scalar_one()
+            domain_model_user = User.model_validate(orm_user)
+        except (NoResultFound, ValidationError):
+            raise ErrUserNotFound
+
+        return domain_model_user
+
+    def get_by_phone(self, phone: str) -> User:
+        query = self._get_user_select_query()
+        query = self._add_phone_to_query(query, phone)
+        result = self.db.execute(query)
+
+        try:
+            orm_user = result.scalar_one()
+            domain_model_user = User.model_validate(orm_user)
+        except (NoResultFound, ValidationError):
+            raise ErrUserNotFound
+
+        return domain_model_user
+
+    def get_by_email(self, email: str) -> User:
+        query = self._get_user_select_query()
+        query = self._add_email_to_query(query, email)
+        result = self.db.execute(query)
+
+        try:
+            orm_user = result.scalar_one()
+            domain_model_user = User.model_validate(orm_user)
+        except (NoResultFound, ValidationError):
+            raise ErrUserNotFound
+
+        return domain_model_user
+
+    def get_by_google_id(self, google_id: str) -> User:
+        query = self._get_user_select_query()
+        query = self._add_google_id_to_query(query, google_id)
+        result = self.db.execute(query)
+
+        try:
+            orm_user = result.scalar_one()
+            domain_model_user = User.model_validate(orm_user)
+        except (NoResultFound, ValidationError):
+            raise ErrUserNotFound
+
+        return domain_model_user
+
+    def get_by_yandex_id(self, yandex_id: int) -> User:
+        query = self._get_user_select_query()
+        query = self._add_yandex_id_to_query(query, yandex_id)
+        result = self.db.execute(query)
+
+        try:
+            orm_user = result.scalar_one()
+            domain_model_user = User.model_validate(orm_user)
+        except (NoResultFound, ValidationError):
+            raise ErrUserNotFound
+
+        return domain_model_user
+
+    def create(
+        self,
+        name: str,
+        email: str,
+        profile_img_url: str = "",
+        google_id: str | None = None,
+        yandex_id: int | None = None,
+        phone: str | None = None,
+    ) -> UserDbModel:
         # Create user using given data
         if google_id:
             user = UserDbModel(

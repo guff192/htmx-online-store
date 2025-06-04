@@ -3,7 +3,7 @@ from pydantic import BaseModel, ConfigDict
 from pydantic_core import Url
 
 
-UserId = UUID
+UserId = UUID | str
 
 
 class User(BaseModel):

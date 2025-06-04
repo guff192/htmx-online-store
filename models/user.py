@@ -19,4 +19,4 @@ class User(BaseModel):
 
     profile_img_url: Url | None = None
 
-    is_admin: bool
+    is_admin: bool = False

@@ -15,7 +15,7 @@ def valid_test_user(
     user = UserDbModel(
         id=uuid4(),
         google_id="test" * 5 + str(request.param),
-        yandex_id=124532151325,
+        yandex_id=124532151,
         name="test",
         email="test@test.com",
         phone='79991234567',
@@ -34,7 +34,7 @@ def invalid_test_user(
     user = UserDbModel(
         id=uuid4(),
         google_id="test" * 5 + str(request.param),
-        yandex_id=124532151325,
+        yandex_id=124532151,
         name="test",
         email="test@test.com",
         phone='79991234567',

@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from db_models.user import UserDbModel
-from exceptions.auth_exceptions import ErrUserNotFound
+from exceptions.auth_exceptions import ErrUserInvalid, ErrUserNotFound
 from models.user import User
 from repository.user_repository import UserRepository, user_repository_dependency
 from tests.fixtures.db_fixtures import db_session, engine, tables  # noqa F401
@@ -348,3 +348,84 @@ class TestCreate:
         assert created_user.id == test_user_model_with_basic_data.id
         assert created_user.name == test_user_model_with_basic_data.name
         assert created_user.email == test_user_model_with_basic_data.email
+
+
+class TestUpdate:
+    @fixture(scope="class")
+    def log_info(self):
+        log_test_info("Testing UserRepository.update() method")
+        yield
+
+    def test_with_valid_user(
+        self,
+        user_repo: UserRepository,  # noqa F811
+        valid_test_user: UserDbModel,  # noqa F811
+    ):
+        logger.info("Testing with valid user")
+
+        new_name = "new test name"
+        new_email = "new_test_email@example.com"
+        update_model = User(
+            id=str(valid_test_user.id),
+            name=new_name,
+            email=new_email,
+        )
+
+        updated_user = user_repo.update(update_model)
+        assert str(updated_user.id) == str(valid_test_user.id)
+        assert updated_user.name == new_name
+        assert updated_user.email == new_email
+
+    def test_with_non_existent_user(
+        self,
+        user_repo: UserRepository,  # noqa F811
+        valid_test_user: UserDbModel,  # noqa F811
+    ):
+        logger.info("Testing with non-existent user")
+
+        new_name = "new test name"
+        new_email = "new_test_email@example.com"
+        update_model = User(
+            id=uuid4(),
+            name=new_name,
+            email=new_email,
+        )
+
+        with raises(HTTPException) as raises_context:
+            user_repo.update(update_model)
+
+        assert raises_context.type is ErrUserNotFound, (
+            f"Expected ErrUserNotFound, but got {raises_context.type}"
+        )
+
+    def test_with_invalid_user(
+        self,
+        user_repo: UserRepository,  # noqa F811
+        invalid_test_user: UserDbModel,  # noqa F811
+    ):
+        logger.info("Testing with invalid user")
+
+        update_model = User(
+            id=str(invalid_test_user.id),
+            name="new test name",
+            email="new_test_email@example.com",
+        )
+
+        with raises(HTTPException) as raises_context:
+            user_repo.update(update_model)
+
+        assert raises_context.type is ErrUserInvalid, (
+            f"Expected ErrUserInvalid, but got {raises_context.type}"
+        )
+
+
+class TestUserRepositoryDependency:
+    @fixture(scope="class")
+    def log_info(self):
+        log_test_info("Testing UserRepository dependency")
+        yield
+
+    def test_user_repository_dependency(self):
+        logger.info("Testing UserRepository dependency")
+        repo = next(user_repository_dependency())
+        assert isinstance(repo, UserRepository)

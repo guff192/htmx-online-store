@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict
+from pydantic_core import Url
 
 
 class Manufacturer(BaseModel):
@@ -6,5 +7,5 @@ class Manufacturer(BaseModel):
 
     id: int | None = None
     name: str = ''
-    logo_url: str | None = None
+    logo_url: Url | None = None
 

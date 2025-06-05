@@ -18,7 +18,7 @@
         - [X] Write banner repository tests
         - [X] Write user repository tests
         - [ ] Write cart repository tests
-        - [ ] Write manufacturer repository tests
+        - [X] Write manufacturer repository tests
         - [ ] Write order repository tests
         - [ ] Write payment repository tests
     - [ ] Rewrite Repositories, Services and ViewModels to use domain models
@@ -28,7 +28,7 @@
             - [X] Rewrite banner repository
             - [X] Rewrite user repository
             - [ ] Rewrite cart repository
-            - [ ] Rewrite manufacturer repository
+            - [X] Rewrite manufacturer repository
             - [ ] Rewrite order repository
             - [ ] Rewrite payment repository
     - [ ] Get rid of this dumb "dto" layer

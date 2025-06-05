@@ -2,57 +2,32 @@ from loguru import logger
 from pytest import fixture
 from sqlalchemy.orm import Session
 
+from db_models.manufacturer import ManufacturerDbModel
 from db_models.product import (
-    ProductDbModel,
     AvailableProductConfigurationDbModel,
+    ProductDbModel,
 )
 from db_models.product_configuration import (
-    ProductConfigurationDbModel,
     ConfigurationTypeDbModel,
+    ProductConfigurationDbModel,
 )
-from db_models.manufacturer import ManufacturerDbModel
 from exceptions.product_configurations_exceptions import ErrProductConfigurationNotFound
 from repository.configuration_repository import ConfigurationRepository
-
-from tests.test_repository import log_repository_test_info
-
-from tests.fixtures.db_fixtures import db
-from tests.fixtures.logging_fixtures import setup_logger
+from tests.fixtures.db_fixtures import db_session, engine, tables
 from tests.fixtures.db_model_fixtures import (
+    invalid_test_config,  # noqa F401
+    invalid_test_product,  # noqa F401
     valid_test_config,  # noqa F401
     valid_test_config_type,  # noqa F401
     valid_test_configs,  # noqa F401
-    valid_test_product,  # noqa F401
-    invalid_test_config,  # noqa F401
-    invalid_test_product,  # noqa F401
     valid_test_manufacturer,  # noqa F401
+    valid_test_product,  # noqa F401
 )
+from tests.fixtures.logging_fixtures import setup_logger
 from tests.fixtures.repository_fixtures import configuration_repo  # noqa F401
 from tests.helpers.db_helpers import add_all_to_db, add_to_db  # noqa F401
 from tests.helpers.logging_helpers import log_test_info
-
-
-# Fixtures
-@fixture(scope="function", autouse=True)
-def test_cleanup(db: Session):  # noqa F811
-    yield
-
-    try:
-        db.query(AvailableProductConfigurationDbModel).delete()
-        db.query(ProductDbModel).delete()
-        db.query(ProductConfigurationDbModel).delete()
-        db.query(ConfigurationTypeDbModel).delete()
-        db.query(ManufacturerDbModel).delete()
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        logger.error(f"Failed to cleanup test data: {str(e)}")
-        raise e
-
-
-# Tests
-def test_pre_cleanup():
-    log_test_info("Testing Configuration Repository", level=2)
+from tests.test_repository import log_repository_test_info
 
 
 class TestGetById:

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from db_models.manufacturer import ManufacturerDbModel
 from db_models.product import ProductDbModel
 from db_models.product_configuration import ProductConfigurationDbModel
-from tests.fixtures.db_fixtures import db  # noqa F401
+from tests.fixtures.db_fixtures import db_session, engine, tables  # noqa F401
 from tests.fixtures.db_model_fixtures.manufacturer import valid_test_manufacturer  # noqa F401
 from tests.fixtures.db_model_fixtures.product_configuration import valid_test_configs  # noqa F401
 from tests.helpers.configurations_helpers import create_available_configs_for_product
@@ -14,7 +14,7 @@ from tests.helpers.db_helpers import add_to_db
 @fixture(scope="function", params=[x + 1 for x in range(3)])
 def valid_test_product(
     request,
-    db: Session,  # noqa F811
+    db_session: Session,  # noqa F811
     valid_test_manufacturer: ManufacturerDbModel,  # noqa F811
     valid_test_configs: list[ProductConfigurationDbModel], # noqa F811
 ) -> ProductDbModel:
@@ -28,16 +28,16 @@ def valid_test_product(
         manufacturer=valid_test_manufacturer,
         manufacturer_id=valid_test_manufacturer.id,
     )
-    add_to_db(db, product)
+    add_to_db(db_session, product)
 
-    create_available_configs_for_product(db, product, valid_test_configs)
+    create_available_configs_for_product(db_session, product, valid_test_configs)
 
     return product
 
 
 @fixture(scope="function")
 def valid_test_products(
-    db: Session,  # noqa
+    db_session: Session,  # noqa
     valid_test_manufacturer: ManufacturerDbModel, # noqa F811
     valid_test_configs: list[ProductConfigurationDbModel], # noqa F811
 ) -> list[ProductDbModel]:
@@ -54,8 +54,8 @@ def valid_test_products(
             manufacturer_id=valid_test_manufacturer.id,
         )
         products.append(product)
-        add_to_db(db, product)
-        create_available_configs_for_product(db, products[0], valid_test_configs)
+        add_to_db(db_session, product)
+        create_available_configs_for_product(db_session, products[0], valid_test_configs)
 
     return products
 
@@ -63,7 +63,7 @@ def valid_test_products(
 @fixture(scope="function", params=[x + 1 for x in range(3)])
 def invalid_test_product(
     request,
-    db: Session, # noqa F811
+    db_session: Session, # noqa F811
     valid_test_manufacturer: ManufacturerDbModel, # noqa F811
     valid_test_configs: list[ProductConfigurationDbModel], # noqa F811
 ):  # noqa
@@ -77,9 +77,9 @@ def invalid_test_product(
         manufacturer_id=valid_test_manufacturer.id,
         newcomer=True,
     )
-    add_to_db(db, product)
+    add_to_db(db_session, product)
 
-    create_available_configs_for_product(db, product, valid_test_configs)
+    create_available_configs_for_product(db_session, product, valid_test_configs)
 
     return product
 

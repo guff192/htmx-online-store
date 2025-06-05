@@ -13,7 +13,7 @@ from db_models.product import ProductDbModel, AvailableProductConfigurationDbMod
 from db_models.manufacturer import ManufacturerDbModel
 from repository.product_repository import ProductRepository
 
-from tests.fixtures.db_fixtures import db  # noqa F411
+from tests.fixtures.db_fixtures import db_session, engine, tables  # noqa F411
 from tests.fixtures.logging_fixtures import setup_logger  # noqa F411
 from tests.fixtures.db_model_fixtures import (
     valid_test_config_type,  # noqa F411
@@ -25,25 +25,6 @@ from tests.fixtures.db_model_fixtures import (
 )
 from tests.fixtures.repository_fixtures import product_repo, configuration_repo  # noqa F411
 from tests.helpers.logging_helpers import log_product_short, log_test_info  # noqa F411
-
-
-# Fixtures
-@fixture(scope="function", autouse=True)
-def test_cleanup(db: Session):  # noqa F811
-    yield
-
-    try:
-        db.query(AvailableProductConfigurationDbModel).delete()
-        db.query(ProductDbModel).delete()
-        db.query(ProductConfigurationDbModel).delete()
-        db.query(ConfigurationTypeDbModel).delete()
-        db.query(ManufacturerDbModel).delete()
-        db.commit()
-    except Exception as e:
-        db.rollback()
-
-        logger.error(f"Failed to cleanup test data: {str(e)}")
-        raise e
 
 
 # Tests
@@ -59,7 +40,7 @@ class TestQueryFiltering:
 
     def test_query_with_valid_products(
         self,
-        db: Session,  # noqa F811
+        db_session: Session,  # noqa F811
         product_repo: ProductRepository,  # noqa F811
         valid_test_products: list[ProductDbModel],  # noqa F811
     ):
@@ -68,7 +49,7 @@ class TestQueryFiltering:
 
         query = str(valid_test_products[0].description)
         updated_stmt = product_repo._add_query_filter(stmt, query)
-        all_products = db.execute(updated_stmt).scalars().all()
+        all_products = db_session.execute(updated_stmt).scalars().all()
 
         assert len(all_products) == len(valid_test_products)
         assert all(p in all_products for p in valid_test_products)
@@ -83,7 +64,7 @@ class TestPriceFiltering:
 
     def test_price_filter_narrow(
         self,
-        db: Session,  # noqa F811
+        db_session: Session,  # noqa F811
         product_repo: ProductRepository,  # noqa F811
         valid_test_products: list[ProductDbModel],  # noqa F811
     ):
@@ -91,13 +72,13 @@ class TestPriceFiltering:
         stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_price_filter(stmt, 10_000, 15_000)
-        all_products = db.execute(updated_stmt).scalars().all()
+        all_products = db_session.execute(updated_stmt).scalars().all()
         assert len(all_products) == 1
         assert all_products[0] in valid_test_products
 
     def test_price_filter_wide(
         self,
-        db: Session,  # noqa F811
+        db_session: Session,  # noqa F811
         product_repo: ProductRepository,  # noqa F811
         valid_test_products: list[ProductDbModel],  # noqa F811
     ):
@@ -105,7 +86,7 @@ class TestPriceFiltering:
         stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_price_filter(stmt, 5_000, 150_000)
-        all_products = db.execute(updated_stmt).scalars().all()
+        all_products = db_session.execute(updated_stmt).scalars().all()
 
         assert len(all_products) == len(valid_test_products)
 
@@ -115,7 +96,7 @@ class TestPriceFiltering:
 
     def test_price_filter_invalid(
         self,
-        db: Session,  # noqa F811
+        db_session: Session,  # noqa F811
         product_repo: ProductRepository,  # noqa F811
         valid_test_products: list[ProductDbModel],  # noqa F811
     ):
@@ -123,7 +104,7 @@ class TestPriceFiltering:
         stmt = select(ProductDbModel)
 
         updated_stmt = product_repo._add_price_filter(stmt, 50_000, 5_000)
-        all_products = db.execute(updated_stmt).scalars().all()
+        all_products = db_session.execute(updated_stmt).scalars().all()
 
         assert len(all_products) == 0
 

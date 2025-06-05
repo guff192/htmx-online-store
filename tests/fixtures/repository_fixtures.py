@@ -6,8 +6,11 @@ from repository.configuration_repository import (
     ConfigurationRepository,
     get_configuration_repository,
 )
+from repository.manufacturer_repository import (
+    ManufacturerRepository,
+    get_manufacturer_repository,
+)
 from repository.product_repository import ProductRepository, get_product_repository
-
 from repository.user_repository import UserRepository, get_user_repository
 from tests.fixtures.db_fixtures import db_session, engine, tables  # noqa
 
@@ -20,6 +23,11 @@ def banner_repo(db_session: Session):  # noqa F811
 @fixture(scope="function")
 def configuration_repo(db_session: Session) -> ConfigurationRepository:  # noqa F811
     return get_configuration_repository(db_session)
+
+
+@fixture(scope="function")
+def manufacturer_repo(db_session: Session) -> ManufacturerRepository:  # noqa F811
+    return get_manufacturer_repository(db_session)
 
 
 @fixture(scope="function")

@@ -1,5 +1,6 @@
+from fastapi import HTTPException
 from loguru import logger
-from pytest import fixture
+from pytest import fixture, raises
 from sqlalchemy.orm import Session
 
 from db_models.manufacturer import ManufacturerDbModel
@@ -59,16 +60,11 @@ class TestGetById:
 
         id_to_search = int(str(invalid_test_config.id))
 
-        try:
+        with raises(HTTPException) as raises_context:
             found_config = configuration_repo.get_by_id(id_to_search)
-        except Exception as e:
-            assert isinstance(e, ErrProductConfigurationNotFound), (
-                f"Expected ErrProductConfigurationNotFound, got {type(e)}"
-            )
-            return
 
-        assert False, (
-            "Expected ErrProductConfigurationNotFound, but no exception was raised"
+        assert raises_context.type is ErrProductConfigurationNotFound, (
+            f"Expected ErrProductConfigurationNotFound, got {raises_context.type}"
         )
 
     def test_with_invalid_id(
@@ -80,16 +76,11 @@ class TestGetById:
 
         id_to_search = int(str(valid_test_config.id)) + 1
 
-        try:
+        with raises(HTTPException) as raises_context:
             found_config = configuration_repo.get_by_id(id_to_search)
-        except Exception as e:
-            assert isinstance(e, ErrProductConfigurationNotFound), (
-                f"Expected ErrProductConfigurationNotFound, got {type(e)}"
-            )
-            return
 
-        assert False, (
-            "Expected ErrProductConfigurationNotFound, but no exception was raised"
+        assert raises_context.type is ErrProductConfigurationNotFound, (
+            f"Expected ErrProductConfigurationNotFound, got {raises_context.type}"
         )
 
     def test_without_config(
@@ -100,16 +91,11 @@ class TestGetById:
 
         id_to_search = 1
 
-        try:
+        with raises(HTTPException) as raises_context:
             found_config = configuration_repo.get_by_id(id_to_search)
-        except Exception as e:
-            assert isinstance(e, ErrProductConfigurationNotFound), (
-                f"Expected ErrProductConfigurationNotFound, got {type(e)}"
-            )
-            return
 
-        assert False, (
-            "Expected ErrProductConfigurationNotFound, but no exception was raised"
+        assert raises_context.type is ErrProductConfigurationNotFound, (
+            f"Expected ErrProductConfigurationNotFound, got {raises_context.type}"
         )
 
 

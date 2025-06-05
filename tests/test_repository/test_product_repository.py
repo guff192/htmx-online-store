@@ -1,5 +1,6 @@
+from fastapi import HTTPException
 from loguru import logger
-from pytest import fixture
+from pytest import fixture, raises
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -233,15 +234,12 @@ class TestGetById:
     ):
         logger.info("Testing with invalid product")
 
-        try:
+        with raises(HTTPException) as raises_context:
             product = product_repo.get_by_id(invalid_test_product._id)
-        except Exception as e:
-            assert isinstance(e, ErrProductNotFound), (
-                f"Expected ErrProductNotFound, got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrProductNotFound, but no exception was raised"
+        assert raises_context.type is ErrProductNotFound, (
+            f"Expected ErrProductNotFound, got {raises_context.type}"
+        )
 
     def test_without_products(
         self,
@@ -249,15 +247,12 @@ class TestGetById:
     ):
         logger.info("Testing without products")
 
-        try:
+        with raises(HTTPException) as raises_context:
             product = product_repo.get_by_id(1)  # noqa F841
-        except Exception as e:
-            assert isinstance(e, ErrProductNotFound), (
-                f"Expected ErrProductNotFound, got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrProductNotFound, but no exception was raised"
+        assert raises_context.type is ErrProductNotFound, (
+            f"Expected ErrProductNotFound, got {raises_context.type}"
+        )
 
 
 class TestGetNewcomers:
@@ -353,15 +348,12 @@ class TestGetByName:
     ):
         logger.info("Testing with invalid name")
 
-        try:
+        with raises(HTTPException) as raises_context:
             found_product: Product | None = product_repo.get_by_name("invalid_name")
-        except Exception as e:
-            assert isinstance(e, ErrProductNotFound), (
-                f"Expected ErrProductNotFound, got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrProductNotFound, but no exception was raised"
+        assert raises_context.type is ErrProductNotFound, (
+            f"Expected ErrProductNotFound, got {raises_context.type}"
+        )
 
     def test_with_invalid_product(
         self,
@@ -370,15 +362,12 @@ class TestGetByName:
     ):
         logger.info("Testing with invalid product")
 
-        try:
+        with raises(HTTPException) as raises_context:
             found_product: Product | None = product_repo.get_by_name(
                 str(invalid_test_product.name)
             )
             logger.debug(f"{found_product = }")
-        except Exception as e:
-            assert isinstance(e, ErrProductNotFound), (
-                f"Expected ErrProductNotFound, got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrProductNotFound, but no exception was raised"
+        assert raises_context.type is ErrProductNotFound, (
+            f"Expected ErrProductNotFound, got {raises_context.type}"
+        )

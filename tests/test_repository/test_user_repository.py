@@ -1,17 +1,19 @@
 from uuid import uuid4
 
+from fastapi import HTTPException
 from loguru import logger
-from pytest import fixture
+from pytest import fixture, raises
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from db_models.user import UserDbModel
 from exceptions.auth_exceptions import ErrUserNotFound
 from models.user import User
-from repository.user_repository import UserRepository
-from tests.fixtures.db_fixtures import db  # noqa F401
+from repository.user_repository import UserRepository, user_repository_dependency
+from tests.fixtures.db_fixtures import db_session, engine, tables  # noqa F401
 from tests.fixtures.db_model_fixtures import valid_test_user  # noqa F401
 from tests.fixtures.db_model_fixtures.user import invalid_test_user  # noqa F401
+from tests.fixtures.logging_fixtures import setup_logger  # noqa F401
 from tests.fixtures.model_fixtures.user import (
     test_user_model_with_basic_data,  # noqa F401
     test_user_model_with_google_id,  # noqa F401
@@ -52,29 +54,23 @@ class TestGetById:
     ):
         logger.info("Testing with valid user")
 
-        try:
+        with raises(HTTPException) as raises_context:
             user_repo.get_by_id(str(invalid_test_user.id))
-        except Exception as e:
-            assert isinstance(e, ErrUserNotFound), (
-                f"Expected ErrUserNotFound, got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrUserNotFound, but no exception was raised"
+        assert raises_context.type is ErrUserNotFound, (
+            f"Expected ErrUserNotFound, got {raises_context.type}"
+        )
 
     def test_without_users(self, user_repo: UserRepository):  # noqa F811
         logger.info("Testing without users")
 
         id_to_search = str(uuid4())
-        try:
+        with raises(HTTPException) as raises_context:
             user_repo.get_by_id(id_to_search)
-        except Exception as e:
-            assert isinstance(e, ErrUserNotFound), (
-                f"Expected ErrUserNotFound, but got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrUserNotFound, but no exception was raised"
+        assert raises_context.type is ErrUserNotFound, (
+            f"Expected ErrUserNotFound, but got {raises_context.type}"
+        )
 
 
 class TestGetByPhone:
@@ -101,29 +97,23 @@ class TestGetByPhone:
     ):
         logger.info("Testing with invalid user")
 
-        try:
+        with raises(HTTPException) as raises_context:
             user_repo.get_by_phone(str(invalid_test_user.phone))
-        except Exception as e:
-            assert isinstance(e, ErrUserNotFound), (
-                f"Expected ErrUserNotFound, got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrUserNotFound, but no exception was raised"
+        assert raises_context.type is ErrUserNotFound, (
+            f"Expected ErrUserNotFound, got {raises_context.type}"
+        )
 
     def test_without_users(self, user_repo: UserRepository):  # noqa F811
         logger.info("Testing without users")
 
         phone_to_search = str(uuid4())
-        try:
+        with raises(HTTPException) as raises_context:
             user_repo.get_by_phone(phone_to_search)
-        except Exception as e:
-            assert isinstance(e, ErrUserNotFound), (
-                f"Expected ErrUserNotFound, but got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrUserNotFound, but no exception was raised"
+        assert raises_context.type is ErrUserNotFound, (
+            f"Expected ErrUserNotFound, but got {raises_context.type}"
+        )
 
 
 class TestGetByEmail:
@@ -150,29 +140,23 @@ class TestGetByEmail:
     ):
         logger.info("Testing with valid user")
 
-        try:
+        with raises(HTTPException) as raises_context:
             user_repo.get_by_email(str(invalid_test_user.email))
-        except Exception as e:
-            assert isinstance(e, ErrUserNotFound), (
-                f"Expected ErrUserNotFound, got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrUserNotFound, but no exception was raised"
+        assert raises_context.type is ErrUserNotFound, (
+            f"Expected ErrUserNotFound, got {raises_context.type}"
+        )
 
     def test_without_users(self, user_repo: UserRepository):  # noqa F811
         logger.info("Testing without users")
 
         email_to_search = "test_email@test.com"
-        try:
+        with raises(HTTPException) as raises_context:
             user_repo.get_by_email(email_to_search)
-        except Exception as e:
-            assert isinstance(e, ErrUserNotFound), (
-                f"Expected ErrUserNotFound, but got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrUserNotFound, but no exception was raised"
+        assert raises_context.type is ErrUserNotFound, (
+            f"Expected ErrUserNotFound, but got {raises_context.type}"
+        )
 
 
 class TestGetByGoogleId:
@@ -199,29 +183,23 @@ class TestGetByGoogleId:
     ):
         logger.info("Testing with valid user")
 
-        try:
+        with raises(HTTPException) as raises_context:
             user_repo.get_by_google_id(str(invalid_test_user.google_id))
-        except Exception as e:
-            assert isinstance(e, ErrUserNotFound), (
-                f"Expected ErrUserNotFound, got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrUserNotFound, but no exception was raised"
+        assert raises_context.type is ErrUserNotFound, (
+            f"Expected ErrUserNotFound, got {raises_context.type}"
+        )
 
     def test_without_users(self, user_repo: UserRepository):  # noqa F811
         logger.info("Testing without users")
 
         google_id_to_search = "test" * 5 + "1"
-        try:
+        with raises(HTTPException) as raises_context:
             user_repo.get_by_google_id(google_id_to_search)
-        except Exception as e:
-            assert isinstance(e, ErrUserNotFound), (
-                f"Expected ErrUserNotFound, but got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrUserNotFound, but no exception was raised"
+        assert raises_context.type is ErrUserNotFound, (
+            f"Expected ErrUserNotFound, but got {raises_context.type}"
+        )
 
 
 class TestGetByYandexId:
@@ -248,29 +226,23 @@ class TestGetByYandexId:
     ):
         logger.info("Testing with valid user")
 
-        try:
+        with raises(HTTPException) as raises_context:
             user_repo.get_by_yandex_id(int(str(invalid_test_user.yandex_id)))
-        except Exception as e:
-            assert isinstance(e, ErrUserNotFound), (
-                f"Expected ErrUserNotFound, got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrUserNotFound, but no exception was raised"
+        assert raises_context.type is ErrUserNotFound, (
+            f"Expected ErrUserNotFound, got {raises_context.type}"
+        )
 
     def test_without_users(self, user_repo: UserRepository):  # noqa F811
         logger.info("Testing without users")
 
         yandex_id_to_search = 124532151
-        try:
+        with raises(HTTPException) as raises_context:
             user_repo.get_by_yandex_id(yandex_id_to_search)
-        except Exception as e:
-            assert isinstance(e, ErrUserNotFound), (
-                f"Expected ErrUserNotFound, but got {type(e)}"
-            )
-            return
 
-        assert False, "Expected ErrUserNotFound, but no exception was raised"
+        assert raises_context.type is ErrUserNotFound, (
+            f"Expected ErrUserNotFound, but got {raises_context.type}"
+        )
 
 
 class TestCreate:
@@ -281,7 +253,7 @@ class TestCreate:
 
     def test_create_with_google_id(
         self,
-        db: Session,  # noqa F811
+        db_session: Session,  # noqa F811
         user_repo: UserRepository,  # noqa F811
         test_user_model_with_google_id: User,  # noqa F811
     ):
@@ -292,7 +264,7 @@ class TestCreate:
         query = select(UserDbModel).filter(
             UserDbModel.id == test_user_model_with_google_id.id
         )
-        found_user = db.execute(query).scalar_one()
+        found_user = db_session.execute(query).scalar_one()
 
         assert str(found_user.id) == str(test_user_model_with_google_id.id)
         assert str(found_user.google_id) == test_user_model_with_google_id.google_id
@@ -306,7 +278,7 @@ class TestCreate:
 
     def test_create_with_yandex_id(
         self,
-        db: Session,  # noqa F811
+        db_session: Session,  # noqa F811
         user_repo: UserRepository,  # noqa F811
         test_user_model_with_yandex_id: User,  # noqa F811
     ):
@@ -317,7 +289,7 @@ class TestCreate:
         query = select(UserDbModel).filter(
             UserDbModel.id == test_user_model_with_yandex_id.id
         )
-        found_user = db.execute(query).scalar_one()
+        found_user = db_session.execute(query).scalar_one()
 
         assert str(found_user.id) == str(test_user_model_with_yandex_id.id)
         assert str(found_user.phone) == test_user_model_with_yandex_id.phone
@@ -331,7 +303,7 @@ class TestCreate:
 
     def test_create_with_phone(
         self,
-        db: Session,  # noqa F811
+        db_session: Session,  # noqa F811
         user_repo: UserRepository,  # noqa F811
         test_user_model_with_phone: User,  # noqa F811
     ):
@@ -342,7 +314,7 @@ class TestCreate:
         query = select(UserDbModel).filter(
             UserDbModel.id == test_user_model_with_phone.id
         )
-        found_user = db.execute(query).scalar_one()
+        found_user = db_session.execute(query).scalar_one()
 
         assert str(found_user.id) == str(test_user_model_with_phone.id)
         assert str(found_user.phone) == test_user_model_with_phone.phone
@@ -356,7 +328,7 @@ class TestCreate:
 
     def test_create_with_basic_data(
         self,
-        db: Session,  # noqa F811
+        db_session: Session,  # noqa F811
         user_repo: UserRepository,  # noqa F811
         test_user_model_with_basic_data: User,  # noqa F811
     ):
@@ -367,7 +339,7 @@ class TestCreate:
         query = select(UserDbModel).filter(
             UserDbModel.id == test_user_model_with_basic_data.id
         )
-        found_user = db.execute(query).scalar_one()
+        found_user = db_session.execute(query).scalar_one()
 
         assert str(found_user.id) == str(test_user_model_with_basic_data.id)
         assert str(found_user.name) == str(test_user_model_with_basic_data.name)

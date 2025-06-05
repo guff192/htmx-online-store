@@ -8,7 +8,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from db.session import db_dependency, get_db
-from exceptions.auth_exceptions import ErrUserNotFound
+from exceptions.auth_exceptions import ErrUserInvalid, ErrUserNotFound
 from db_models.user import UserDbModel
 from models.user import User
 
@@ -34,8 +34,7 @@ class UserRepository:
     def _add_user_id_to_query(
         self, query: USER_QUERY_TYPE, user_id: str
     ) -> USER_QUERY_TYPE:
-        user_uuid = UUID(user_id)
-        return query.filter(UserDbModel.id == user_uuid)
+        return query.filter(UserDbModel.id == user_id)
 
     def _add_phone_to_query(
         self, query: USER_QUERY_TYPE, phone: str
@@ -137,27 +136,33 @@ class UserRepository:
 
         return User.model_validate(user_create_orm_model)
 
-    def update(self, user_uuid: UUID, name: str, email: str) -> UserDbModel:
-        user_query = self.db.query(UserDbModel).filter(UserDbModel.id == user_uuid)
-        found_user = user_query.first()
+    def update(self, user_update_model: User) -> User:
+        select_query = self._get_user_select_query()
+        update_query = self._get_user_update_query()
+        select_query = self._add_user_id_to_query(select_query, str(user_update_model.id))
+        update_query = self._add_user_id_to_query(update_query, str(user_update_model.id))
+
+        result = self.db.execute(select_query)
+        found_user = result.scalar_one_or_none()
         if not found_user:
             raise ErrUserNotFound()
-        logger.debug(f'{name = }\n{email = }\n')
-        logger.debug(found_user.__dict__)
 
         user_update_dict = {
-            UserDbModel.name: name,
-            UserDbModel.email: email,
+            k: v for k, v in user_update_model.model_dump(exclude_none=True).items()
+            if k not in ("id", "google_id", "yandex_id")  # ids are not updatable
         }
-        user_query.update(user_update_dict)
-
+        update_query = update_query.values(**user_update_dict)
+        self.db.execute(update_query)
         self.db.commit()
-        self.db.flush([found_user])
 
-        updated_user = self.get_by_id(str(user_uuid))
-        logger.debug(updated_user.__dict__)
+        updated_user_orm = self.db.execute(select_query).scalar_one_or_none()
+        try:
+            updated_user_model = User.model_validate(updated_user_orm)
+            logger.debug(updated_user_model)
+        except ValidationError:
+            raise ErrUserInvalid
 
-        return updated_user
+        return updated_user_model
 
 
 def user_repository_dependency(db: Session = Depends(db_dependency)):
@@ -167,4 +172,3 @@ def user_repository_dependency(db: Session = Depends(db_dependency)):
 
 def get_user_repository(db: Session = get_db()) -> UserRepository:
     return UserRepository(db)
-

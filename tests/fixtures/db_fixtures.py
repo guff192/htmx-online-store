@@ -5,7 +5,7 @@ from db.session import get_db
 
 @fixture(scope="function")
 def db():
-    db_session =  get_db()
+    db_session = get_db()
     try:
         yield db_session
     finally:

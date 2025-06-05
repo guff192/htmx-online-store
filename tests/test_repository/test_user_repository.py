@@ -22,20 +22,6 @@ from tests.fixtures.repository_fixtures import user_repo  # noqa F401
 from tests.helpers.logging_helpers import log_test_info
 
 
-@fixture(scope="function", autouse=True)
-def test_cleanup(db: Session):  # noqa F811
-    yield
-
-    try:
-        db.query(UserDbModel).delete()
-        db.commit()
-    except Exception as e:
-        db.rollback()
-
-        logger.error(f"Failed to cleanup test data: {str(e)}")
-        raise e
-
-
 # Tests
 def log_info():
     log_test_info("Testing BannerRepository methods", level=2)

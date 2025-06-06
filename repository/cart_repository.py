@@ -150,16 +150,3 @@ def cart_repository_dependency(
         db.close()
 
 
-def test_cart_repository():
-    USER_ID = '5a354f3f-6818-4695-a8e8-98a2a645cd27'
-    PRODUCT_ID = 13
-    CONFIGURATION_ID = 1
-    session = next(db_dependency())
-    repo = CartRepository(
-        session,
-        ProductRepository(session, ConfigurationRepository(session)),
-        UserRepository(session)
-    )
-    user_product = repo.remove_from_cart(USER_ID, PRODUCT_ID, CONFIGURATION_ID)
-    logger.debug(user_product)
-

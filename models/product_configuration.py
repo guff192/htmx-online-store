@@ -1,4 +1,11 @@
-from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
+from pydantic import (
+    AliasChoices,
+    AliasPath,
+    BaseModel,
+    ConfigDict,
+    Field,
+    NonNegativeInt,
+)
 from pydantic_core import Url
 
 
@@ -18,5 +25,11 @@ class ProductConfiguration(BaseModel):
     additional_price: NonNegativeInt | None = None
     short_name: str | None = None
 
-    type: ConfigurationType = Field(validation_alias='configuration_type')
-    value: int | float | str | bool
+    type: ConfigurationType = Field(
+        validation_alias=AliasChoices(
+            "configuration_type", AliasPath("configuration", "configuration_type")
+        )
+    )
+    value: int | float | str | bool = Field(
+        validation_alias=AliasChoices("value", AliasPath("configuration", "value"))
+    )
